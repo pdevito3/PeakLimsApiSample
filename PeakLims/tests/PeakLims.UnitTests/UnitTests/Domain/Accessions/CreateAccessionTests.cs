@@ -26,7 +26,6 @@ public class CreateAccessionTests
         var fakeAccession = FakeAccession.Generate(accessionToCreate);
 
         // Assert
-        fakeAccession.AccessionNumber.Should().Be(accessionToCreate.AccessionNumber);
         fakeAccession.Status.Should().Be(accessionToCreate.Status);
         fakeAccession.PatientId.Should().Be(accessionToCreate.PatientId);
         fakeAccession.HealthcareOrganizationId.Should().Be(accessionToCreate.HealthcareOrganizationId);

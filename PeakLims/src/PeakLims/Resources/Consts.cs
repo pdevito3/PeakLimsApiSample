@@ -11,5 +11,6 @@ public static class Consts
     public static class DatabaseSequences
     {
         public const string PatientInternalIdPrefix = "PAT";
+        public const string AccessionNumberPrefix = "ACC";
     }
 }

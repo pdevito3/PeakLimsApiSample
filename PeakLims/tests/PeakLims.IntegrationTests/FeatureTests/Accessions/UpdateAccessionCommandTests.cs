@@ -43,7 +43,6 @@ public class UpdateAccessionCommandTests : TestBase
         var updatedAccession = await ExecuteDbContextAsync(db => db.Accessions.FirstOrDefaultAsync(a => a.Id == id));
 
         // Assert
-        updatedAccession.AccessionNumber.Should().Be(updatedAccessionDto.AccessionNumber);
         updatedAccession.Status.Should().Be(updatedAccessionDto.Status);
         updatedAccession.PatientId.Should().Be(updatedAccessionDto.PatientId);
         updatedAccession.HealthcareOrganizationId.Should().Be(updatedAccessionDto.HealthcareOrganizationId);

@@ -29,7 +29,6 @@ public class UpdateAccessionTests
         fakeAccession.Update(updatedAccession);
 
         // Assert
-        fakeAccession.AccessionNumber.Should().Be(updatedAccession.AccessionNumber);
         fakeAccession.Status.Should().Be(updatedAccession.Status);
         fakeAccession.PatientId.Should().Be(updatedAccession.PatientId);
         fakeAccession.HealthcareOrganizationId.Should().Be(updatedAccession.HealthcareOrganizationId);

@@ -35,12 +35,10 @@ public class AddAccessionCommandTests : TestBase
             .FirstOrDefaultAsync(a => a.Id == accessionReturned.Id));
 
         // Assert
-        accessionReturned.AccessionNumber.Should().Be(fakeAccessionOne.AccessionNumber);
         accessionReturned.Status.Should().Be(fakeAccessionOne.Status);
         accessionReturned.PatientId.Should().Be(fakeAccessionOne.PatientId);
         accessionReturned.HealthcareOrganizationId.Should().Be(fakeAccessionOne.HealthcareOrganizationId);
 
-        accessionCreated.AccessionNumber.Should().Be(fakeAccessionOne.AccessionNumber);
         accessionCreated.Status.Should().Be(fakeAccessionOne.Status);
         accessionCreated.PatientId.Should().Be(fakeAccessionOne.PatientId);
         accessionCreated.HealthcareOrganizationId.Should().Be(fakeAccessionOne.HealthcareOrganizationId);

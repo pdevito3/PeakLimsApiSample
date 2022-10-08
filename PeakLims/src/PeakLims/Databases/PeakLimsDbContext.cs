@@ -73,6 +73,10 @@ public sealed class PeakLimsDbContext : DbContext
             .StartsAt(10145702) // people don't like a nice round starting number
             .IncrementsBy(1);
         
+        modelBuilder.HasSequence<long>(Consts.DatabaseSequences.AccessionNumberPrefix)
+            .StartsAt(10005702) // people don't like a nice round starting number
+            .IncrementsBy(1);
+        
         modelBuilder.FilterSoftDeletedRecords();
         /* any query filters added after this will override soft delete 
                 https://docs.microsoft.com/en-us/ef/core/querying/filters

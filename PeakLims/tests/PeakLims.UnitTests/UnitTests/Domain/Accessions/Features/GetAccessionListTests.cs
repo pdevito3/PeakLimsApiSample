@@ -62,38 +62,6 @@ public class GetAccessionListTests
     }
 
     [Test]
-    public async Task can_filter_accession_list_using_AccessionNumber()
-    {
-        //Arrange
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.AccessionNumber, _ => "alpha")
-            .Generate());
-        var fakeAccessionTwo = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.AccessionNumber, _ => "bravo")
-            .Generate());
-        var queryParameters = new AccessionParametersDto() { Filters = $"AccessionNumber == {fakeAccessionTwo.AccessionNumber}" };
-
-        var accessionList = new List<Accession>() { fakeAccessionOne, fakeAccessionTwo };
-        var mockDbData = accessionList.AsQueryable().BuildMock();
-
-        _accessionRepository
-            .Setup(x => x.Query())
-            .Returns(mockDbData);
-
-        //Act
-        var query = new GetAccessionList.Query(queryParameters);
-        var handler = new GetAccessionList.Handler(_accessionRepository.Object, _mapper, _sieveProcessor, _heimGuard.Object);
-        var response = await handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        response.Should().HaveCount(1);
-        response
-            .FirstOrDefault()
-            .Should().BeEquivalentTo(fakeAccessionTwo, options =>
-                options.ExcludingMissingMembers());
-    }
-
-    [Test]
     public async Task can_filter_accession_list_using_Status()
     {
         //Arrange
@@ -122,40 +90,6 @@ public class GetAccessionListTests
         response
             .FirstOrDefault()
             .Should().BeEquivalentTo(fakeAccessionTwo, options =>
-                options.ExcludingMissingMembers());
-    }
-
-    [Test]
-    public async Task can_get_sorted_list_of_accession_by_AccessionNumber()
-    {
-        //Arrange
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.AccessionNumber, _ => "alpha")
-            .Generate());
-        var fakeAccessionTwo = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.AccessionNumber, _ => "bravo")
-            .Generate());
-        var queryParameters = new AccessionParametersDto() { SortOrder = "-AccessionNumber" };
-
-        var AccessionList = new List<Accession>() { fakeAccessionOne, fakeAccessionTwo };
-        var mockDbData = AccessionList.AsQueryable().BuildMock();
-
-        _accessionRepository
-            .Setup(x => x.Query())
-            .Returns(mockDbData);
-
-        //Act
-        var query = new GetAccessionList.Query(queryParameters);
-        var handler = new GetAccessionList.Handler(_accessionRepository.Object, _mapper, _sieveProcessor, _heimGuard.Object);
-        var response = await handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        response.FirstOrDefault()
-            .Should().BeEquivalentTo(fakeAccessionTwo, options =>
-                options.ExcludingMissingMembers());
-        response.Skip(1)
-            .FirstOrDefault()
-            .Should().BeEquivalentTo(fakeAccessionOne, options =>
                 options.ExcludingMissingMembers());
     }
 

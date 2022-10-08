@@ -21,7 +21,7 @@ using PeakLims.Domain.AccessionComments;
 public class Accession : BaseEntity
 {
     [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string AccessionNumber { get; private set; }
+    public virtual string AccessionNumber { get; }
 
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string Status { get; private set; }
@@ -61,7 +61,6 @@ public class Accession : BaseEntity
 
         var newAccession = new Accession();
 
-        newAccession.AccessionNumber = accessionForCreationDto.AccessionNumber;
         newAccession.Status = accessionForCreationDto.Status;
         newAccession.PatientId = accessionForCreationDto.PatientId;
         newAccession.HealthcareOrganizationId = accessionForCreationDto.HealthcareOrganizationId;
@@ -75,7 +74,6 @@ public class Accession : BaseEntity
     {
         new AccessionForUpdateDtoValidator().ValidateAndThrow(accessionForUpdateDto);
 
-        AccessionNumber = accessionForUpdateDto.AccessionNumber;
         Status = accessionForUpdateDto.Status;
         PatientId = accessionForUpdateDto.PatientId;
         HealthcareOrganizationId = accessionForUpdateDto.HealthcareOrganizationId;
