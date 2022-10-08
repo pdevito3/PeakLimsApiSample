@@ -35,7 +35,7 @@ public class AccessionQueryTests : TestBase
 
         // Assert
         accession.AccessionNumber.Should().Be(fakeAccessionOne.AccessionNumber);
-        accession.State.Should().Be(fakeAccessionOne.State);
+        accession.Status.Should().Be(fakeAccessionOne.Status);
         accession.PatientId.Should().Be(fakeAccessionOne.PatientId);
         accession.HealthcareOrganizationId.Should().Be(fakeAccessionOne.HealthcareOrganizationId);
     }

@@ -24,7 +24,7 @@ public class Accession : BaseEntity
     public virtual string AccessionNumber { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string State { get; private set; }
+    public virtual string Status { get; private set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
@@ -62,7 +62,7 @@ public class Accession : BaseEntity
         var newAccession = new Accession();
 
         newAccession.AccessionNumber = accessionForCreationDto.AccessionNumber;
-        newAccession.State = accessionForCreationDto.State;
+        newAccession.Status = accessionForCreationDto.Status;
         newAccession.PatientId = accessionForCreationDto.PatientId;
         newAccession.HealthcareOrganizationId = accessionForCreationDto.HealthcareOrganizationId;
 
@@ -76,7 +76,7 @@ public class Accession : BaseEntity
         new AccessionForUpdateDtoValidator().ValidateAndThrow(accessionForUpdateDto);
 
         AccessionNumber = accessionForUpdateDto.AccessionNumber;
-        State = accessionForUpdateDto.State;
+        Status = accessionForUpdateDto.Status;
         PatientId = accessionForUpdateDto.PatientId;
         HealthcareOrganizationId = accessionForUpdateDto.HealthcareOrganizationId;
 

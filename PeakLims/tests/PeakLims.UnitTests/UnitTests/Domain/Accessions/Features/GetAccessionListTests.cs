@@ -94,16 +94,16 @@ public class GetAccessionListTests
     }
 
     [Test]
-    public async Task can_filter_accession_list_using_State()
+    public async Task can_filter_accession_list_using_Status()
     {
         //Arrange
         var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.State, _ => "alpha")
+            .RuleFor(a => a.Status, _ => "alpha")
             .Generate());
         var fakeAccessionTwo = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.State, _ => "bravo")
+            .RuleFor(a => a.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new AccessionParametersDto() { Filters = $"State == {fakeAccessionTwo.State}" };
+        var queryParameters = new AccessionParametersDto() { Filters = $"Status == {fakeAccessionTwo.Status}" };
 
         var accessionList = new List<Accession>() { fakeAccessionOne, fakeAccessionTwo };
         var mockDbData = accessionList.AsQueryable().BuildMock();
@@ -160,16 +160,16 @@ public class GetAccessionListTests
     }
 
     [Test]
-    public async Task can_get_sorted_list_of_accession_by_State()
+    public async Task can_get_sorted_list_of_accession_by_Status()
     {
         //Arrange
         var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.State, _ => "alpha")
+            .RuleFor(a => a.Status, _ => "alpha")
             .Generate());
         var fakeAccessionTwo = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.State, _ => "bravo")
+            .RuleFor(a => a.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new AccessionParametersDto() { SortOrder = "-State" };
+        var queryParameters = new AccessionParametersDto() { SortOrder = "-Status" };
 
         var AccessionList = new List<Accession>() { fakeAccessionOne, fakeAccessionTwo };
         var mockDbData = AccessionList.AsQueryable().BuildMock();

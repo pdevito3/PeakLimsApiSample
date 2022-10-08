@@ -29,7 +29,7 @@ public class UpdatePanelOrderTests
         fakePanelOrder.Update(updatedPanelOrder);
 
         // Assert
-        fakePanelOrder.State.Should().Be(updatedPanelOrder.State);
+        fakePanelOrder.Status.Should().Be(updatedPanelOrder.Status);
         fakePanelOrder.PanelId.Should().Be(updatedPanelOrder.PanelId);
     }
     

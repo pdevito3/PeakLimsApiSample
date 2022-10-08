@@ -25,7 +25,7 @@ public class ContainerQueryTests : TestBase
 
         // Assert
         container.ContainerNumber.Should().Be(fakeContainerOne.ContainerNumber);
-        container.State.Should().Be(fakeContainerOne.State);
+        container.Status.Should().Be(fakeContainerOne.Status);
         container.Type.Should().Be(fakeContainerOne.Type);
     }
 

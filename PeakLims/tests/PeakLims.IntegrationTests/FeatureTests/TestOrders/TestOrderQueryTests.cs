@@ -29,7 +29,7 @@ public class TestOrderQueryTests : TestBase
         var testOrder = await SendAsync(query);
 
         // Assert
-        testOrder.State.Should().Be(fakeTestOrderOne.State);
+        testOrder.Status.Should().Be(fakeTestOrderOne.Status);
         testOrder.TestId.Should().Be(fakeTestOrderOne.TestId);
     }
 

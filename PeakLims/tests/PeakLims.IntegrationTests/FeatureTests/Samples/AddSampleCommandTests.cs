@@ -41,7 +41,7 @@ public class AddSampleCommandTests : TestBase
 
         // Assert
         sampleReturned.SampleNumber.Should().Be(fakeSampleOne.SampleNumber);
-        sampleReturned.State.Should().Be(fakeSampleOne.State);
+        sampleReturned.Status.Should().Be(fakeSampleOne.Status);
         sampleReturned.Type.Should().Be(fakeSampleOne.Type);
         sampleReturned.Quantity.Should().Be(fakeSampleOne.Quantity);
         sampleReturned.CollectionDate.Should().Be(fakeSampleOne.CollectionDate);
@@ -52,7 +52,7 @@ public class AddSampleCommandTests : TestBase
         sampleReturned.ContainerId.Should().Be(fakeSampleOne.ContainerId);
 
         sampleCreated.SampleNumber.Should().Be(fakeSampleOne.SampleNumber);
-        sampleCreated.State.Should().Be(fakeSampleOne.State);
+        sampleCreated.Status.Should().Be(fakeSampleOne.Status);
         sampleCreated.Type.Should().Be(fakeSampleOne.Type);
         sampleCreated.Quantity.Should().Be(fakeSampleOne.Quantity);
         sampleCreated.CollectionDate.Should().Be(fakeSampleOne.CollectionDate);

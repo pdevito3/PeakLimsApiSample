@@ -37,7 +37,7 @@ public class UpdatePanelOrderCommandTests : TestBase
         var updatedPanelOrder = await ExecuteDbContextAsync(db => db.PanelOrders.FirstOrDefaultAsync(p => p.Id == id));
 
         // Assert
-        updatedPanelOrder.State.Should().Be(updatedPanelOrderDto.State);
+        updatedPanelOrder.Status.Should().Be(updatedPanelOrderDto.Status);
         updatedPanelOrder.PanelId.Should().Be(updatedPanelOrderDto.PanelId);
     }
 }

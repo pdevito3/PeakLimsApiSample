@@ -26,7 +26,7 @@ public class CreatePanelOrderTests
         var fakePanelOrder = FakePanelOrder.Generate(panelOrderToCreate);
 
         // Assert
-        fakePanelOrder.State.Should().Be(panelOrderToCreate.State);
+        fakePanelOrder.Status.Should().Be(panelOrderToCreate.Status);
         fakePanelOrder.PanelId.Should().Be(panelOrderToCreate.PanelId);
     }
 

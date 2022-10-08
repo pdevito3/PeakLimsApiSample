@@ -27,7 +27,7 @@ public class CreateContainerTests
 
         // Assert
         fakeContainer.ContainerNumber.Should().Be(containerToCreate.ContainerNumber);
-        fakeContainer.State.Should().Be(containerToCreate.State);
+        fakeContainer.Status.Should().Be(containerToCreate.Status);
         fakeContainer.Type.Should().Be(containerToCreate.Type);
     }
 

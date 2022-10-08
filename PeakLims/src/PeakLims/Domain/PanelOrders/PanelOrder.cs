@@ -16,7 +16,7 @@ using PeakLims.Domain.Panels;
 public class PanelOrder : BaseEntity
 {
     [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string State { get; private set; }
+    public virtual string Status { get; private set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
@@ -31,7 +31,7 @@ public class PanelOrder : BaseEntity
 
         var newPanelOrder = new PanelOrder();
 
-        newPanelOrder.State = panelOrderForCreationDto.State;
+        newPanelOrder.Status = panelOrderForCreationDto.Status;
         newPanelOrder.PanelId = panelOrderForCreationDto.PanelId;
 
         newPanelOrder.QueueDomainEvent(new PanelOrderCreated(){ PanelOrder = newPanelOrder });
@@ -43,7 +43,7 @@ public class PanelOrder : BaseEntity
     {
         new PanelOrderForUpdateDtoValidator().ValidateAndThrow(panelOrderForUpdateDto);
 
-        State = panelOrderForUpdateDto.State;
+        Status = panelOrderForUpdateDto.Status;
         PanelId = panelOrderForUpdateDto.PanelId;
 
         QueueDomainEvent(new PanelOrderUpdated(){ Id = Id });

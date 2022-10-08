@@ -29,7 +29,7 @@ public class UpdateTestOrderTests
         fakeTestOrder.Update(updatedTestOrder);
 
         // Assert
-        fakeTestOrder.State.Should().Be(updatedTestOrder.State);
+        fakeTestOrder.Status.Should().Be(updatedTestOrder.Status);
         fakeTestOrder.TestId.Should().Be(updatedTestOrder.TestId);
     }
     

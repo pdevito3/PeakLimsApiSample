@@ -44,7 +44,7 @@ public class UpdateAccessionCommandTests : TestBase
 
         // Assert
         updatedAccession.AccessionNumber.Should().Be(updatedAccessionDto.AccessionNumber);
-        updatedAccession.State.Should().Be(updatedAccessionDto.State);
+        updatedAccession.Status.Should().Be(updatedAccessionDto.Status);
         updatedAccession.PatientId.Should().Be(updatedAccessionDto.PatientId);
         updatedAccession.HealthcareOrganizationId.Should().Be(updatedAccessionDto.HealthcareOrganizationId);
     }

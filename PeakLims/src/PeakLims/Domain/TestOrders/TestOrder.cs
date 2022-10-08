@@ -16,7 +16,7 @@ using PeakLims.Domain.Tests;
 public class TestOrder : BaseEntity
 {
     [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string State { get; private set; }
+    public virtual string Status { get; private set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
@@ -31,7 +31,7 @@ public class TestOrder : BaseEntity
 
         var newTestOrder = new TestOrder();
 
-        newTestOrder.State = testOrderForCreationDto.State;
+        newTestOrder.Status = testOrderForCreationDto.Status;
         newTestOrder.TestId = testOrderForCreationDto.TestId;
 
         newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
@@ -43,7 +43,7 @@ public class TestOrder : BaseEntity
     {
         new TestOrderForUpdateDtoValidator().ValidateAndThrow(testOrderForUpdateDto);
 
-        State = testOrderForUpdateDto.State;
+        Status = testOrderForUpdateDto.Status;
         TestId = testOrderForUpdateDto.TestId;
 
         QueueDomainEvent(new TestOrderUpdated(){ Id = Id });

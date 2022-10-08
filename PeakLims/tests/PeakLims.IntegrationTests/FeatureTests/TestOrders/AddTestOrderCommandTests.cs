@@ -30,10 +30,10 @@ public class AddTestOrderCommandTests : TestBase
             .FirstOrDefaultAsync(t => t.Id == testOrderReturned.Id));
 
         // Assert
-        testOrderReturned.State.Should().Be(fakeTestOrderOne.State);
+        testOrderReturned.Status.Should().Be(fakeTestOrderOne.Status);
         testOrderReturned.TestId.Should().Be(fakeTestOrderOne.TestId);
 
-        testOrderCreated.State.Should().Be(fakeTestOrderOne.State);
+        testOrderCreated.Status.Should().Be(fakeTestOrderOne.Status);
         testOrderCreated.TestId.Should().Be(fakeTestOrderOne.TestId);
     }
 }

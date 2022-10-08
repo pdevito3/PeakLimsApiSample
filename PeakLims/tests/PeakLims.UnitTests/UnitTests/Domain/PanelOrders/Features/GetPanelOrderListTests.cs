@@ -62,16 +62,16 @@ public class GetPanelOrderListTests
     }
 
     [Test]
-    public async Task can_filter_panelorder_list_using_State()
+    public async Task can_filter_panelorder_list_using_Status()
     {
         //Arrange
         var fakePanelOrderOne = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()
-            .RuleFor(p => p.State, _ => "alpha")
+            .RuleFor(p => p.Status, _ => "alpha")
             .Generate());
         var fakePanelOrderTwo = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()
-            .RuleFor(p => p.State, _ => "bravo")
+            .RuleFor(p => p.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new PanelOrderParametersDto() { Filters = $"State == {fakePanelOrderTwo.State}" };
+        var queryParameters = new PanelOrderParametersDto() { Filters = $"Status == {fakePanelOrderTwo.Status}" };
 
         var panelOrderList = new List<PanelOrder>() { fakePanelOrderOne, fakePanelOrderTwo };
         var mockDbData = panelOrderList.AsQueryable().BuildMock();
@@ -94,16 +94,16 @@ public class GetPanelOrderListTests
     }
 
     [Test]
-    public async Task can_get_sorted_list_of_panelorder_by_State()
+    public async Task can_get_sorted_list_of_panelorder_by_Status()
     {
         //Arrange
         var fakePanelOrderOne = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()
-            .RuleFor(p => p.State, _ => "alpha")
+            .RuleFor(p => p.Status, _ => "alpha")
             .Generate());
         var fakePanelOrderTwo = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()
-            .RuleFor(p => p.State, _ => "bravo")
+            .RuleFor(p => p.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new PanelOrderParametersDto() { SortOrder = "-State" };
+        var queryParameters = new PanelOrderParametersDto() { SortOrder = "-Status" };
 
         var PanelOrderList = new List<PanelOrder>() { fakePanelOrderOne, fakePanelOrderTwo };
         var mockDbData = PanelOrderList.AsQueryable().BuildMock();

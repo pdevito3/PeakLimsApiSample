@@ -26,7 +26,7 @@ public class CreateTestOrderTests
         var fakeTestOrder = FakeTestOrder.Generate(testOrderToCreate);
 
         // Assert
-        fakeTestOrder.State.Should().Be(testOrderToCreate.State);
+        fakeTestOrder.Status.Should().Be(testOrderToCreate.Status);
         fakeTestOrder.TestId.Should().Be(testOrderToCreate.TestId);
     }
 

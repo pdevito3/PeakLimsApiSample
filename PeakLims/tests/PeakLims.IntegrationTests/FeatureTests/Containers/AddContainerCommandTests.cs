@@ -26,11 +26,11 @@ public class AddContainerCommandTests : TestBase
 
         // Assert
         containerReturned.ContainerNumber.Should().Be(fakeContainerOne.ContainerNumber);
-        containerReturned.State.Should().Be(fakeContainerOne.State);
+        containerReturned.Status.Should().Be(fakeContainerOne.Status);
         containerReturned.Type.Should().Be(fakeContainerOne.Type);
 
         containerCreated.ContainerNumber.Should().Be(fakeContainerOne.ContainerNumber);
-        containerCreated.State.Should().Be(fakeContainerOne.State);
+        containerCreated.Status.Should().Be(fakeContainerOne.Status);
         containerCreated.Type.Should().Be(fakeContainerOne.Type);
     }
 }

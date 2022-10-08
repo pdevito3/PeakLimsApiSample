@@ -32,7 +32,7 @@ public class UpdateContainerCommandTests : TestBase
 
         // Assert
         updatedContainer.ContainerNumber.Should().Be(updatedContainerDto.ContainerNumber);
-        updatedContainer.State.Should().Be(updatedContainerDto.State);
+        updatedContainer.Status.Should().Be(updatedContainerDto.Status);
         updatedContainer.Type.Should().Be(updatedContainerDto.Type);
     }
 }

@@ -30,10 +30,10 @@ public class AddPanelOrderCommandTests : TestBase
             .FirstOrDefaultAsync(p => p.Id == panelOrderReturned.Id));
 
         // Assert
-        panelOrderReturned.State.Should().Be(fakePanelOrderOne.State);
+        panelOrderReturned.Status.Should().Be(fakePanelOrderOne.Status);
         panelOrderReturned.PanelId.Should().Be(fakePanelOrderOne.PanelId);
 
-        panelOrderCreated.State.Should().Be(fakePanelOrderOne.State);
+        panelOrderCreated.Status.Should().Be(fakePanelOrderOne.Status);
         panelOrderCreated.PanelId.Should().Be(fakePanelOrderOne.PanelId);
     }
 }

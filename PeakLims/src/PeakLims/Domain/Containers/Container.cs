@@ -18,7 +18,7 @@ public class Container : BaseEntity
     public virtual string ContainerNumber { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string State { get; private set; }
+    public virtual string Status { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string Type { get; private set; }
@@ -31,7 +31,7 @@ public class Container : BaseEntity
         var newContainer = new Container();
 
         newContainer.ContainerNumber = containerForCreationDto.ContainerNumber;
-        newContainer.State = containerForCreationDto.State;
+        newContainer.Status = containerForCreationDto.Status;
         newContainer.Type = containerForCreationDto.Type;
 
         newContainer.QueueDomainEvent(new ContainerCreated(){ Container = newContainer });
@@ -44,7 +44,7 @@ public class Container : BaseEntity
         new ContainerForUpdateDtoValidator().ValidateAndThrow(containerForUpdateDto);
 
         ContainerNumber = containerForUpdateDto.ContainerNumber;
-        State = containerForUpdateDto.State;
+        Status = containerForUpdateDto.Status;
         Type = containerForUpdateDto.Type;
 
         QueueDomainEvent(new ContainerUpdated(){ Id = Id });

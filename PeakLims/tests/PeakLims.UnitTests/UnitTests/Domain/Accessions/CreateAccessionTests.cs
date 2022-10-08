@@ -27,7 +27,7 @@ public class CreateAccessionTests
 
         // Assert
         fakeAccession.AccessionNumber.Should().Be(accessionToCreate.AccessionNumber);
-        fakeAccession.State.Should().Be(accessionToCreate.State);
+        fakeAccession.Status.Should().Be(accessionToCreate.Status);
         fakeAccession.PatientId.Should().Be(accessionToCreate.PatientId);
         fakeAccession.HealthcareOrganizationId.Should().Be(accessionToCreate.HealthcareOrganizationId);
     }

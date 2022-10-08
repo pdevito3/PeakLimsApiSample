@@ -50,7 +50,7 @@ public class UpdateSampleCommandTests : TestBase
 
         // Assert
         updatedSample.SampleNumber.Should().Be(updatedSampleDto.SampleNumber);
-        updatedSample.State.Should().Be(updatedSampleDto.State);
+        updatedSample.Status.Should().Be(updatedSampleDto.Status);
         updatedSample.Type.Should().Be(updatedSampleDto.Type);
         updatedSample.Quantity.Should().Be(updatedSampleDto.Quantity);
         updatedSample.CollectionDate.Should().Be(updatedSampleDto.CollectionDate);

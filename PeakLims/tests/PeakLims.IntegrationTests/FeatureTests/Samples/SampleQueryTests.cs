@@ -40,7 +40,7 @@ public class SampleQueryTests : TestBase
 
         // Assert
         sample.SampleNumber.Should().Be(fakeSampleOne.SampleNumber);
-        sample.State.Should().Be(fakeSampleOne.State);
+        sample.Status.Should().Be(fakeSampleOne.Status);
         sample.Type.Should().Be(fakeSampleOne.Type);
         sample.Quantity.Should().Be(fakeSampleOne.Quantity);
         sample.CollectionDate.Should().Be(fakeSampleOne.CollectionDate);

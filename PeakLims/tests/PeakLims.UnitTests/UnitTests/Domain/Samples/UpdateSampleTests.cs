@@ -30,7 +30,7 @@ public class UpdateSampleTests
 
         // Assert
         fakeSample.SampleNumber.Should().Be(updatedSample.SampleNumber);
-        fakeSample.State.Should().Be(updatedSample.State);
+        fakeSample.Status.Should().Be(updatedSample.Status);
         fakeSample.Type.Should().Be(updatedSample.Type);
         fakeSample.Quantity.Should().Be(updatedSample.Quantity);
         fakeSample.CollectionDate.Should().Be(updatedSample.CollectionDate);

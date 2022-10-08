@@ -36,12 +36,12 @@ public class AddAccessionCommandTests : TestBase
 
         // Assert
         accessionReturned.AccessionNumber.Should().Be(fakeAccessionOne.AccessionNumber);
-        accessionReturned.State.Should().Be(fakeAccessionOne.State);
+        accessionReturned.Status.Should().Be(fakeAccessionOne.Status);
         accessionReturned.PatientId.Should().Be(fakeAccessionOne.PatientId);
         accessionReturned.HealthcareOrganizationId.Should().Be(fakeAccessionOne.HealthcareOrganizationId);
 
         accessionCreated.AccessionNumber.Should().Be(fakeAccessionOne.AccessionNumber);
-        accessionCreated.State.Should().Be(fakeAccessionOne.State);
+        accessionCreated.Status.Should().Be(fakeAccessionOne.Status);
         accessionCreated.PatientId.Should().Be(fakeAccessionOne.PatientId);
         accessionCreated.HealthcareOrganizationId.Should().Be(fakeAccessionOne.HealthcareOrganizationId);
     }

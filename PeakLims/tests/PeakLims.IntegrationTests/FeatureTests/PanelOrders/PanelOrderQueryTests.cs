@@ -29,7 +29,7 @@ public class PanelOrderQueryTests : TestBase
         var panelOrder = await SendAsync(query);
 
         // Assert
-        panelOrder.State.Should().Be(fakePanelOrderOne.State);
+        panelOrder.Status.Should().Be(fakePanelOrderOne.Status);
         panelOrder.PanelId.Should().Be(fakePanelOrderOne.PanelId);
     }
 

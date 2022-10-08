@@ -62,16 +62,16 @@ public class GetTestOrderListTests
     }
 
     [Test]
-    public async Task can_filter_testorder_list_using_State()
+    public async Task can_filter_testorder_list_using_Status()
     {
         //Arrange
         var fakeTestOrderOne = FakeTestOrder.Generate(new FakeTestOrderForCreationDto()
-            .RuleFor(t => t.State, _ => "alpha")
+            .RuleFor(t => t.Status, _ => "alpha")
             .Generate());
         var fakeTestOrderTwo = FakeTestOrder.Generate(new FakeTestOrderForCreationDto()
-            .RuleFor(t => t.State, _ => "bravo")
+            .RuleFor(t => t.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new TestOrderParametersDto() { Filters = $"State == {fakeTestOrderTwo.State}" };
+        var queryParameters = new TestOrderParametersDto() { Filters = $"Status == {fakeTestOrderTwo.Status}" };
 
         var testOrderList = new List<TestOrder>() { fakeTestOrderOne, fakeTestOrderTwo };
         var mockDbData = testOrderList.AsQueryable().BuildMock();
@@ -94,16 +94,16 @@ public class GetTestOrderListTests
     }
 
     [Test]
-    public async Task can_get_sorted_list_of_testorder_by_State()
+    public async Task can_get_sorted_list_of_testorder_by_Status()
     {
         //Arrange
         var fakeTestOrderOne = FakeTestOrder.Generate(new FakeTestOrderForCreationDto()
-            .RuleFor(t => t.State, _ => "alpha")
+            .RuleFor(t => t.Status, _ => "alpha")
             .Generate());
         var fakeTestOrderTwo = FakeTestOrder.Generate(new FakeTestOrderForCreationDto()
-            .RuleFor(t => t.State, _ => "bravo")
+            .RuleFor(t => t.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new TestOrderParametersDto() { SortOrder = "-State" };
+        var queryParameters = new TestOrderParametersDto() { SortOrder = "-Status" };
 
         var TestOrderList = new List<TestOrder>() { fakeTestOrderOne, fakeTestOrderTwo };
         var mockDbData = TestOrderList.AsQueryable().BuildMock();

@@ -94,16 +94,16 @@ public class GetSampleListTests
     }
 
     [Test]
-    public async Task can_filter_sample_list_using_State()
+    public async Task can_filter_sample_list_using_Status()
     {
         //Arrange
         var fakeSampleOne = FakeSample.Generate(new FakeSampleForCreationDto()
-            .RuleFor(s => s.State, _ => "alpha")
+            .RuleFor(s => s.Status, _ => "alpha")
             .Generate());
         var fakeSampleTwo = FakeSample.Generate(new FakeSampleForCreationDto()
-            .RuleFor(s => s.State, _ => "bravo")
+            .RuleFor(s => s.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new SampleParametersDto() { Filters = $"State == {fakeSampleTwo.State}" };
+        var queryParameters = new SampleParametersDto() { Filters = $"Status == {fakeSampleTwo.Status}" };
 
         var sampleList = new List<Sample>() { fakeSampleOne, fakeSampleTwo };
         var mockDbData = sampleList.AsQueryable().BuildMock();
@@ -230,16 +230,16 @@ public class GetSampleListTests
     }
 
     [Test]
-    public async Task can_get_sorted_list_of_sample_by_State()
+    public async Task can_get_sorted_list_of_sample_by_Status()
     {
         //Arrange
         var fakeSampleOne = FakeSample.Generate(new FakeSampleForCreationDto()
-            .RuleFor(s => s.State, _ => "alpha")
+            .RuleFor(s => s.Status, _ => "alpha")
             .Generate());
         var fakeSampleTwo = FakeSample.Generate(new FakeSampleForCreationDto()
-            .RuleFor(s => s.State, _ => "bravo")
+            .RuleFor(s => s.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new SampleParametersDto() { SortOrder = "-State" };
+        var queryParameters = new SampleParametersDto() { SortOrder = "-Status" };
 
         var SampleList = new List<Sample>() { fakeSampleOne, fakeSampleTwo };
         var mockDbData = SampleList.AsQueryable().BuildMock();

@@ -94,16 +94,16 @@ public class GetContainerListTests
     }
 
     [Test]
-    public async Task can_filter_container_list_using_State()
+    public async Task can_filter_container_list_using_Status()
     {
         //Arrange
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto()
-            .RuleFor(c => c.State, _ => "alpha")
+            .RuleFor(c => c.Status, _ => "alpha")
             .Generate());
         var fakeContainerTwo = FakeContainer.Generate(new FakeContainerForCreationDto()
-            .RuleFor(c => c.State, _ => "bravo")
+            .RuleFor(c => c.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new ContainerParametersDto() { Filters = $"State == {fakeContainerTwo.State}" };
+        var queryParameters = new ContainerParametersDto() { Filters = $"Status == {fakeContainerTwo.Status}" };
 
         var containerList = new List<Container>() { fakeContainerOne, fakeContainerTwo };
         var mockDbData = containerList.AsQueryable().BuildMock();
@@ -192,16 +192,16 @@ public class GetContainerListTests
     }
 
     [Test]
-    public async Task can_get_sorted_list_of_container_by_State()
+    public async Task can_get_sorted_list_of_container_by_Status()
     {
         //Arrange
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto()
-            .RuleFor(c => c.State, _ => "alpha")
+            .RuleFor(c => c.Status, _ => "alpha")
             .Generate());
         var fakeContainerTwo = FakeContainer.Generate(new FakeContainerForCreationDto()
-            .RuleFor(c => c.State, _ => "bravo")
+            .RuleFor(c => c.Status, _ => "bravo")
             .Generate());
-        var queryParameters = new ContainerParametersDto() { SortOrder = "-State" };
+        var queryParameters = new ContainerParametersDto() { SortOrder = "-Status" };
 
         var ContainerList = new List<Container>() { fakeContainerOne, fakeContainerTwo };
         var mockDbData = ContainerList.AsQueryable().BuildMock();

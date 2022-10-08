@@ -21,7 +21,7 @@ public class Sample : BaseEntity
     public virtual string SampleNumber { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string State { get; private set; }
+    public virtual string Status { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string Type { get; private set; }
@@ -64,7 +64,7 @@ public class Sample : BaseEntity
         var newSample = new Sample();
 
         newSample.SampleNumber = sampleForCreationDto.SampleNumber;
-        newSample.State = sampleForCreationDto.State;
+        newSample.Status = sampleForCreationDto.Status;
         newSample.Type = sampleForCreationDto.Type;
         newSample.Quantity = sampleForCreationDto.Quantity;
         newSample.CollectionDate = sampleForCreationDto.CollectionDate;
@@ -84,7 +84,7 @@ public class Sample : BaseEntity
         new SampleForUpdateDtoValidator().ValidateAndThrow(sampleForUpdateDto);
 
         SampleNumber = sampleForUpdateDto.SampleNumber;
-        State = sampleForUpdateDto.State;
+        Status = sampleForUpdateDto.Status;
         Type = sampleForUpdateDto.Type;
         Quantity = sampleForUpdateDto.Quantity;
         CollectionDate = sampleForUpdateDto.CollectionDate;
