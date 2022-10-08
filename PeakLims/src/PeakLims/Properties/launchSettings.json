@@ -1,0 +1,26 @@
+{
+  "profiles": {
+    "Development": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AUTH_AUDIENCE": "peak_lims",
+        "AUTH_AUTHORITY": "http://localhost:7821/auth/realms/DevRealm",
+        "AUTH_AUTHORIZATION_URL": "http://localhost:7821/auth/realms/DevRealm/protocol/openid-connect/auth",
+        "AUTH_TOKEN_URL": "http://localhost:7821/auth/realms/DevRealm/protocol/openid-connect/token",
+        "AUTH_CLIENT_ID": "peak_lims.swagger",
+        "AUTH_CLIENT_SECRET": "9bbea418-bed9-4f32-8e5f-12a11d389559",
+        "DB_CONNECTION_STRING": "Host=localhost;Port=52892;Database=dev_peaklims;Username=postgres;Password=postgres",
+        "RMQ_HOST": "localhost",
+        "RMQ_VIRTUAL_HOST": "/",
+        "RMQ_USERNAME": "guest",
+        "RMQ_PASSWORD": "guest",
+        "RMQ_PORT": "52893",
+        "JAEGER_HOST": "localhost"
+      },
+      "applicationUrl": "https://localhost:6247"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+config:
+  keycloak:url: http://localhost:7821
+  keycloak:clientId: admin-cli
+  keycloak:username: admin
+  keycloak:password: admin
