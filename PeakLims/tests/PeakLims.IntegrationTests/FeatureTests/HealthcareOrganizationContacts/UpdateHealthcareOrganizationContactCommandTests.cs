@@ -37,9 +37,9 @@ public class UpdateHealthcareOrganizationContactCommandTests : TestBase
         var updatedHealthcareOrganizationContact = await ExecuteDbContextAsync(db => db.HealthcareOrganizationContacts.FirstOrDefaultAsync(h => h.Id == id));
 
         // Assert
-        updatedHealthcareOrganizationContact.Name.Should().Be(updatedHealthcareOrganizationContactDto.Name);
-        updatedHealthcareOrganizationContact.Email.Should().Be(updatedHealthcareOrganizationContactDto.Email);
-        updatedHealthcareOrganizationContact.Npi.Should().Be(updatedHealthcareOrganizationContactDto.Npi);
-        updatedHealthcareOrganizationContact.HealthcareOrganizationId.Should().Be(updatedHealthcareOrganizationContactDto.HealthcareOrganizationId);
+        updatedHealthcareOrganizationContact?.Name.Should().Be(updatedHealthcareOrganizationContactDto.Name);
+        updatedHealthcareOrganizationContact?.Email.Value.Should().Be(updatedHealthcareOrganizationContactDto.Email);
+        updatedHealthcareOrganizationContact?.Npi.Should().Be(updatedHealthcareOrganizationContactDto.Npi);
+        updatedHealthcareOrganizationContact?.HealthcareOrganizationId.Should().Be(updatedHealthcareOrganizationContactDto.HealthcareOrganizationId);
     }
 }

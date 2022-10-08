@@ -1,9 +1,5 @@
-namespace PeakLims.UnitTests.Patients.Features;
+namespace PeakLims.UnitTests.UnitTests.Domain.Patients.Features;
 
-using Domain.Patients;
-using Domain.Patients.Dtos;
-using Domain.Patients.Features;
-using Domain.Patients.Services;
 using FluentAssertions;
 using HeimGuard;
 using MapsterMapper;
@@ -11,10 +7,14 @@ using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using Moq;
 using NUnit.Framework;
-using SharedTestHelpers.Fakes.Patient;
+using PeakLims.Domain.Patients;
+using PeakLims.Domain.Patients.Dtos;
+using PeakLims.Domain.Patients.Features;
+using PeakLims.Domain.Patients.Services;
+using PeakLims.SharedTestHelpers.Fakes.Patient;
+using PeakLims.UnitTests.UnitTests.TestHelpers;
 using Sieve.Models;
 using Sieve.Services;
-using UnitTests.TestHelpers;
 
 public class GetPatientListTests
 {

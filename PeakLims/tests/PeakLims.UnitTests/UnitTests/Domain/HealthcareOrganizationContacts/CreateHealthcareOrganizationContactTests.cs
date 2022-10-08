@@ -7,6 +7,7 @@ using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using NUnit.Framework;
+using PeakLims.Domain.Emails;
 
 [Parallelizable]
 public class CreateHealthcareOrganizationContactTests
@@ -27,7 +28,7 @@ public class CreateHealthcareOrganizationContactTests
 
         // Assert
         fakeHealthcareOrganizationContact.Name.Should().Be(healthcareOrganizationContactToCreate.Name);
-        fakeHealthcareOrganizationContact.Email.Should().Be(healthcareOrganizationContactToCreate.Email);
+        fakeHealthcareOrganizationContact.Email.Should().Be(new Email(healthcareOrganizationContactToCreate.Email));
         fakeHealthcareOrganizationContact.Npi.Should().Be(healthcareOrganizationContactToCreate.Npi);
         fakeHealthcareOrganizationContact.HealthcareOrganizationId.Should().Be(healthcareOrganizationContactToCreate.HealthcareOrganizationId);
     }

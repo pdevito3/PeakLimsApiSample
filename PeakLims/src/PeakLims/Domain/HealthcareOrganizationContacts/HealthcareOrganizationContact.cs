@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
+using Emails;
 using Sieve.Attributes;
 using PeakLims.Domain.HealthcareOrganizations;
 
@@ -18,8 +19,7 @@ public class HealthcareOrganizationContact : BaseEntity
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string Name { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string Email { get; private set; }
+    public virtual Email Email { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string Npi { get; private set; }
@@ -39,7 +39,7 @@ public class HealthcareOrganizationContact : BaseEntity
         var newHealthcareOrganizationContact = new HealthcareOrganizationContact();
 
         newHealthcareOrganizationContact.Name = healthcareOrganizationContactForCreationDto.Name;
-        newHealthcareOrganizationContact.Email = healthcareOrganizationContactForCreationDto.Email;
+        newHealthcareOrganizationContact.Email = new Email(healthcareOrganizationContactForCreationDto.Email);
         newHealthcareOrganizationContact.Npi = healthcareOrganizationContactForCreationDto.Npi;
         newHealthcareOrganizationContact.HealthcareOrganizationId = healthcareOrganizationContactForCreationDto.HealthcareOrganizationId;
 
@@ -53,7 +53,7 @@ public class HealthcareOrganizationContact : BaseEntity
         new HealthcareOrganizationContactForUpdateDtoValidator().ValidateAndThrow(healthcareOrganizationContactForUpdateDto);
 
         Name = healthcareOrganizationContactForUpdateDto.Name;
-        Email = healthcareOrganizationContactForUpdateDto.Email;
+        Email = new Email(healthcareOrganizationContactForUpdateDto.Email);
         Npi = healthcareOrganizationContactForUpdateDto.Npi;
         HealthcareOrganizationId = healthcareOrganizationContactForUpdateDto.HealthcareOrganizationId;
 

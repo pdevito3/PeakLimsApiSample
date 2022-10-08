@@ -1,10 +1,10 @@
-namespace PeakLims.UnitTests.Patients;
+namespace PeakLims.UnitTests.UnitTests.Domain.Patients;
 
 using Bogus;
-using Domain.Patients.DomainEvents;
 using FluentAssertions;
 using NUnit.Framework;
-using SharedTestHelpers.Fakes.Patient;
+using PeakLims.Domain.Patients.DomainEvents;
+using PeakLims.SharedTestHelpers.Fakes.Patient;
 
 [Parallelizable]
 public class CreatePatientTests

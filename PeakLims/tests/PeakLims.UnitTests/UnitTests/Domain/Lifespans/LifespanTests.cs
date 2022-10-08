@@ -1,9 +1,9 @@
-namespace PeakLims.UnitTests.Lifespans;
+namespace PeakLims.UnitTests.UnitTests.Domain.Lifespans;
 
 using Bogus;
-using Domain.Lifespans;
 using FluentAssertions;
 using NUnit.Framework;
+using PeakLims.Domain.Lifespans;
 
 [Parallelizable]
 public class LifespanTests
