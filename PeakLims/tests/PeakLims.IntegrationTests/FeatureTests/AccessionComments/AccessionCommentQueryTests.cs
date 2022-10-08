@@ -20,8 +20,10 @@ public class AccessionCommentQueryTests : TestBase
         // Arrange
         var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
         await InsertAsync(fakeAccessionOne);
-
-        var fakeAccessionCommentParentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto().Generate());
+        
+        var fakeAccessionCommentParentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()
+            .RuleFor(a => a.AccessionId, _ => fakeAccessionOne.Id)
+            .Generate());
         await InsertAsync(fakeAccessionCommentParentOne);
 
         var fakeAccessionCommentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()

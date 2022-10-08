@@ -30,7 +30,7 @@ public class AddSampleCommandTests : TestBase
 
         var fakeSampleOne = new FakeSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
+            // .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
             .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id).Generate();
 
         // Act

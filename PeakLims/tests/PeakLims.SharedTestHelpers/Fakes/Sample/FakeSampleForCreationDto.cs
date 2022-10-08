@@ -9,8 +9,8 @@ public class FakeSampleForCreationDto : AutoFaker<SampleForCreationDto>
 {
     public FakeSampleForCreationDto()
     {
-        // if you want default values on any of your properties (e.g. an int between a certain range or a date always in the past), you can add `RuleFor` lines describing those defaults
-        //RuleFor(s => s.ExampleIntProperty, s => s.Random.Number(50, 100000));
-        //RuleFor(s => s.ExampleDateProperty, s => s.Date.Past());
+        RuleFor(s => s.ParentSampleId, _ => null);
+        RuleFor(s => s.ContainerId, _ => null);
+        RuleFor(s => s.PatientId, _ => null);
     }
 }
