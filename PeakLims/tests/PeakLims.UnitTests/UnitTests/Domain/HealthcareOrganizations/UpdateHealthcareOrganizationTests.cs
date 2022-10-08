@@ -30,7 +30,13 @@ public class UpdateHealthcareOrganizationTests
 
         // Assert
         fakeHealthcareOrganization.Name.Should().Be(updatedHealthcareOrganization.Name);
-        fakeHealthcareOrganization.Email.Should().Be(updatedHealthcareOrganization.Email);
+        fakeHealthcareOrganization.Email.Value.Should().Be(updatedHealthcareOrganization.Email);
+        fakeHealthcareOrganization.PrimaryAddress.Line1.Should().Be(updatedHealthcareOrganization.PrimaryAddress.Line1);
+        fakeHealthcareOrganization.PrimaryAddress.Line2.Should().Be(updatedHealthcareOrganization.PrimaryAddress.Line2);
+        fakeHealthcareOrganization.PrimaryAddress.City.Should().Be(updatedHealthcareOrganization.PrimaryAddress.City);
+        fakeHealthcareOrganization.PrimaryAddress.State.Should().Be(updatedHealthcareOrganization.PrimaryAddress.State);
+        fakeHealthcareOrganization.PrimaryAddress.PostalCode.Value.Should().Be(updatedHealthcareOrganization.PrimaryAddress.PostalCode);
+        fakeHealthcareOrganization.PrimaryAddress.Country.Should().Be(updatedHealthcareOrganization.PrimaryAddress.Country);
     }
     
     [Test]

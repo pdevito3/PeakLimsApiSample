@@ -27,8 +27,20 @@ public class AddHealthcareOrganizationCommandTests : TestBase
         // Assert
         healthcareOrganizationReturned.Name.Should().Be(fakeHealthcareOrganizationOne.Name);
         healthcareOrganizationReturned.Email.Should().Be(fakeHealthcareOrganizationOne.Email);
+        healthcareOrganizationReturned.PrimaryAddress.Line1.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.Line1);
+        healthcareOrganizationReturned.PrimaryAddress.Line2.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.Line2);
+        healthcareOrganizationReturned.PrimaryAddress.City.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.City);
+        healthcareOrganizationReturned.PrimaryAddress.State.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.State);
+        healthcareOrganizationReturned.PrimaryAddress.PostalCode.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.PostalCode);
+        healthcareOrganizationReturned.PrimaryAddress.Country.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.Country);
 
-        healthcareOrganizationCreated.Name.Should().Be(fakeHealthcareOrganizationOne.Name);
-        healthcareOrganizationCreated.Email.Should().Be(fakeHealthcareOrganizationOne.Email);
+        healthcareOrganizationCreated?.Name.Should().Be(fakeHealthcareOrganizationOne.Name);
+        healthcareOrganizationCreated?.Email.Value.Should().Be(fakeHealthcareOrganizationOne.Email);
+        healthcareOrganizationCreated?.PrimaryAddress.Line1.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.Line1);
+        healthcareOrganizationCreated?.PrimaryAddress.Line2.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.Line2);
+        healthcareOrganizationCreated?.PrimaryAddress.City.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.City);
+        healthcareOrganizationCreated?.PrimaryAddress.State.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.State);
+        healthcareOrganizationCreated?.PrimaryAddress.PostalCode.Value.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.PostalCode);
+        healthcareOrganizationCreated?.PrimaryAddress.Country.Should().Be(fakeHealthcareOrganizationOne.PrimaryAddress.Country);
     }
 }
