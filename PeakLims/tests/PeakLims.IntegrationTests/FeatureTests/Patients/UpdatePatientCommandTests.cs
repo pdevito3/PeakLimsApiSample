@@ -9,6 +9,7 @@ using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Lifespans;
 using static TestFixture;
 
 public class UpdatePatientCommandTests : TestBase
@@ -33,11 +34,10 @@ public class UpdatePatientCommandTests : TestBase
         // Assert
         updatedPatient.FirstName.Should().Be(updatedPatientDto.FirstName);
         updatedPatient.LastName.Should().Be(updatedPatientDto.LastName);
-        updatedPatient.DateOfBirth.Should().Be(updatedPatientDto.DateOfBirth);
-        updatedPatient.Age.Should().Be(updatedPatientDto.Age);
-        updatedPatient.Sex.Should().Be(updatedPatientDto.Sex);
-        updatedPatient.Race.Should().Be(updatedPatientDto.Race);
-        updatedPatient.Ethnicity.Should().Be(updatedPatientDto.Ethnicity);
-        updatedPatient.InternalId.Should().Be(updatedPatientDto.InternalId);
+        updatedPatient.Lifespan.Should().Be(new Lifespan((DateOnly)updatedPatientDto.Lifespan.DateOfBirth));
+        updatedPatient.Race.Value.Should().Be(updatedPatientDto.Race);
+        updatedPatient.Ethnicity.Value.Should().Be(updatedPatientDto.Ethnicity);
+        updatedPatient.Sex.Value.Should().Be(updatedPatientDto.Sex);
+        updatedPatient.InternalId.Should().Be(fakePatientOne.InternalId);
     }
 }

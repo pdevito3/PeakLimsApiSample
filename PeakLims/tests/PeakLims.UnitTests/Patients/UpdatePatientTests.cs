@@ -1,12 +1,11 @@
-namespace PeakLims.UnitTests.UnitTests.Domain.Patients;
+namespace PeakLims.UnitTests.Patients;
 
-using PeakLims.SharedTestHelpers.Fakes.Patient;
-using PeakLims.Domain.Patients;
-using PeakLims.Domain.Patients.DomainEvents;
 using Bogus;
+using Domain.Lifespans;
+using Domain.Patients.DomainEvents;
 using FluentAssertions;
-using FluentAssertions.Extensions;
 using NUnit.Framework;
+using SharedTestHelpers.Fakes.Patient;
 
 [Parallelizable]
 public class UpdatePatientTests
@@ -31,12 +30,10 @@ public class UpdatePatientTests
         // Assert
         fakePatient.FirstName.Should().Be(updatedPatient.FirstName);
         fakePatient.LastName.Should().Be(updatedPatient.LastName);
-        fakePatient.DateOfBirth.Should().Be(updatedPatient.DateOfBirth);
-        fakePatient.Age.Should().Be(updatedPatient.Age);
-        fakePatient.Sex.Should().Be(updatedPatient.Sex);
-        fakePatient.Race.Should().Be(updatedPatient.Race);
-        fakePatient.Ethnicity.Should().Be(updatedPatient.Ethnicity);
-        fakePatient.InternalId.Should().Be(updatedPatient.InternalId);
+        fakePatient.Lifespan.Should().Be(new Lifespan((DateOnly)updatedPatient.Lifespan.DateOfBirth));
+        fakePatient.Race.Value.Should().Be(updatedPatient.Race);
+        fakePatient.Ethnicity.Value.Should().Be(updatedPatient.Ethnicity);
+        fakePatient.Sex.Value.Should().Be(updatedPatient.Sex);
     }
     
     [Test]

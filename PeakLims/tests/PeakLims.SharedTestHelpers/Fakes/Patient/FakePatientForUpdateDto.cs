@@ -1,6 +1,10 @@
 namespace PeakLims.SharedTestHelpers.Fakes.Patient;
 
 using AutoBogus;
+using Domain.Ethnicities;
+using Domain.Races;
+using Domain.Sexes;
+using Lifespan;
 using PeakLims.Domain.Patients;
 using PeakLims.Domain.Patients.Dtos;
 
@@ -9,8 +13,9 @@ public class FakePatientForUpdateDto : AutoFaker<PatientForUpdateDto>
 {
     public FakePatientForUpdateDto()
     {
-        // if you want default values on any of your properties (e.g. an int between a certain range or a date always in the past), you can add `RuleFor` lines describing those defaults
-        //RuleFor(p => p.ExampleIntProperty, p => p.Random.Number(50, 100000));
-        //RuleFor(p => p.ExampleDateProperty, p => p.Date.Past());
+        RuleFor(x => x.Lifespan, () => new FakeLifespanForUpdateDto().Generate());
+        RuleFor(x => x.Sex, f => f.PickRandom(Sex.ListNames()));
+        RuleFor(x => x.Race, f => f.PickRandom(Race.ListNames()));
+        RuleFor(x => x.Ethnicity, f => f.PickRandom(Ethnicity.ListNames()));
     }
 }

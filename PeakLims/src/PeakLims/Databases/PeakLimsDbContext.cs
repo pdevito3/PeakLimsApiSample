@@ -34,6 +34,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query;
+using Resources;
 
 public sealed class PeakLimsDbContext : DbContext
 {
@@ -67,6 +68,11 @@ public sealed class PeakLimsDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.HasSequence<long>(Consts.DatabaseSequences.PatientInternalIdPrefix)
+            .StartsAt(10145702) // people don't like a nice round starting number
+            .IncrementsBy(1);
+        
         modelBuilder.FilterSoftDeletedRecords();
         /* any query filters added after this will override soft delete 
                 https://docs.microsoft.com/en-us/ef/core/querying/filters
