@@ -33,7 +33,6 @@ using FluentAssertions.Extensions;
 public class TestFixture
 {
     private static IServiceScopeFactory _scopeFactory;
-    private static Checkpoint _checkpoint;
     private static ServiceProvider _provider;
     private readonly TestcontainerDatabase _dbContainer = dbSetup();
 
@@ -62,13 +61,6 @@ public class TestFixture
         _scopeFactory = _provider.GetService<IServiceScopeFactory>();
 
         // MassTransit Start Setup -- Do Not Delete Comment
-
-        _checkpoint = new Checkpoint
-        {
-            TablesToIgnore = new Table[] { "__EFMigrationsHistory" },
-            SchemasToExclude = new[] { "information_schema", "pg_subscription", "pg_catalog", "pg_toast" },
-            DbAdapter = DbAdapter.Postgres
-        };
 
         SetupDateAssertions();
         await EnsureDatabase();
@@ -177,11 +169,17 @@ public class TestFixture
 
     public static async Task ResetState()
     {
-        await using var conn = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"));
-        await conn.OpenAsync();
+        await using var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"));
+        await connection.OpenAsync();
         try
         {
-            await _checkpoint.Reset(conn);
+            var respawner = await Respawner.CreateAsync(connection, new RespawnerOptions
+            {
+                TablesToIgnore = new Table[] { "__EFMigrationsHistory" },
+                SchemasToExclude = new[] { "information_schema", "pg_subscription", "pg_catalog", "pg_toast" },
+                DbAdapter = DbAdapter.Postgres
+            });
+            await respawner.ResetAsync(connection);
         }
         catch (InvalidOperationException e)
         {
