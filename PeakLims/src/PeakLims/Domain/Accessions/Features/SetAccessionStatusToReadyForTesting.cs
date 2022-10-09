@@ -1,5 +1,6 @@
 namespace PeakLims.Domain.Accessions.Features;
 
+using HealthcareOrganizationContacts.Services;
 using PeakLims.Domain.Accessions.Dtos;
 using PeakLims.Domain.Accessions.Services;
 using PeakLims.Services;
@@ -8,18 +9,18 @@ using PeakLims.Domain;
 using HeimGuard;
 using MapsterMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using PanelOrders.Services;
 
-public static class UpdateAccession
+public static class SetAccessionStatusToReadyForTesting
 {
     public sealed class Command : IRequest<bool>
     {
         public readonly Guid Id;
-        public readonly AccessionForUpdateDto AccessionToUpdate;
 
-        public Command(Guid accession, AccessionForUpdateDto newAccessionData)
+        public Command(Guid accessionId)
         {
-            Id = accession;
-            AccessionToUpdate = newAccessionData;
+            Id = accessionId;
         }
     }
 
@@ -38,12 +39,10 @@ public static class UpdateAccession
 
         public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
         {
-            await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdateAccessions);
+            await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanSetAccessionStatusToReadyForTesting);
 
-            var accessionToUpdate = await _accessionRepository.GetById(request.Id, cancellationToken: cancellationToken);
-
-            accessionToUpdate.Update(request.AccessionToUpdate);
-            _accessionRepository.Update(accessionToUpdate);
+            var accessionToUpdate = await _accessionRepository.GetAccessionForStatusChange(request.Id, cancellationToken);
+            accessionToUpdate.SetStatusToReadyForTesting();
             return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
         }
     }

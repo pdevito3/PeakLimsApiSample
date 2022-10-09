@@ -148,6 +148,11 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the Accession.</response>
         </member>
+        <member name="M:PeakLims.Controllers.v1.AccessionsController.SetAccessionStatusToReadyForTesting(System.Guid)">
+            <summary>
+            Sets an accession status to `Ready for Testing`
+            </summary>
+        </member>
         <member name="M:PeakLims.Controllers.v1.ContainersController.GetContainers(PeakLims.Domain.Containers.Dtos.ContainerParametersDto)">
              <summary>
              Gets a list of all Containers.

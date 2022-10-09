@@ -7,6 +7,7 @@ using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using NUnit.Framework;
+using PeakLims.Domain.AccessionStatuses;
 
 [Parallelizable]
 public class CreateAccessionTests
@@ -26,7 +27,7 @@ public class CreateAccessionTests
         var fakeAccession = FakeAccession.Generate(accessionToCreate);
 
         // Assert
-        fakeAccession.Status.Should().Be(accessionToCreate.Status);
+        fakeAccession.Status.Should().Be(AccessionStatus.Draft());
         fakeAccession.PatientId.Should().Be(accessionToCreate.PatientId);
         fakeAccession.HealthcareOrganizationId.Should().Be(accessionToCreate.HealthcareOrganizationId);
     }

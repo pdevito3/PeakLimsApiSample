@@ -6,6 +6,7 @@ using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.AccessionStatuses;
 using PeakLims.Domain.Accessions.Features;
 using static TestFixture;
 using SharedKernel.Exceptions;
@@ -35,11 +36,11 @@ public class AddAccessionCommandTests : TestBase
             .FirstOrDefaultAsync(a => a.Id == accessionReturned.Id));
 
         // Assert
-        accessionReturned.Status.Should().Be(fakeAccessionOne.Status);
+        accessionReturned.Status.Should().Be(AccessionStatus.Draft().Value);
         accessionReturned.PatientId.Should().Be(fakeAccessionOne.PatientId);
         accessionReturned.HealthcareOrganizationId.Should().Be(fakeAccessionOne.HealthcareOrganizationId);
 
-        accessionCreated.Status.Should().Be(fakeAccessionOne.Status);
+        accessionCreated.Status.Should().Be(AccessionStatus.Draft());
         accessionCreated.PatientId.Should().Be(fakeAccessionOne.PatientId);
         accessionCreated.HealthcareOrganizationId.Should().Be(fakeAccessionOne.HealthcareOrganizationId);
     }

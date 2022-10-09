@@ -191,5 +191,25 @@ public sealed class AccessionsController: ControllerBase
         return NoContent();
     }
 
+
+    /// <summary>
+    /// Sets an accession status to `Ready for Testing`
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{id:guid}", Name = "SetAccessionStatusToReadyForTesting")]
+    public async Task<IActionResult> SetAccessionStatusToReadyForTesting(Guid id)
+    {
+        var command = new SetAccessionStatusToReadyForTesting.Command(id);
+        await _mediator.Send(command);
+
+        return NoContent();
+    }
+
     // endpoint marker - do not delete this comment
 }

@@ -1,36 +1,43 @@
 namespace PeakLims.IntegrationTests.FeatureTests.Accessions;
 
 using PeakLims.SharedTestHelpers.Fakes.Accession;
-using PeakLims.Domain.Accessions.Dtos;
-using SharedKernel.Exceptions;
 using PeakLims.Domain.Accessions.Features;
 using FluentAssertions;
-using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
-using static TestFixture;
+using Domain.AccessionStatuses;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using SharedTestHelpers.Fakes.HealthcareOrganizationContact;
+using SharedTestHelpers.Fakes.Panel;
+using SharedTestHelpers.Fakes.PanelOrder;
+using static TestFixture;
 
-public class UpdateAccessionCommandTests : TestBase
+public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
 {
     [Test]
-    public async Task can_update_existing_accession_in_db()
+    public async Task can_change_status_to_readyfortesting()
     {
         // Arrange
         var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
         await InsertAsync(fakePatientOne);
-
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
         await InsertAsync(fakeHealthcareOrganizationOne);
-
         var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
             .RuleFor(a => a.PatientId, _ => fakePatientOne.Id)
             .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
-        var updatedAccessionDto = new FakeAccessionForUpdateDto()
-            .RuleFor(a => a.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate();
+        var fakePanel = FakePanel.Generate();
+        await InsertAsync(fakePanel);
+        var fakePanelOrder = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()
+            .RuleFor(x => x.PanelId, fakePanel.Id)
+            .Generate());
+        fakeAccessionOne.AddPanel(fakePanelOrder);
+        var fakeContact = FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto()
+            .RuleFor(x => x.HealthcareOrganizationId, fakeHealthcareOrganizationOne.Id)
+            .Generate());
+        fakeAccessionOne.AddContact(fakeContact);
+        
         await InsertAsync(fakeAccessionOne);
 
         var accession = await ExecuteDbContextAsync(db => db.Accessions
@@ -38,13 +45,11 @@ public class UpdateAccessionCommandTests : TestBase
         var id = accession.Id;
 
         // Act
-        var command = new UpdateAccession.Command(id, updatedAccessionDto);
+        var command = new SetAccessionStatusToReadyForTesting.Command(id);
         await SendAsync(command);
         var updatedAccession = await ExecuteDbContextAsync(db => db.Accessions.FirstOrDefaultAsync(a => a.Id == id));
 
         // Assert
-        updatedAccession.Status.Should().Be(fakeAccessionOne.Status);
-        updatedAccession.PatientId.Should().Be(updatedAccessionDto.PatientId);
-        updatedAccession.HealthcareOrganizationId.Should().Be(updatedAccessionDto.HealthcareOrganizationId);
+        updatedAccession?.Status.Should().Be(AccessionStatus.ReadyForTesting());
     }
 }

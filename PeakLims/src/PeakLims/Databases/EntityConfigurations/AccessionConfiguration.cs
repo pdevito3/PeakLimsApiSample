@@ -1,5 +1,6 @@
 namespace PeakLims.Databases.EntityConfigurations;
 
+using Domain.AccessionStatuses;
 using PeakLims.Domain.Accessions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -15,5 +16,8 @@ public sealed class AccessionConfiguration : IEntityTypeConfiguration<Accession>
         builder.Property(o => o.AccessionNumber)
             .HasDefaultValueSql($"concat('{Consts.DatabaseSequences.AccessionNumberPrefix}', nextval('\"{Consts.DatabaseSequences.AccessionNumberPrefix}\"'))")
             .IsRequired();
+
+        builder.Property(x => x.Status)
+            .HasConversion(x => x.Value, x => new AccessionStatus(x));
     }
 }

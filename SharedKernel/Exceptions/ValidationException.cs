@@ -31,7 +31,7 @@ namespace SharedKernel.Exceptions
         }
 
         public ValidationException(string errorPropertyName, string errorMessage)
-            : this()
+            : base(errorMessage)
         {
             Errors = new Dictionary<string, string[]>
             {

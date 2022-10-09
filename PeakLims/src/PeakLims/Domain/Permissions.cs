@@ -45,6 +45,7 @@ public static class Permissions
     public const string CanUpdateAccessions = nameof(CanUpdateAccessions);
     public const string CanAddAccessions = nameof(CanAddAccessions);
     public const string CanReadAccessions = nameof(CanReadAccessions);
+    public const string CanSetAccessionStatusToReadyForTesting = nameof(CanSetAccessionStatusToReadyForTesting);
     public const string CanDeletePatients = nameof(CanDeletePatients);
     public const string CanUpdatePatients = nameof(CanUpdatePatients);
     public const string CanAddPatients = nameof(CanAddPatients);
@@ -61,7 +62,7 @@ public static class Permissions
     public const string CanAddUserRoles = nameof(CanAddUserRoles);
     public const string CanGetRoles = nameof(CanGetRoles);
     public const string CanGetPermissions = nameof(CanGetPermissions);
-    
+
     public static List<string> List()
     {
         return typeof(Permissions)
