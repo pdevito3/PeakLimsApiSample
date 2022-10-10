@@ -7,6 +7,7 @@ using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using NUnit.Framework;
+using PeakLims.Domain.TestStatuses;
 
 [Parallelizable]
 public class CreateTestTests
@@ -32,6 +33,7 @@ public class CreateTestTests
         fakeTest.Methodology.Should().Be(testToCreate.Methodology);
         fakeTest.Platform.Should().Be(testToCreate.Platform);
         fakeTest.Version.Should().Be(testToCreate.Version);
+        fakeTest.Status.Should().Be(TestStatus.Draft());
     }
 
     [Test]

@@ -884,15 +884,15 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the Test.</response>
         </member>
-        <member name="M:PeakLims.Controllers.v1.TestsController.DeleteTest(System.Guid)">
+        <member name="M:PeakLims.Controllers.v1.TestsController.SetTestStatusToActive(System.Guid)">
             <summary>
-            Deletes an existing Test record.
+            Sets test status to `Active`
             </summary>
-            <response code="204">Test deleted.</response>
-            <response code="400">Test has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Test.</response>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.TestsController.SetTestStatusToInactive(System.Guid)">
+            <summary>
+            Sets test status to `Inactive`
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.UsersController.AddRole(System.Guid,System.String)">
             <summary>

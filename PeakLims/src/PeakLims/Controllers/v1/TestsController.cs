@@ -168,13 +168,8 @@ public sealed class TestsController: ControllerBase
 
 
     /// <summary>
-    /// Deletes an existing Test record.
+    /// Sets test status to `Active`
     /// </summary>
-    /// <response code="204">Test deleted.</response>
-    /// <response code="400">Test has missing/invalid values.</response>
-    /// <response code="401">This request was not able to be authenticated.</response>
-    /// <response code="403">The required permissions to access this resource were not present in the given request.</response>
-    /// <response code="500">There was an error on the server while creating the Test.</response>
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
     [ProducesResponseType(401)]
@@ -182,10 +177,30 @@ public sealed class TestsController: ControllerBase
     [ProducesResponseType(500)]
     [Authorize]
     [Produces("application/json")]
-    [HttpDelete("{id:guid}", Name = "DeleteTest")]
-    public async Task<ActionResult> DeleteTest(Guid id)
+    [HttpPut("{id:guid}", Name = "SetTestStatusToActive")]
+    public async Task<IActionResult> SetTestStatusToActive(Guid id)
     {
-        var command = new DeleteTest.Command(id);
+        var command = new ActivateTest.Command(id);
+        await _mediator.Send(command);
+
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Sets test status to `Inactive`
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{id:guid}", Name = "SetTestStatusToInactive")]
+    public async Task<IActionResult> SetTestStatusToInactive(Guid id)
+    {
+        var command = new DeactivateTest.Command(id);
         await _mediator.Send(command);
 
         return NoContent();

@@ -1,21 +1,22 @@
 namespace PeakLims.Domain.Tests.Features;
 
-using PeakLims.Domain.Tests.Services;
-using PeakLims.Services;
-using SharedKernel.Exceptions;
-using PeakLims.Domain;
 using HeimGuard;
 using MediatR;
+using PeakLims.Domain;
+using PeakLims.Domain.Accessions.Services;
+using PeakLims.Services;
+using Services;
+using SharedKernel.Exceptions;
 
-public static class DeleteTest
+public static class ActivateTest
 {
     public sealed class Command : IRequest<bool>
     {
         public readonly Guid Id;
 
-        public Command(Guid test)
+        public Command(Guid accessionId)
         {
-            Id = test;
+            Id = accessionId;
         }
     }
 
@@ -34,11 +35,10 @@ public static class DeleteTest
 
         public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
         {
-            await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanDeleteTests);
+            await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanActivateTests);
 
-            var recordToDelete = await _testRepository.GetById(request.Id, cancellationToken: cancellationToken);
-
-            _testRepository.Remove(recordToDelete);
+            var testToUpdate = await _testRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            testToUpdate.Activate();
             return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
         }
     }

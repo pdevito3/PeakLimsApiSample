@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using Sieve.Attributes;
 using PeakLims.Domain.Panels;
-
+using TestStatuses;
 
 public class Test : BaseEntity
 {
@@ -33,6 +33,9 @@ public class Test : BaseEntity
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual int Version { get; private set; }
 
+    [Sieve(CanFilter = true, CanSort = true)]
+    public virtual TestStatus Status { get; private set; }
+
     [JsonIgnore]
     [IgnoreDataMember]
     public virtual ICollection<Panel> Panels { get; private set; }
@@ -50,6 +53,7 @@ public class Test : BaseEntity
         newTest.Methodology = testForCreationDto.Methodology;
         newTest.Platform = testForCreationDto.Platform;
         newTest.Version = testForCreationDto.Version;
+        newTest.Status = TestStatus.Draft();
 
         newTest.QueueDomainEvent(new TestCreated(){ Test = newTest });
         
@@ -67,6 +71,18 @@ public class Test : BaseEntity
         Platform = testForUpdateDto.Platform;
         Version = testForUpdateDto.Version;
 
+        QueueDomainEvent(new TestUpdated(){ Id = Id });
+    }
+
+    public void Activate()
+    {
+        Status = TestStatus.Active();
+        QueueDomainEvent(new TestUpdated(){ Id = Id });
+    }
+
+    public void Deactivate()
+    {
+        Status = TestStatus.Inactive();
         QueueDomainEvent(new TestUpdated(){ Id = Id });
     }
     

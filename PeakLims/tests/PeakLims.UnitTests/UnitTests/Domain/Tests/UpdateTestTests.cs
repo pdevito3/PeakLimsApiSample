@@ -35,6 +35,7 @@ public class UpdateTestTests
         fakeTest.Methodology.Should().Be(updatedTest.Methodology);
         fakeTest.Platform.Should().Be(updatedTest.Platform);
         fakeTest.Version.Should().Be(updatedTest.Version);
+        fakeTest.Status.Should().Be(fakeTest.Status);
     }
     
     [Test]
