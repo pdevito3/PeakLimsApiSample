@@ -11,13 +11,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using Sieve.Attributes;
 using PeakLims.Domain.Panels;
+using Services;
 using TestStatuses;
 
 public class Test : BaseEntity
 {
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string TestNumber { get; private set; }
-
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string TestCode { get; private set; }
 
@@ -46,8 +44,7 @@ public class Test : BaseEntity
         new TestForCreationDtoValidator().ValidateAndThrow(testForCreationDto);
 
         var newTest = new Test();
-
-        newTest.TestNumber = testForCreationDto.TestNumber;
+        
         newTest.TestCode = testForCreationDto.TestCode;
         newTest.TestName = testForCreationDto.TestName;
         newTest.Methodology = testForCreationDto.Methodology;
@@ -63,8 +60,7 @@ public class Test : BaseEntity
     public void Update(TestForUpdateDto testForUpdateDto)
     {
         new TestForUpdateDtoValidator().ValidateAndThrow(testForUpdateDto);
-
-        TestNumber = testForUpdateDto.TestNumber;
+        
         TestCode = testForUpdateDto.TestCode;
         TestName = testForUpdateDto.TestName;
         Methodology = testForUpdateDto.Methodology;

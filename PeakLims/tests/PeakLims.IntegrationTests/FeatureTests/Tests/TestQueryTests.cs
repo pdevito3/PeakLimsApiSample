@@ -24,7 +24,6 @@ public class TestQueryTests : TestBase
         var test = await SendAsync(query);
 
         // Assert
-        test.TestNumber.Should().Be(fakeTestOne.TestNumber);
         test.TestCode.Should().Be(fakeTestOne.TestCode);
         test.TestName.Should().Be(fakeTestOne.TestName);
         test.Methodology.Should().Be(fakeTestOne.Methodology);

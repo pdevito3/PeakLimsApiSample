@@ -31,7 +31,6 @@ public class UpdateTestCommandTests : TestBase
         var updatedTest = await ExecuteDbContextAsync(db => db.Tests.FirstOrDefaultAsync(t => t.Id == id));
 
         // Assert
-        updatedTest.TestNumber.Should().Be(updatedTestDto.TestNumber);
         updatedTest.TestCode.Should().Be(updatedTestDto.TestCode);
         updatedTest.TestName.Should().Be(updatedTestDto.TestName);
         updatedTest.Methodology.Should().Be(updatedTestDto.Methodology);

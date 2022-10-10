@@ -25,14 +25,12 @@ public class AddTestCommandTests : TestBase
             .FirstOrDefaultAsync(t => t.Id == testReturned.Id));
 
         // Assert
-        testReturned.TestNumber.Should().Be(fakeTestOne.TestNumber);
         testReturned.TestCode.Should().Be(fakeTestOne.TestCode);
         testReturned.TestName.Should().Be(fakeTestOne.TestName);
         testReturned.Methodology.Should().Be(fakeTestOne.Methodology);
         testReturned.Platform.Should().Be(fakeTestOne.Platform);
         testReturned.Version.Should().Be(fakeTestOne.Version);
-
-        testCreated.TestNumber.Should().Be(fakeTestOne.TestNumber);
+        
         testCreated.TestCode.Should().Be(fakeTestOne.TestCode);
         testCreated.TestName.Should().Be(fakeTestOne.TestName);
         testCreated.Methodology.Should().Be(fakeTestOne.Methodology);

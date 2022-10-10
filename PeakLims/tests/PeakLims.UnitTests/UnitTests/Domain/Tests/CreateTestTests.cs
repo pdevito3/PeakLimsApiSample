@@ -27,7 +27,6 @@ public class CreateTestTests
         var fakeTest = FakeTest.Generate(testToCreate);
 
         // Assert
-        fakeTest.TestNumber.Should().Be(testToCreate.TestNumber);
         fakeTest.TestCode.Should().Be(testToCreate.TestCode);
         fakeTest.TestName.Should().Be(testToCreate.TestName);
         fakeTest.Methodology.Should().Be(testToCreate.Methodology);
