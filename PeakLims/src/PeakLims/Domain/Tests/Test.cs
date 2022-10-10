@@ -1,18 +1,16 @@
 namespace PeakLims.Domain.Tests;
 
-using SharedKernel.Exceptions;
 using PeakLims.Domain.Tests.Dtos;
 using PeakLims.Domain.Tests.Validators;
 using PeakLims.Domain.Tests.DomainEvents;
 using FluentValidation;
 using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using Sieve.Attributes;
 using PeakLims.Domain.Panels;
 using Services;
 using TestStatuses;
+using ValidationException = SharedKernel.Exceptions.ValidationException;
 
 public class Test : BaseEntity
 {
@@ -57,11 +55,19 @@ public class Test : BaseEntity
         return newTest;
     }
 
+    public static void GuardWhenExists(string testCode, int version, ITestRepository testRepository)
+    {
+        if (Exists(testCode, version, testRepository))
+            throw new ValidationException(nameof(Test),
+                $"A test with the given test code ('{testCode}') and version ('{version}') already exists.");
+    }
+
+    public static bool Exists(string testCode, int version, ITestRepository testRepository) => testRepository.Exists(testCode, version);
+
     public void Update(TestForUpdateDto testForUpdateDto)
     {
         new TestForUpdateDtoValidator().ValidateAndThrow(testForUpdateDto);
         
-        TestCode = testForUpdateDto.TestCode;
         TestName = testForUpdateDto.TestName;
         Methodology = testForUpdateDto.Methodology;
         Platform = testForUpdateDto.Platform;

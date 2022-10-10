@@ -1,21 +1,12 @@
 namespace PeakLims.UnitTests.UnitTests.Domain.Accessions;
 
 using PeakLims.SharedTestHelpers.Fakes.Accession;
-using PeakLims.Domain.Accessions.DomainEvents;
 using Bogus;
-using FakeItEasy;
 using FluentAssertions;
 using NUnit.Framework;
-using PeakLims.Domain.Accessions;
-using PeakLims.Domain.AccessionStatuses;
-using PeakLims.Domain.HealthcareOrganizationContacts;
-using PeakLims.Domain.PanelOrders;
-using PeakLims.Domain.TestOrders;
-using SharedTestHelpers.Fakes.HealthcareOrganizationContact;
 using SharedTestHelpers.Fakes.Panel;
 using SharedTestHelpers.Fakes.PanelOrder;
 using SharedTestHelpers.Fakes.Test;
-using SharedTestHelpers.Fakes.TestOrder;
 
 [Parallelizable]
 public class ManagePanelOrderOnAccessionTests

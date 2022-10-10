@@ -43,6 +43,7 @@ public static class UpdateTest
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdateTests);
 
             var testToUpdate = await _testRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            Test.GuardWhenExists(testToUpdate.TestCode, request.TestToUpdate.Version, _testRepository);
 
             testToUpdate.Update(request.TestToUpdate);
             _testRepository.Update(testToUpdate);

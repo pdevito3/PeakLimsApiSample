@@ -37,4 +37,23 @@ public class AddTestCommandTests : TestBase
         testCreated.Platform.Should().Be(fakeTestOne.Platform);
         testCreated.Version.Should().Be(fakeTestOne.Version);
     }
+    
+    [Test]
+    public async Task can_not_add_test_with_same_code_and_version()
+    {
+        // Arrange
+        var fakeTestOne = new FakeTestForCreationDto().Generate();
+        var fakeTestTwo = new FakeTestForCreationDto().Generate();
+        fakeTestTwo.TestCode = fakeTestOne.TestCode;
+        fakeTestTwo.Version = fakeTestOne.Version;
+
+        // Act
+        var commandOne = new AddTest.Command(fakeTestOne);
+        await SendAsync(commandOne);
+        var commandTwo = new AddTest.Command(fakeTestTwo);
+        var act = () => SendAsync(commandTwo);
+
+        // Assert
+        await act.Should().ThrowAsync<ValidationException>();
+    }
 }

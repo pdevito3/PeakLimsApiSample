@@ -1,11 +1,9 @@
 namespace PeakLims.IntegrationTests.FeatureTests.Tests;
 
 using PeakLims.SharedTestHelpers.Fakes.Test;
-using PeakLims.Domain.Tests.Dtos;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.Tests.Features;
 using FluentAssertions;
-using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
@@ -31,10 +29,27 @@ public class UpdateTestCommandTests : TestBase
         var updatedTest = await ExecuteDbContextAsync(db => db.Tests.FirstOrDefaultAsync(t => t.Id == id));
 
         // Assert
-        updatedTest.TestCode.Should().Be(fakeTestOne.TestCode);
-        updatedTest.TestName.Should().Be(updatedTestDto.TestName);
-        updatedTest.Methodology.Should().Be(updatedTestDto.Methodology);
-        updatedTest.Platform.Should().Be(updatedTestDto.Platform);
-        updatedTest.Version.Should().Be(updatedTestDto.Version);
+        updatedTest?.TestCode.Should().Be(fakeTestOne.TestCode);
+        updatedTest?.TestName.Should().Be(updatedTestDto.TestName);
+        updatedTest?.Methodology.Should().Be(updatedTestDto.Methodology);
+        updatedTest?.Platform.Should().Be(updatedTestDto.Platform);
+        updatedTest?.Version.Should().Be(updatedTestDto.Version);
+    }
+    
+    [Test]
+    public async Task can_not_add_test_with_same_code_and_version()
+    {
+        // Arrange
+        var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        await InsertAsync(fakeTestOne);
+        var fakeTestTwo = new FakeTestForUpdateDto().Generate();
+        fakeTestTwo.Version = fakeTestOne.Version;
+
+        // Act
+        var command = new UpdateTest.Command(fakeTestOne.Id, fakeTestTwo);
+        var act = () => SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ValidationException>();
     }
 }
