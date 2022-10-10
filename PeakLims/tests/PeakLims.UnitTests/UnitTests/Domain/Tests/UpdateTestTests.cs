@@ -29,7 +29,7 @@ public class UpdateTestTests
         fakeTest.Update(updatedTest);
 
         // Assert
-        fakeTest.TestCode.Should().Be(updatedTest.TestCode);
+        fakeTest.TestCode.Should().Be(fakeTest.TestCode);
         fakeTest.TestName.Should().Be(updatedTest.TestName);
         fakeTest.Methodology.Should().Be(updatedTest.Methodology);
         fakeTest.Platform.Should().Be(updatedTest.Platform);
