@@ -42,6 +42,7 @@ public class AccessionStatus : ValueObject
     public static AccessionStatus Abandoned() => new AccessionStatus(AccessionStatusEnum.Abandoned.Name);
     public static AccessionStatus Cancelled() => new AccessionStatus(AccessionStatusEnum.Cancelled.Name);
     public static AccessionStatus Qns() => new AccessionStatus(AccessionStatusEnum.Qns.Name);
+    public bool IsFinalState() => _status.IsFinalState();
 
     protected AccessionStatus() { } // EF Core
 }
@@ -63,11 +64,15 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
     {
     }
 
+    public abstract bool IsFinalState();
+
     private class DraftType : AccessionStatusEnum
     {
         public DraftType() : base("Draft", 0)
         {
         }
+
+        public override bool IsFinalState() => false;
     }
 
     private class ReadyForTestingType : AccessionStatusEnum
@@ -75,6 +80,8 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
         public ReadyForTestingType() : base("Ready For Testing", 1)
         {
         }
+
+        public override bool IsFinalState() => false;
     }
 
     private class TestingType : AccessionStatusEnum
@@ -82,6 +89,8 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
         public TestingType() : base("Testing", 2)
         {
         }
+
+        public override bool IsFinalState() => false;
     }
 
     private class TestingCompleteType : AccessionStatusEnum
@@ -89,6 +98,8 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
         public TestingCompleteType() : base("Testing Complete", 3)
         {
         }
+
+        public override bool IsFinalState() => false;
     }
 
     private class ReportPendingType : AccessionStatusEnum
@@ -96,6 +107,8 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
         public ReportPendingType() : base("Report Pending", 4)
         {
         }
+
+        public override bool IsFinalState() => false;
     }
 
     private class ReportCompleteType : AccessionStatusEnum
@@ -103,6 +116,8 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
         public ReportCompleteType() : base("Report Complete", 5)
         {
         }
+
+        public override bool IsFinalState() => false;
     }
 
     private class CompletedType : AccessionStatusEnum
@@ -110,6 +125,8 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
         public CompletedType() : base("Completed", 6)
         {
         }
+
+        public override bool IsFinalState() => true;
     }
 
     private class AbandonedType : AccessionStatusEnum
@@ -117,6 +134,8 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
         public AbandonedType() : base("Abandoned", 7)
         {
         }
+
+        public override bool IsFinalState() => true;
     }
 
     private class CancelledType : AccessionStatusEnum
@@ -124,6 +143,8 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
         public CancelledType() : base("Cancelled", 8)
         {
         }
+
+        public override bool IsFinalState() => true;
     }
 
     private class QnsType : AccessionStatusEnum
@@ -131,5 +152,7 @@ public abstract class AccessionStatusEnum : SmartEnum<AccessionStatusEnum>
         public QnsType() : base("QNS", 9)
         {
         }
+
+        public override bool IsFinalState() => true;
     }
 }

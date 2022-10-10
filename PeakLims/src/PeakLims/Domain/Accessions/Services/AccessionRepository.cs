@@ -23,7 +23,10 @@ public sealed class AccessionRepository : GenericRepository<Accession>, IAccessi
     {
         return _dbContext.Accessions
             .Include(x => x.PanelOrders)
+            .ThenInclude(x => x.Panel)
+            .ThenInclude(x => x.Tests)
             .Include(x => x.TestOrders)
+            .ThenInclude(x => x.Test)
             .Include(x => x.Contacts)
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync(cancellationToken);

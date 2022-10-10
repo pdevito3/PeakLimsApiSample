@@ -27,7 +27,8 @@ public class TestStatus : ValueObject
     {
         Value = value.Name;
     }
-    
+
+    public bool IsActive() => Value == Active().Value;
     public static TestStatus Of(string value) => new TestStatus(value);
     public static implicit operator string(TestStatus value) => value.Value;
     public static List<string> ListNames() => TestStatusEnum.List.Select(x => x.Name).ToList();

@@ -6,7 +6,6 @@ using Domain.TestStatuses;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using PeakLims.Domain.AccessionStatuses;
 using SharedTestHelpers.Fakes.Test;
 using static TestFixture;
 

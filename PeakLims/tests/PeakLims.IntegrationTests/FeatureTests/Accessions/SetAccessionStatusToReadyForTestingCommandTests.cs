@@ -12,6 +12,7 @@ using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using SharedTestHelpers.Fakes.HealthcareOrganizationContact;
 using SharedTestHelpers.Fakes.Panel;
 using SharedTestHelpers.Fakes.PanelOrder;
+using SharedTestHelpers.Fakes.Test;
 using static TestFixture;
 
 public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
@@ -27,16 +28,18 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
         var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
             .RuleFor(a => a.PatientId, _ => fakePatientOne.Id)
             .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
-        var fakePanel = FakePanel.Generate();
-        await InsertAsync(fakePanel);
-        var fakePanelOrder = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()
-            .RuleFor(x => x.PanelId, fakePanel.Id)
-            .Generate());
-        fakeAccessionOne.AddPanel(fakePanelOrder);
+        
         var fakeContact = FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto()
             .RuleFor(x => x.HealthcareOrganizationId, fakeHealthcareOrganizationOne.Id)
             .Generate());
         fakeAccessionOne.AddContact(fakeContact);
+        
+        var fakeTest = FakeTest.GenerateActivated();
+        var fakePanel = FakePanel.Generate();
+        fakePanel.AddTest(fakeTest);
+        var fakePanelOrder = FakePanelOrder.Generate();
+        fakePanelOrder.SetPanel(fakePanel);
+        fakeAccessionOne.AddPanelOrder(fakePanelOrder);
         
         await InsertAsync(fakeAccessionOne);
 

@@ -35,7 +35,7 @@ public class Panel : BaseEntity
 
     [JsonIgnore]
     [IgnoreDataMember]
-    public virtual ICollection<Test> Tests { get; private set; }
+    public virtual ICollection<Test> Tests { get; private set; } = new List<Test>();
 
 
     public static Panel Create(PanelForCreationDto panelForCreationDto)
@@ -67,6 +67,18 @@ public class Panel : BaseEntity
         Type = panelForUpdateDto.Type;
         Version = panelForUpdateDto.Version;
 
+        QueueDomainEvent(new PanelUpdated(){ Id = Id });
+    }
+
+    public void AddTest(Test test)
+    {        
+        Tests.Add(test);
+        QueueDomainEvent(new PanelUpdated(){ Id = Id });
+    }
+
+    public void RemoveTest(Test test)
+    {        
+        Tests.Remove(test);
         QueueDomainEvent(new PanelUpdated(){ Id = Id });
     }
     

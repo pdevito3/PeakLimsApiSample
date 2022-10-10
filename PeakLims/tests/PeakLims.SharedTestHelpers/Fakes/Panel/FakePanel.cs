@@ -13,6 +13,6 @@ public class FakePanel
 
     public static Panel Generate()
     {
-        return Panel.Create(new FakePanelForCreationDto().Generate());
+        return Generate(new FakePanelForCreationDto().Generate());
     }
 }

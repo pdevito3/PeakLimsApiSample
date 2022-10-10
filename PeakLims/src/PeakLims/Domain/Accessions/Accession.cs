@@ -92,30 +92,35 @@ public class Accession : BaseEntity
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
     }
 
-    public void AddPanel(PanelOrder panelOrder)
+    public void AddPanelOrder(PanelOrder panelOrder)
     {
-        var alreadyExists = PanelOrderAlreadyExists(panelOrder);
-        if (alreadyExists)
-            return;
+        // TODO unit test
+        if(Status.IsFinalState())
+            throw new ValidationException(nameof(Accession),
+                $"This accession is in a final state. Panel orders can not be modified.");
         
+        var hasNonActiveTests = panelOrder.Panel.Tests.Any(x => !x.Status.IsActive());
+        if(hasNonActiveTests)
+            throw new ValidationException(nameof(Accession),
+                $"This panel has one or more tests that are not active. Only active tests can be added to an accession.");
+
         PanelOrders.Add(panelOrder);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
     }
 
-    public void RemovePanel(PanelOrder panelOrder)
+    public void RemovePanelOrder(PanelOrder panelOrder)
     {
-        var alreadyExists = PanelOrderAlreadyExists(panelOrder);
-        if (alreadyExists)
+        // TODO unit test
+        if(Status.IsFinalState())
+            throw new ValidationException(nameof(Accession),
+                $"This accession is in a final state. Panel orders can not be modified.");
+
+        var alreadyExists = PanelOrders.Any(x => panelOrder.Panel.Id == x.Panel.Id);
+        if (!alreadyExists)
             return;
         
         PanelOrders.Remove(panelOrder);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
-    }
-
-    private bool PanelOrderAlreadyExists(PanelOrder panelOrder)
-    {
-        var alreadyExists = PanelOrders.Any(x => panelOrder.Panel.Id == x.Panel.Id);
-        return alreadyExists;
     }
 
     public void AddContact(HealthcareOrganizationContact contact)
@@ -131,7 +136,7 @@ public class Accession : BaseEntity
     public void RemoveContact(HealthcareOrganizationContact contact)
     {
         var alreadyExists = HealthcareOrganizationContactAlreadyExists(contact);
-        if (alreadyExists)
+        if (!alreadyExists)
             return;
         
         Contacts.Remove(contact);

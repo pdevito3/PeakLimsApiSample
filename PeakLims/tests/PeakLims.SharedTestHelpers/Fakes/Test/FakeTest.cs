@@ -8,11 +8,24 @@ public class FakeTest
 {
     public static Test Generate(TestForCreationDto testForCreationDto)
     {
-        return Test.Create(testForCreationDto);
+        var test = Test.Create(testForCreationDto);
+        return test;
+    }
+    
+    public static Test GenerateActivated(TestForCreationDto testForCreationDto)
+    {
+        var test = Test.Create(testForCreationDto);
+        test.Activate();
+        return test;
     }
 
     public static Test Generate()
     {
-        return Test.Create(new FakeTestForCreationDto().Generate());
+        return Generate(new FakeTestForCreationDto().Generate());
+    }
+    
+    public static Test GenerateActivated()
+    {
+        return GenerateActivated(new FakeTestForCreationDto().Generate());
     }
 }

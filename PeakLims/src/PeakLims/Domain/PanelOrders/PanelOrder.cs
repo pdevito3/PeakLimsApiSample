@@ -48,6 +48,12 @@ public class PanelOrder : BaseEntity
 
         QueueDomainEvent(new PanelOrderUpdated(){ Id = Id });
     }
+
+    public void SetPanel(Panel panel)
+    {        
+        Panel = panel;
+        QueueDomainEvent(new PanelOrderUpdated(){ Id = Id });
+    }
     
     protected PanelOrder() { } // For EF + Mocking
 }
