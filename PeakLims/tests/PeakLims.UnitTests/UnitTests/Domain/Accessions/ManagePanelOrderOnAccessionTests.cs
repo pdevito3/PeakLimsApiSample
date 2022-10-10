@@ -46,12 +46,10 @@ public class ManagePanelOrderOnAccessionTests
         fakeAccession.PanelOrders.Count.Should().Be(1);
         fakeAccession.PanelOrders.Should().ContainEquivalentOf(panelOrder);
         
-        // Act - Remove
-        fakeAccession.RemovePanelOrder(panelOrder);
-        
-        // can idempotently remove
-        fakeAccession.RemovePanelOrder(panelOrder);
-        fakeAccession.RemovePanelOrder(panelOrder);
+        // Act - Can remove idempotently
+        fakeAccession.RemovePanelOrder(panelOrder)
+            .RemovePanelOrder(panelOrder)
+            .RemovePanelOrder(panelOrder);
 
         // Assert - Remove
         fakeAccession.PanelOrders.Count.Should().Be(0);

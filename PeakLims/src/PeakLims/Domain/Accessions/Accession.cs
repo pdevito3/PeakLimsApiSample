@@ -64,16 +64,17 @@ public class Accession : BaseEntity
         return newAccession;
     }
 
-    public void Update(AccessionForUpdateDto accessionForUpdateDto)
+    public Accession Update(AccessionForUpdateDto accessionForUpdateDto)
     {
-        if (Status != AccessionStatus.Draft()) return;
+        if (Status != AccessionStatus.Draft()) return this;
         
         PatientId = accessionForUpdateDto.PatientId;
         HealthcareOrganizationId = accessionForUpdateDto.HealthcareOrganizationId;
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
+        return this;
     }
 
-    public void SetStatusToReadyForTesting()
+    public Accession SetStatusToReadyForTesting()
     {
         new ValidationException(nameof(Accession),
                 $"A patient is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}")
@@ -90,9 +91,10 @@ public class Accession : BaseEntity
         
         Status = AccessionStatus.ReadyForTesting();
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
+        return this;
     }
 
-    public void AddPanelOrder(PanelOrder panelOrder)
+    public Accession AddPanelOrder(PanelOrder panelOrder)
     {
         // TODO unit test
         if(Status.IsFinalState())
@@ -106,9 +108,10 @@ public class Accession : BaseEntity
 
         PanelOrders.Add(panelOrder);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
+        return this;
     }
 
-    public void RemovePanelOrder(PanelOrder panelOrder)
+    public Accession RemovePanelOrder(PanelOrder panelOrder)
     {
         // TODO unit test
         if(Status.IsFinalState())
@@ -117,30 +120,33 @@ public class Accession : BaseEntity
 
         var alreadyExists = PanelOrders.Any(x => panelOrder.Panel.Id == x.Panel.Id);
         if (!alreadyExists)
-            return;
+            return this;
         
         PanelOrders.Remove(panelOrder);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
+        return this;
     }
 
-    public void AddContact(HealthcareOrganizationContact contact)
+    public Accession AddContact(HealthcareOrganizationContact contact)
     {
         var alreadyExists = HealthcareOrganizationContactAlreadyExists(contact);
         if (alreadyExists)
-            return;
+            return this;
         
         Contacts.Add(contact);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
+        return this;
     }
 
-    public void RemoveContact(HealthcareOrganizationContact contact)
+    public Accession RemoveContact(HealthcareOrganizationContact contact)
     {
         var alreadyExists = HealthcareOrganizationContactAlreadyExists(contact);
         if (!alreadyExists)
-            return;
+            return this;
         
         Contacts.Remove(contact);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
+        return this;
     }
 
     private bool HealthcareOrganizationContactAlreadyExists(HealthcareOrganizationContact contact)

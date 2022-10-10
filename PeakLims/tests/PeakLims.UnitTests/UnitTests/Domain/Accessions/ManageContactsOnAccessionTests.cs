@@ -23,23 +23,19 @@ public class ManageContactsOnAccessionTests
         var fakeAccession = FakeAccession.Generate();
         var contact = FakeHealthcareOrganizationContact.Generate();
         
-        // Act - Add
-        fakeAccession.AddContact(contact);
-        
-        // can idempotently add
-        fakeAccession.AddContact(contact);
-        fakeAccession.AddContact(contact);
+        // Act - Can add idempotently
+        fakeAccession.AddContact(contact)
+            .AddContact(contact)
+            .AddContact(contact);
 
         // Assert - Add
         fakeAccession.Contacts.Count.Should().Be(1);
         fakeAccession.Contacts.Should().ContainEquivalentOf(contact);
         
-        // Act - Remove
-        fakeAccession.RemoveContact(contact);
-        
-        // can idempotently remove
-        fakeAccession.RemoveContact(contact);
-        fakeAccession.RemoveContact(contact);
+        // Act - Can remove idempotently
+        fakeAccession.RemoveContact(contact)
+            .RemoveContact(contact)
+            .RemoveContact(contact);
 
         // Assert - Remove
         fakeAccession.Contacts.Count.Should().Be(0);
