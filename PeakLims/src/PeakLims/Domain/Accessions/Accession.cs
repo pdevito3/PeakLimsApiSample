@@ -94,12 +94,39 @@ public class Accession : BaseEntity
         return this;
     }
 
+    public Accession AddTestOrder(TestOrder testOrder)
+    {
+        // TODO unit test
+        GuardIfInFinalState("Test orders");
+        
+        var hasNonActiveTests = !testOrder.Test.Status.IsActive();
+        if(hasNonActiveTests)
+            throw new ValidationException(nameof(Accession),
+                $"This test is not active. Only active tests can be added to an accession.");
+
+        TestOrders.Add(testOrder);
+        QueueDomainEvent(new AccessionUpdated(){ Id = Id });
+        return this;
+    }
+
+    public Accession RemoveTestOrder(TestOrder testOrder)
+    {
+        // TODO unit test
+        GuardIfInFinalState("Test orders");
+
+        var alreadyExists = TestOrders.Any(x => testOrder.Id == x.Id);
+        if (!alreadyExists)
+            return this;
+        
+        TestOrders.Remove(testOrder);
+        QueueDomainEvent(new AccessionUpdated(){ Id = Id });
+        return this;
+    }
+
     public Accession AddPanelOrder(PanelOrder panelOrder)
     {
         // TODO unit test
-        if(Status.IsFinalState())
-            throw new ValidationException(nameof(Accession),
-                $"This accession is in a final state. Panel orders can not be modified.");
+        GuardIfInFinalState("Panel orders");
         
         var hasNonActiveTests = panelOrder.Panel.Tests.Any(x => !x.Status.IsActive());
         if(hasNonActiveTests)
@@ -114,9 +141,7 @@ public class Accession : BaseEntity
     public Accession RemovePanelOrder(PanelOrder panelOrder)
     {
         // TODO unit test
-        if(Status.IsFinalState())
-            throw new ValidationException(nameof(Accession),
-                $"This accession is in a final state. Panel orders can not be modified.");
+        GuardIfInFinalState("Panel orders");
 
         var alreadyExists = PanelOrders.Any(x => panelOrder.Panel.Id == x.Panel.Id);
         if (!alreadyExists)
@@ -153,6 +178,13 @@ public class Accession : BaseEntity
     {
         var alreadyExists = Contacts.Any(x => contact.Id == x.Id);
         return alreadyExists;
+    }
+
+    private void GuardIfInFinalState(string subject)
+    {
+        if (Status.IsFinalState())
+            throw new ValidationException(nameof(Accession),
+                $"This accession is in a final state. {subject} can not be modified.");
     }
     
     protected Accession() { } // For EF + Mocking

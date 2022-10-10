@@ -48,6 +48,12 @@ public class TestOrder : BaseEntity
 
         QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
     }
+
+    public void SetTest(Test panel)
+    {        
+        Test = panel;
+        QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
+    }
     
     protected TestOrder() { } // For EF + Mocking
 }
