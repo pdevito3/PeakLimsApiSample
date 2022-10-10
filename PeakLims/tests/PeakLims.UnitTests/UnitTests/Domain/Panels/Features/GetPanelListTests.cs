@@ -62,38 +62,6 @@ public class GetPanelListTests
     }
 
     [Test]
-    public async Task can_filter_panel_list_using_PanelNumber()
-    {
-        //Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto()
-            .RuleFor(p => p.PanelNumber, _ => "alpha")
-            .Generate());
-        var fakePanelTwo = FakePanel.Generate(new FakePanelForCreationDto()
-            .RuleFor(p => p.PanelNumber, _ => "bravo")
-            .Generate());
-        var queryParameters = new PanelParametersDto() { Filters = $"PanelNumber == {fakePanelTwo.PanelNumber}" };
-
-        var panelList = new List<Panel>() { fakePanelOne, fakePanelTwo };
-        var mockDbData = panelList.AsQueryable().BuildMock();
-
-        _panelRepository
-            .Setup(x => x.Query())
-            .Returns(mockDbData);
-
-        //Act
-        var query = new GetPanelList.Query(queryParameters);
-        var handler = new GetPanelList.Handler(_panelRepository.Object, _mapper, _sieveProcessor, _heimGuard.Object);
-        var response = await handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        response.Should().HaveCount(1);
-        response
-            .FirstOrDefault()
-            .Should().BeEquivalentTo(fakePanelTwo, options =>
-                options.ExcludingMissingMembers());
-    }
-
-    [Test]
     public async Task can_filter_panel_list_using_PanelCode()
     {
         //Arrange
@@ -250,40 +218,6 @@ public class GetPanelListTests
         response
             .FirstOrDefault()
             .Should().BeEquivalentTo(fakePanelTwo, options =>
-                options.ExcludingMissingMembers());
-    }
-
-    [Test]
-    public async Task can_get_sorted_list_of_panel_by_PanelNumber()
-    {
-        //Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto()
-            .RuleFor(p => p.PanelNumber, _ => "alpha")
-            .Generate());
-        var fakePanelTwo = FakePanel.Generate(new FakePanelForCreationDto()
-            .RuleFor(p => p.PanelNumber, _ => "bravo")
-            .Generate());
-        var queryParameters = new PanelParametersDto() { SortOrder = "-PanelNumber" };
-
-        var PanelList = new List<Panel>() { fakePanelOne, fakePanelTwo };
-        var mockDbData = PanelList.AsQueryable().BuildMock();
-
-        _panelRepository
-            .Setup(x => x.Query())
-            .Returns(mockDbData);
-
-        //Act
-        var query = new GetPanelList.Query(queryParameters);
-        var handler = new GetPanelList.Handler(_panelRepository.Object, _mapper, _sieveProcessor, _heimGuard.Object);
-        var response = await handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        response.FirstOrDefault()
-            .Should().BeEquivalentTo(fakePanelTwo, options =>
-                options.ExcludingMissingMembers());
-        response.Skip(1)
-            .FirstOrDefault()
-            .Should().BeEquivalentTo(fakePanelOne, options =>
                 options.ExcludingMissingMembers());
     }
 

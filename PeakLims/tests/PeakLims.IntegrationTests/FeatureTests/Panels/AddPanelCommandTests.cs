@@ -25,14 +25,12 @@ public class AddPanelCommandTests : TestBase
             .FirstOrDefaultAsync(p => p.Id == panelReturned.Id));
 
         // Assert
-        panelReturned.PanelNumber.Should().Be(fakePanelOne.PanelNumber);
         panelReturned.PanelCode.Should().Be(fakePanelOne.PanelCode);
         panelReturned.PanelName.Should().Be(fakePanelOne.PanelName);
         panelReturned.TurnAroundTime.Should().Be(fakePanelOne.TurnAroundTime);
         panelReturned.Type.Should().Be(fakePanelOne.Type);
         panelReturned.Version.Should().Be(fakePanelOne.Version);
-
-        panelCreated.PanelNumber.Should().Be(fakePanelOne.PanelNumber);
+        
         panelCreated.PanelCode.Should().Be(fakePanelOne.PanelCode);
         panelCreated.PanelName.Should().Be(fakePanelOne.PanelName);
         panelCreated.TurnAroundTime.Should().Be(fakePanelOne.TurnAroundTime);

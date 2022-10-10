@@ -26,7 +26,6 @@ public class CreatePanelTests
         var fakePanel = FakePanel.Generate(panelToCreate);
 
         // Assert
-        fakePanel.PanelNumber.Should().Be(panelToCreate.PanelNumber);
         fakePanel.PanelCode.Should().Be(panelToCreate.PanelCode);
         fakePanel.PanelName.Should().Be(panelToCreate.PanelName);
         fakePanel.TurnAroundTime.Should().Be(panelToCreate.TurnAroundTime);

@@ -15,8 +15,6 @@ using PeakLims.Domain.Tests;
 
 public class Panel : BaseEntity
 {
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string PanelNumber { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string PanelCode { get; private set; }
@@ -44,7 +42,6 @@ public class Panel : BaseEntity
 
         var newPanel = new Panel();
 
-        newPanel.PanelNumber = panelForCreationDto.PanelNumber;
         newPanel.PanelCode = panelForCreationDto.PanelCode;
         newPanel.PanelName = panelForCreationDto.PanelName;
         newPanel.TurnAroundTime = panelForCreationDto.TurnAroundTime;
@@ -60,7 +57,6 @@ public class Panel : BaseEntity
     {
         new PanelForUpdateDtoValidator().ValidateAndThrow(panelForUpdateDto);
 
-        PanelNumber = panelForUpdateDto.PanelNumber;
         PanelCode = panelForUpdateDto.PanelCode;
         PanelName = panelForUpdateDto.PanelName;
         TurnAroundTime = panelForUpdateDto.TurnAroundTime;

@@ -24,7 +24,6 @@ public class PanelQueryTests : TestBase
         var panel = await SendAsync(query);
 
         // Assert
-        panel.PanelNumber.Should().Be(fakePanelOne.PanelNumber);
         panel.PanelCode.Should().Be(fakePanelOne.PanelCode);
         panel.PanelName.Should().Be(fakePanelOne.PanelName);
         panel.TurnAroundTime.Should().Be(fakePanelOne.TurnAroundTime);
