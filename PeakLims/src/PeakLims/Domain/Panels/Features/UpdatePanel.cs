@@ -16,12 +16,12 @@ public static class UpdatePanel
     public sealed class Command : IRequest<bool>
     {
         public readonly Guid Id;
-        public readonly PanelForUpdateDto PanelToUpdate;
+        public readonly PanelForUpdateDto UpdatedPanelData;
 
         public Command(Guid panel, PanelForUpdateDto newPanelData)
         {
             Id = panel;
-            PanelToUpdate = newPanelData;
+            UpdatedPanelData = newPanelData;
         }
     }
 
@@ -43,8 +43,9 @@ public static class UpdatePanel
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdatePanels);
 
             var panelToUpdate = await _panelRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            Panel.GuardWhenExists(panelToUpdate.PanelCode, request.UpdatedPanelData.Version, _panelRepository);
 
-            panelToUpdate.Update(request.PanelToUpdate);
+            panelToUpdate.Update(request.UpdatedPanelData);
             _panelRepository.Update(panelToUpdate);
             return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
         }

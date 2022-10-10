@@ -41,6 +41,7 @@ public static class AddPanel
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddPanels);
 
+            Panel.GuardWhenExists(request.PanelToAdd.PanelCode, request.PanelToAdd.Version, _panelRepository);
             var panel = Panel.Create(request.PanelToAdd);
             await _panelRepository.Add(panel, cancellationToken);
 

@@ -6,6 +6,7 @@ using PeakLims.Services;
 
 public interface IPanelRepository : IGenericRepository<Panel>
 {
+    bool Exists(string panelCode, int version);
 }
 
 public sealed class PanelRepository : GenericRepository<Panel>, IPanelRepository
@@ -15,5 +16,10 @@ public sealed class PanelRepository : GenericRepository<Panel>, IPanelRepository
     public PanelRepository(PeakLimsDbContext dbContext) : base(dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public bool Exists(string panelCode, int version)
+    {
+        return _dbContext.Panels.Any(x => x.PanelCode == panelCode && x.Version == version);
     }
 }

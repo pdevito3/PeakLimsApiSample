@@ -37,4 +37,23 @@ public class AddPanelCommandTests : TestBase
         panelCreated.Type.Should().Be(fakePanelOne.Type);
         panelCreated.Version.Should().Be(fakePanelOne.Version);
     }
+    
+    [Test]
+    public async Task can_not_add_panel_with_same_code_and_version()
+    {
+        // Arrange
+        var fakePanelOne = new FakePanelForCreationDto().Generate();
+        var fakePanelTwo = new FakePanelForCreationDto().Generate();
+        fakePanelTwo.PanelCode = fakePanelOne.PanelCode;
+        fakePanelTwo.Version = fakePanelOne.Version;
+
+        // Act
+        var commandOne = new AddPanel.Command(fakePanelOne);
+        await SendAsync(commandOne);
+        var commandTwo = new AddPanel.Command(fakePanelTwo);
+        var act = () => SendAsync(commandTwo);
+
+        // Assert
+        await act.Should().ThrowAsync<ValidationException>();
+    }
 }

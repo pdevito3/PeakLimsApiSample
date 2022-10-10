@@ -37,7 +37,7 @@ public class UpdateTestCommandTests : TestBase
     }
     
     [Test]
-    public async Task can_not_add_test_with_same_code_and_version()
+    public async Task can_not_update_test_with_same_code_and_version()
     {
         // Arrange
         var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());

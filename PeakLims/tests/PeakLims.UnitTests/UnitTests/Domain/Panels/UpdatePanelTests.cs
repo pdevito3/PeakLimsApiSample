@@ -29,7 +29,6 @@ public class UpdatePanelTests
         fakePanel.Update(updatedPanel);
 
         // Assert
-        fakePanel.PanelCode.Should().Be(updatedPanel.PanelCode);
         fakePanel.PanelName.Should().Be(updatedPanel.PanelName);
         fakePanel.TurnAroundTime.Should().Be(updatedPanel.TurnAroundTime);
         fakePanel.Type.Should().Be(updatedPanel.Type);

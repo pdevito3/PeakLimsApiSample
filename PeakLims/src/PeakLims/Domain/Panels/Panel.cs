@@ -1,17 +1,15 @@
 namespace PeakLims.Domain.Panels;
 
-using SharedKernel.Exceptions;
 using PeakLims.Domain.Panels.Dtos;
 using PeakLims.Domain.Panels.Validators;
 using PeakLims.Domain.Panels.DomainEvents;
 using FluentValidation;
 using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using Sieve.Attributes;
 using PeakLims.Domain.Tests;
-
+using Services;
+using ValidationException = SharedKernel.Exceptions.ValidationException;
 
 public class Panel : BaseEntity
 {
@@ -57,7 +55,6 @@ public class Panel : BaseEntity
     {
         new PanelForUpdateDtoValidator().ValidateAndThrow(panelForUpdateDto);
 
-        PanelCode = panelForUpdateDto.PanelCode;
         PanelName = panelForUpdateDto.PanelName;
         TurnAroundTime = panelForUpdateDto.TurnAroundTime;
         Type = panelForUpdateDto.Type;
@@ -65,6 +62,15 @@ public class Panel : BaseEntity
 
         QueueDomainEvent(new PanelUpdated(){ Id = Id });
     }
+
+    public static void GuardWhenExists(string panelCode, int version, IPanelRepository panelRepository)
+    {
+        if (Exists(panelCode, version, panelRepository))
+            throw new ValidationException(nameof(Test),
+                $"A panel with the given panel code ('{panelCode}') and version ('{version}') already exists.");
+    }
+
+    public static bool Exists(string panelCode, int version, IPanelRepository panelRepository) => panelRepository.Exists(panelCode, version);
 
     public void AddTest(Test test)
     {        

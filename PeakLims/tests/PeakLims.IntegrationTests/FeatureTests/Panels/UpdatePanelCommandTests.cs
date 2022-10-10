@@ -31,10 +31,26 @@ public class UpdatePanelCommandTests : TestBase
         var updatedPanel = await ExecuteDbContextAsync(db => db.Panels.FirstOrDefaultAsync(p => p.Id == id));
 
         // Assert
-        updatedPanel.PanelCode.Should().Be(updatedPanelDto.PanelCode);
         updatedPanel.PanelName.Should().Be(updatedPanelDto.PanelName);
         updatedPanel.TurnAroundTime.Should().Be(updatedPanelDto.TurnAroundTime);
         updatedPanel.Type.Should().Be(updatedPanelDto.Type);
         updatedPanel.Version.Should().Be(updatedPanelDto.Version);
+    }
+    
+    [Test]
+    public async Task can_not_update_panel_with_same_code_and_version()
+    {
+        // Arrange
+        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
+        await InsertAsync(fakePanelOne);
+        var fakePanelTwo = new FakePanelForUpdateDto().Generate();
+        fakePanelTwo.Version = fakePanelOne.Version;
+
+        // Act
+        var command = new UpdatePanel.Command(fakePanelOne.Id, fakePanelTwo);
+        var act = () => SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ValidationException>();
     }
 }
