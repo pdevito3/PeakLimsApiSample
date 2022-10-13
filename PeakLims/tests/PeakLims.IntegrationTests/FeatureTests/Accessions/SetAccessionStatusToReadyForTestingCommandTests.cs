@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.AccessionStatuses;
+using Domain.Panels.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using SharedTestHelpers.Fakes.HealthcareOrganizationContact;
@@ -35,7 +36,9 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
         fakeAccessionOne.AddContact(fakeContact);
         
         var fakeTest = FakeTest.GenerateActivated();
-        var fakePanel = FakePanel.Generate();
+        var fakePanel = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
         fakePanel.AddTest(fakeTest);
         var fakePanelOrder = FakePanelOrder.Generate();
         fakePanelOrder.SetPanel(fakePanel);

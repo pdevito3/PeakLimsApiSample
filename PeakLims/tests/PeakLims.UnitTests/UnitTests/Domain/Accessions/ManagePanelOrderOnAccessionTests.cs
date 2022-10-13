@@ -25,7 +25,9 @@ public class ManagePanelOrderOnAccessionTests
         var fakeAccession = FakeAccession.Generate();
 
         var test = FakeTest.GenerateActivated();
-        var panel = FakePanel.Generate();
+        var panel = new FakePanelBuilder()
+            .WithMockRepository()
+            .Build();
         panel.AddTest(test);
         var panelOrder = FakePanelOrder.Generate();
         panelOrder.SetPanel(panel);
@@ -54,7 +56,9 @@ public class ManagePanelOrderOnAccessionTests
 
         var test = FakeTest.Generate();
         test.Deactivate();
-        var panel = FakePanel.Generate();
+        var panel = new FakePanelBuilder()
+            .WithMockRepository()
+            .Build();
         panel.AddTest(test);
         var panelOrder = FakePanelOrder.Generate();
         panelOrder.SetPanel(panel);

@@ -9,6 +9,7 @@ using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Panels.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Panel;
 
@@ -18,7 +19,9 @@ public class UpdatePanelOrderCommandTests : TestBase
     public async Task can_update_existing_panelorder_in_db()
     {
         // Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
+        var fakePanelOne = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
         await InsertAsync(fakePanelOne);
 
         var fakePanelOrderOne = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()

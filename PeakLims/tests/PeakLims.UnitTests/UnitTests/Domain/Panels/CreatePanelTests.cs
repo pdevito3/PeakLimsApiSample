@@ -6,7 +6,9 @@ using PeakLims.Domain.Panels.DomainEvents;
 using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using Moq;
 using NUnit.Framework;
+using PeakLims.Domain.Panels.Services;
 
 [Parallelizable]
 public class CreatePanelTests
@@ -23,7 +25,10 @@ public class CreatePanelTests
     {
         // Arrange + Act
         var panelToCreate = new FakePanelForCreationDto().Generate();
-        var fakePanel = FakePanel.Generate(panelToCreate);
+        var fakePanel = new FakePanelBuilder()
+            .WithDto(panelToCreate)
+            .WithMockRepository(false)
+            .Build();
 
         // Assert
         fakePanel.PanelCode.Should().Be(panelToCreate.PanelCode);
@@ -37,7 +42,9 @@ public class CreatePanelTests
     public void queue_domain_event_on_create()
     {
         // Arrange + Act
-        var fakePanel = FakePanel.Generate();
+        var fakePanel = new FakePanelBuilder()
+            .WithMockRepository(false)
+            .Build();
 
         // Assert
         fakePanel.DomainEvents.Count.Should().Be(1);

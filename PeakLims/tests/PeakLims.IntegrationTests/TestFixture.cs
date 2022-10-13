@@ -83,7 +83,6 @@ public class TestFixture
         return service;
     }
 
-
     public static void SetUserRole(string role, string sub = null)
     {
         sub ??= Guid.NewGuid().ToString();

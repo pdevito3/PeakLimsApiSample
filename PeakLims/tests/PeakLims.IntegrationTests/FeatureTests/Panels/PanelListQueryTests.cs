@@ -7,6 +7,7 @@ using PeakLims.Domain.Panels.Features;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Panels.Services;
 using static TestFixture;
 
 public class PanelListQueryTests : TestBase
@@ -16,8 +17,12 @@ public class PanelListQueryTests : TestBase
     public async Task can_get_panel_list()
     {
         // Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
-        var fakePanelTwo = FakePanel.Generate(new FakePanelForCreationDto().Generate());
+        var fakePanelOne = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
+        var fakePanelTwo = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
         var queryParameters = new PanelParametersDto();
 
         await InsertAsync(fakePanelOne, fakePanelTwo);

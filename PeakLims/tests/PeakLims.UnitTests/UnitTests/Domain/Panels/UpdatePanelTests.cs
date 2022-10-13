@@ -22,7 +22,9 @@ public class UpdatePanelTests
     public void can_update_panel()
     {
         // Arrange
-        var fakePanel = FakePanel.Generate();
+        var fakePanel = new FakePanelBuilder()
+            .WithMockRepository(false)
+            .Build();
         var updatedPanel = new FakePanelForUpdateDto().Generate();
         
         // Act
@@ -39,7 +41,9 @@ public class UpdatePanelTests
     public void queue_domain_event_on_update()
     {
         // Arrange
-        var fakePanel = FakePanel.Generate();
+        var fakePanel = new FakePanelBuilder()
+            .WithMockRepository(false)
+            .Build();
         var updatedPanel = new FakePanelForUpdateDto().Generate();
         fakePanel.DomainEvents.Clear();
         

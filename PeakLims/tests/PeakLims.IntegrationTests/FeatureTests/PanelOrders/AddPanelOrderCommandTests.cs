@@ -6,6 +6,7 @@ using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Panels.Services;
 using PeakLims.Domain.PanelOrders.Features;
 using static TestFixture;
 using SharedKernel.Exceptions;
@@ -17,7 +18,9 @@ public class AddPanelOrderCommandTests : TestBase
     public async Task can_add_new_panelorder_to_db()
     {
         // Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
+        var fakePanelOne = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
         await InsertAsync(fakePanelOne);
 
         var fakePanelOrderOne = new FakePanelOrderForCreationDto()

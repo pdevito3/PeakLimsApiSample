@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Domain.Panels.Services;
 using static TestFixture;
 
 public class DeletePanelCommandTests : TestBase
@@ -15,7 +16,9 @@ public class DeletePanelCommandTests : TestBase
     public async Task can_delete_panel_from_db()
     {
         // Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
+        var fakePanelOne = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
         await InsertAsync(fakePanelOne);
         var panel = await ExecuteDbContextAsync(db => db.Panels
             .FirstOrDefaultAsync(p => p.Id == fakePanelOne.Id));
@@ -47,7 +50,9 @@ public class DeletePanelCommandTests : TestBase
     public async Task can_softdelete_panel_from_db()
     {
         // Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
+        var fakePanelOne = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
         await InsertAsync(fakePanelOne);
         var panel = await ExecuteDbContextAsync(db => db.Panels
             .FirstOrDefaultAsync(p => p.Id == fakePanelOne.Id));

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Domain.Panels.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Panel;
 
@@ -16,7 +17,9 @@ public class DeletePanelOrderCommandTests : TestBase
     public async Task can_delete_panelorder_from_db()
     {
         // Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
+        var fakePanelOne = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
         await InsertAsync(fakePanelOne);
 
         var fakePanelOrderOne = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()
@@ -46,29 +49,5 @@ public class DeletePanelOrderCommandTests : TestBase
 
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();
-    }
-
-    [Test]
-    public async Task can_softdelete_panelorder_from_db()
-    {
-        // Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
-        await InsertAsync(fakePanelOne);
-
-        var fakePanelOrderOne = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()
-            .RuleFor(p => p.PanelId, _ => fakePanelOne.Id).Generate());
-        await InsertAsync(fakePanelOrderOne);
-        var panelOrder = await ExecuteDbContextAsync(db => db.PanelOrders
-            .FirstOrDefaultAsync(p => p.Id == fakePanelOrderOne.Id));
-
-        // Act
-        var command = new DeletePanelOrder.Command(panelOrder.Id);
-        await SendAsync(command);
-        var deletedPanelOrder = await ExecuteDbContextAsync(db => db.PanelOrders
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(x => x.Id == panelOrder.Id));
-
-        // Assert
-        deletedPanelOrder?.IsDeleted.Should().BeTrue();
     }
 }

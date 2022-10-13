@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Domain.Panels.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Panel;
 
@@ -17,7 +18,9 @@ public class PanelOrderQueryTests : TestBase
     public async Task can_get_existing_panelorder_with_accurate_props()
     {
         // Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
+        var fakePanelOne = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
         await InsertAsync(fakePanelOne);
 
         var fakePanelOrderOne = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()

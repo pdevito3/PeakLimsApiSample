@@ -7,6 +7,7 @@ using PeakLims.Domain.PanelOrders.Features;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Panels.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Panel;
 
@@ -17,8 +18,12 @@ public class PanelOrderListQueryTests : TestBase
     public async Task can_get_panelorder_list()
     {
         // Arrange
-        var fakePanelOne = FakePanel.Generate(new FakePanelForCreationDto().Generate());
-        var fakePanelTwo = FakePanel.Generate(new FakePanelForCreationDto().Generate());
+        var fakePanelOne = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
+        var fakePanelTwo = new FakePanelBuilder()
+            .WithRepository(GetService<IPanelRepository>())
+            .Build();
         await InsertAsync(fakePanelOne, fakePanelTwo);
 
         var fakePanelOrderOne = FakePanelOrder.Generate(new FakePanelOrderForCreationDto()

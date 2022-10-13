@@ -34,9 +34,10 @@ public class Panel : BaseEntity
     public virtual ICollection<Test> Tests { get; private set; } = new List<Test>();
 
 
-    public static Panel Create(PanelForCreationDto panelForCreationDto)
+    public static Panel Create(PanelForCreationDto panelForCreationDto, IPanelRepository panelRepository)
     {
         new PanelForCreationDtoValidator().ValidateAndThrow(panelForCreationDto);
+        GuardWhenExists(panelForCreationDto.PanelCode, panelForCreationDto.Version, panelRepository);
 
         var newPanel = new Panel();
 
