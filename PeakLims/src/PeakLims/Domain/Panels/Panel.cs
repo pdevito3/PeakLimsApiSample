@@ -52,9 +52,10 @@ public class Panel : BaseEntity
         return newPanel;
     }
 
-    public void Update(PanelForUpdateDto panelForUpdateDto)
+    public void Update(PanelForUpdateDto panelForUpdateDto, IPanelRepository panelRepository)
     {
         new PanelForUpdateDtoValidator().ValidateAndThrow(panelForUpdateDto);
+        GuardWhenExists(PanelCode, panelForUpdateDto.Version, panelRepository);
 
         PanelName = panelForUpdateDto.PanelName;
         TurnAroundTime = panelForUpdateDto.TurnAroundTime;

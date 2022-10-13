@@ -6,7 +6,9 @@ using PeakLims.Domain.Panels.DomainEvents;
 using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using Moq;
 using NUnit.Framework;
+using PeakLims.Domain.Panels.Services;
 
 [Parallelizable]
 public class UpdatePanelTests
@@ -27,8 +29,13 @@ public class UpdatePanelTests
             .Build();
         var updatedPanel = new FakePanelForUpdateDto().Generate();
         
+        var mockPanelRepository = new Mock<IPanelRepository>();
+        mockPanelRepository
+            .Setup(x => x.Exists(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+        
         // Act
-        fakePanel.Update(updatedPanel);
+        fakePanel.Update(updatedPanel, mockPanelRepository.Object);
 
         // Assert
         fakePanel.PanelName.Should().Be(updatedPanel.PanelName);
@@ -47,8 +54,13 @@ public class UpdatePanelTests
         var updatedPanel = new FakePanelForUpdateDto().Generate();
         fakePanel.DomainEvents.Clear();
         
+        var mockPanelRepository = new Mock<IPanelRepository>();
+        mockPanelRepository
+            .Setup(x => x.Exists(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+        
         // Act
-        fakePanel.Update(updatedPanel);
+        fakePanel.Update(updatedPanel, mockPanelRepository.Object);
 
         // Assert
         fakePanel.DomainEvents.Count.Should().Be(1);

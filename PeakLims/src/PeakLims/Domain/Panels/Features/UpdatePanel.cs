@@ -43,9 +43,8 @@ public static class UpdatePanel
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdatePanels);
 
             var panelToUpdate = await _panelRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            Panel.GuardWhenExists(panelToUpdate.PanelCode, request.UpdatedPanelData.Version, _panelRepository);
 
-            panelToUpdate.Update(request.UpdatedPanelData);
+            panelToUpdate.Update(request.UpdatedPanelData, _panelRepository);
             _panelRepository.Update(panelToUpdate);
             return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
         }
