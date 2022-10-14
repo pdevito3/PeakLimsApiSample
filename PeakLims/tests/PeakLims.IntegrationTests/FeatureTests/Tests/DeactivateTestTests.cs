@@ -13,7 +13,7 @@ using static TestFixture;
 public class DeactivateTestTests : TestBase
 {
     [Test]
-    public async Task can_activate_test()
+    public async Task can_deactivate_test()
     {
         // Arrange
         var fakeTest = FakeTest.Generate();
@@ -22,9 +22,9 @@ public class DeactivateTestTests : TestBase
         // Act
         var command = new DeactivateTest.Command(fakeTest.Id);
         await SendAsync(command);
-        var updatedTest = await ExecuteDbContextAsync(db => db.Accessions.FirstOrDefaultAsync(a => a.Id == fakeTest.Id));
+        var updatedTest = await ExecuteDbContextAsync(db => db.Tests.FirstOrDefaultAsync(a => a.Id == fakeTest.Id));
 
         // Assert
-        updatedTest?.Status.Should().Be(TestStatus.Inactive());
+        updatedTest.Status.Should().Be(TestStatus.Inactive());
     }
 }

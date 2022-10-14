@@ -90,6 +90,7 @@ public class FakeAccessionBuilder :
             var fakeTest = FakeTest.GenerateActivated();
             var fakePanel = new FakePanelBuilder()
                 .WithRepository(panelRepository)
+                .Activate()
                 .Build();
             fakePanel.AddTest(fakeTest);
             var fakePanelOrder = FakePanelOrder.Generate();

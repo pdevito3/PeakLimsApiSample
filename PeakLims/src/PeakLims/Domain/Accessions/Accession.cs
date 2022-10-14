@@ -128,6 +128,11 @@ public class Accession : BaseEntity
         // TODO unit test
         GuardIfInFinalState("Panel orders");
         
+        var hasInactivePanel = !panelOrder.Panel.Status.IsActive();
+        if(hasInactivePanel)
+            throw new ValidationException(nameof(Accession),
+                $"This panel is not active. Only active panels can be added to an accession.");
+        
         var hasNonActiveTests = panelOrder.Panel.Tests.Any(x => !x.Status.IsActive());
         if(hasNonActiveTests)
             throw new ValidationException(nameof(Accession),

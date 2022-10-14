@@ -9,11 +9,11 @@ using PeakLims.Domain.TestStatuses;
 using PeakLims.SharedTestHelpers.Fakes.Test;
 
 [Parallelizable]
-public class ActivateTestUnitTests
+public class TestStateChangeTests
 {
     private readonly Faker _faker;
 
-    public ActivateTestUnitTests()
+    public TestStateChangeTests()
     {
         _faker = new Faker();
     }

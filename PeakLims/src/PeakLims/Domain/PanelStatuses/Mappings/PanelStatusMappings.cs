@@ -1,15 +1,15 @@
-namespace PeakLims.Domain.TestStatuses.Mappings;
+namespace PeakLims.Domain.PanelStatuses.Mappings;
 
-using TestStatuses;
+using PanelStatuses;
 using Mapster;
 
-public sealed class TestStatusMappings : IRegister
+public sealed class PanelStatusMappings : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<string, TestStatus>()
-            .MapWith(value => new TestStatus(value));
-        config.NewConfig<TestStatus, string>()
+        config.NewConfig<string, PanelStatus>()
+            .MapWith(value => new PanelStatus(value));
+        config.NewConfig<PanelStatus, string>()
             .MapWith(role => role.Value);
     }
 }

@@ -29,7 +29,6 @@ public class Test : BaseEntity
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual int Version { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
     public virtual TestStatus Status { get; private set; }
 
     [JsonIgnore]

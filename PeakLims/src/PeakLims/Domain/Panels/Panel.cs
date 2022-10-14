@@ -6,6 +6,7 @@ using PeakLims.Domain.Panels.DomainEvents;
 using FluentValidation;
 using System.Text.Json.Serialization;
 using System.Runtime.Serialization;
+using PanelStatuses;
 using Sieve.Attributes;
 using PeakLims.Domain.Tests;
 using Services;
@@ -28,6 +29,8 @@ public class Panel : BaseEntity
 
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual int Version { get; private set; }
+    
+    public virtual PanelStatus Status { get; private set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
@@ -46,6 +49,7 @@ public class Panel : BaseEntity
         newPanel.TurnAroundTime = panelForCreationDto.TurnAroundTime;
         newPanel.Type = panelForCreationDto.Type;
         newPanel.Version = panelForCreationDto.Version;
+        newPanel.Status = PanelStatus.Draft();
 
         newPanel.QueueDomainEvent(new PanelCreated(){ Panel = newPanel });
         
@@ -62,6 +66,18 @@ public class Panel : BaseEntity
         Type = panelForUpdateDto.Type;
         Version = panelForUpdateDto.Version;
 
+        QueueDomainEvent(new PanelUpdated(){ Id = Id });
+    }
+
+    public void Activate()
+    {
+        Status = PanelStatus.Active();
+        QueueDomainEvent(new PanelUpdated(){ Id = Id });
+    }
+
+    public void Deactivate()
+    {
+        Status = PanelStatus.Inactive();
         QueueDomainEvent(new PanelUpdated(){ Id = Id });
     }
 

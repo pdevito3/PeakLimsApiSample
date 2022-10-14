@@ -9,6 +9,7 @@ using FluentAssertions.Extensions;
 using Moq;
 using NUnit.Framework;
 using PeakLims.Domain.Panels.Services;
+using PeakLims.Domain.PanelStatuses;
 
 [Parallelizable]
 public class CreatePanelTests
@@ -36,6 +37,7 @@ public class CreatePanelTests
         fakePanel.TurnAroundTime.Should().Be(panelToCreate.TurnAroundTime);
         fakePanel.Type.Should().Be(panelToCreate.Type);
         fakePanel.Version.Should().Be(panelToCreate.Version);
+        fakePanel.Status.Should().Be(PanelStatus.Draft());
     }
 
     [Test]
