@@ -8,7 +8,6 @@ using PeakLims.Domain.Accessions;
 using PeakLims.Domain.AccessionComments;
 using PeakLims.Domain.Samples;
 using PeakLims.Domain.Containers;
-using PeakLims.Domain.PanelOrders;
 using PeakLims.Domain.TestOrders;
 using PeakLims.Domain.Panels;
 using PeakLims.Domain.Tests;
@@ -17,19 +16,7 @@ using PeakLims.Domain.HealthcareOrganizationContacts;
 using MediatR;
 using PeakLims.Domain.RolePermissions;
 using PeakLims.Domain.Users;
-using PeakLims.Domain.Patients;
-using PeakLims.Domain.Accessions;
-using PeakLims.Domain.AccessionComments;
-using PeakLims.Domain.Samples;
-using PeakLims.Domain.Containers;
-using PeakLims.Domain.PanelOrders;
-using PeakLims.Domain.TestOrders;
-using PeakLims.Domain.Panels;
-using PeakLims.Domain.Tests;
-using PeakLims.Domain.HealthcareOrganizations;
-using PeakLims.Domain.HealthcareOrganizationContacts;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +41,6 @@ public sealed class PeakLimsDbContext : DbContext
     public DbSet<AccessionComment> AccessionComments { get; set; }
     public DbSet<Sample> Samples { get; set; }
     public DbSet<Container> Containers { get; set; }
-    public DbSet<PanelOrder> PanelOrders { get; set; }
     public DbSet<TestOrder> TestOrders { get; set; }
     public DbSet<Panel> Panels { get; set; }
     public DbSet<Test> Tests { get; set; }
@@ -89,7 +75,6 @@ public sealed class PeakLimsDbContext : DbContext
         modelBuilder.ApplyConfiguration(new AccessionCommentConfiguration());
         modelBuilder.ApplyConfiguration(new SampleConfiguration());
         modelBuilder.ApplyConfiguration(new ContainerConfiguration());
-        modelBuilder.ApplyConfiguration(new PanelOrderConfiguration());
         modelBuilder.ApplyConfiguration(new TestOrderConfiguration());
         modelBuilder.ApplyConfiguration(new PanelConfiguration());
         modelBuilder.ApplyConfiguration(new TestConfiguration());

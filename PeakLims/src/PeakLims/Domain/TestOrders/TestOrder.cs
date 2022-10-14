@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using AccessionStatuses;
+using Panels;
 using PeakLims.Domain.Tests;
 using TestOrderStatuses;
 using SharedKernel.Exceptions;
@@ -13,6 +14,12 @@ using SharedKernel.Exceptions;
 public class TestOrder : BaseEntity
 {
     public virtual TestOrderStatus Status { get; private set; }
+    
+    [JsonIgnore]
+    [IgnoreDataMember]
+    [ForeignKey("Panel")]
+    public virtual Guid? AssociatedPanelId { get; private set; }
+    public virtual Panel AssociatedPanel { get; private set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
@@ -21,28 +28,57 @@ public class TestOrder : BaseEntity
     public virtual Test Test { get; private set; }
 
 
-    public static TestOrder Create(TestOrderForCreationDto testOrderForCreationDto)
+    public static TestOrder Create(Test test)
     {
         var newTestOrder = new TestOrder();
 
         newTestOrder.Status = TestOrderStatus.Pending();
-        newTestOrder.TestId = testOrderForCreationDto.TestId;
+        newTestOrder.Test = test;
+        newTestOrder.TestId = test.Id;
 
         newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
         
         return newTestOrder;
     }
-
-    public TestOrder Update(TestOrderForUpdateDto testOrderForUpdateDto)
+    
+    public static TestOrder Create(Guid testId)
     {
-        // TODO unit test
-        if (Status == TestOrderStatus.Pending() || Status == TestOrderStatus.ReadyForTesting())
-        {
-            TestId = testOrderForUpdateDto.TestId;
-            QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
-        }
+        var newTestOrder = new TestOrder();
 
-        return this;
+        newTestOrder.Status = TestOrderStatus.Pending();
+        newTestOrder.TestId = testId;
+
+        newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
+        
+        return newTestOrder;
+    }
+    
+    public static TestOrder Create(Guid testId, Guid associatedPanelId)
+    {
+        var newTestOrder = new TestOrder();
+
+        newTestOrder.Status = TestOrderStatus.Pending();
+        newTestOrder.TestId = testId;
+        newTestOrder.AssociatedPanelId = associatedPanelId;
+
+        newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
+        
+        return newTestOrder;
+    }
+    
+    public static TestOrder Create(Test test, Panel associatedPanel)
+    {
+        var newTestOrder = new TestOrder();
+
+        newTestOrder.Status = TestOrderStatus.Pending();
+        newTestOrder.Test = test;
+        newTestOrder.TestId = test.Id;
+        newTestOrder.AssociatedPanel = associatedPanel;
+        newTestOrder.AssociatedPanelId = associatedPanel.Id;
+
+        newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
+        
+        return newTestOrder;
     }
 
     public TestOrder SetStatusToReadyForTesting()
@@ -60,13 +96,6 @@ public class TestOrder : BaseEntity
         Status = TestOrderStatus.ReadyForTesting();
         QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
         return this;
-    }
-
-    public void SetTest(Test test)
-    {        
-        Test = test;
-        TestId = test.Id;
-        QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
     }
     
     protected TestOrder() { } // For EF + Mocking

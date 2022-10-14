@@ -27,7 +27,7 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
             .Initialize()
             .WithPatientId(fakePatientOne.Id)
             .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
-            .Build(GetService<IPanelRepository>());
+            .Build();
         
         await InsertAsync(fakeAccessionOne);
 

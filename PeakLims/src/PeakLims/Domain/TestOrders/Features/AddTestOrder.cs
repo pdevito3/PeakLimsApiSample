@@ -9,16 +9,17 @@ using PeakLims.Domain;
 using HeimGuard;
 using MapsterMapper;
 using MediatR;
+using Tests.Services;
 
 public static class AddTestOrder
 {
     public sealed class Command : IRequest<TestOrderDto>
     {
-        public readonly TestOrderForCreationDto TestOrderToAdd;
+        public readonly Guid TestId;
 
-        public Command(TestOrderForCreationDto testOrderToAdd)
+        public Command(Guid testId)
         {
-            TestOrderToAdd = testOrderToAdd;
+            TestId = testId;
         }
     }
 
@@ -41,7 +42,7 @@ public static class AddTestOrder
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddTestOrders);
 
-            var testOrder = TestOrder.Create(request.TestOrderToAdd);
+            var testOrder = TestOrder.Create(request.TestId);
             await _testOrderRepository.Add(testOrder, cancellationToken);
 
             await _unitOfWork.CommitChanges(cancellationToken);

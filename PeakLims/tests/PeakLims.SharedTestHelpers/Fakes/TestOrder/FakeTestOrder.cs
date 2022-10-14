@@ -6,13 +6,13 @@ using PeakLims.Domain.TestOrders.Dtos;
 
 public class FakeTestOrder
 {
-    public static TestOrder Generate(TestOrderForCreationDto testOrderForCreationDto)
+    public static TestOrder Generate(Guid testId)
     {
-        return TestOrder.Create(testOrderForCreationDto);
+        return TestOrder.Create(testId);
     }
 
     public static TestOrder Generate()
     {
-        return TestOrder.Create(new FakeTestOrderForCreationDto().Generate());
+        return TestOrder.Create(Guid.NewGuid());
     }
 }

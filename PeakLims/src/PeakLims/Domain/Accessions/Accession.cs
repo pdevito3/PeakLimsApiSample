@@ -6,11 +6,11 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using AccessionStatuses;
+using Panels;
 using Sieve.Attributes;
 using PeakLims.Domain.Patients;
 using PeakLims.Domain.HealthcareOrganizations;
 using PeakLims.Domain.HealthcareOrganizationContacts;
-using PeakLims.Domain.PanelOrders;
 using PeakLims.Domain.TestOrders;
 using PeakLims.Domain.AccessionComments;
 using SharedKernel.Exceptions;
@@ -37,10 +37,6 @@ public class Accession : BaseEntity
     [JsonIgnore]
     [IgnoreDataMember]
     public virtual ICollection<HealthcareOrganizationContact> Contacts { get; } = new List<HealthcareOrganizationContact>();
-
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<PanelOrder> PanelOrders { get; private set; } = new List<PanelOrder>();
 
     [JsonIgnore]
     [IgnoreDataMember]
@@ -82,7 +78,7 @@ public class Accession : BaseEntity
         new ValidationException(nameof(Accession),
                 $"An organization is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}")
             .ThrowWhenNullOrEmpty(HealthcareOrganizationId);
-        if (PanelOrders.Count <= 0 && TestOrders.Count <= 0)
+        if (TestOrders.Count <= 0)
             throw new ValidationException(nameof(Accession),
                 $"At least 1 panel or test is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}");
         if (Contacts.Count <= 0)
@@ -136,38 +132,54 @@ public class Accession : BaseEntity
         return this;
     }
 
-    public Accession AddPanelOrder(PanelOrder panelOrder)
+    public Accession AddPanel(Panel panel)
     {
         // TODO unit test
-        GuardIfInFinalState("Panel orders");
+        GuardIfInFinalState("Panel");
         
         // TODO if any of the panel order test statuses is not in one of the pending states, guard
         
-        var hasInactivePanel = !panelOrder.Panel.Status.IsActive();
+        var hasInactivePanel = !panel.Status.IsActive();
         if(hasInactivePanel)
             throw new ValidationException(nameof(Accession),
                 $"This panel is not active. Only active panels can be added to an accession.");
         
-        var hasNonActiveTests = panelOrder.Panel.Tests.Any(x => !x.Status.IsActive());
+        var hasNonActiveTests = panel.Tests.Any(x => !x.Status.IsActive());
         if(hasNonActiveTests)
             throw new ValidationException(nameof(Accession),
                 $"This panel has one or more tests that are not active. Only active tests can be added to an accession.");
 
-        PanelOrders.Add(panelOrder);
+        // TODO unit test
+        var hasNoTests = panel.Tests.Count == 0;
+        if(hasNoTests)
+            throw new ValidationException(nameof(Accession),
+                $"This panel has no tests to assign.");
+        
+        foreach (var test in panel.Tests)
+        {
+            var testOrder = TestOrder.Create(test, panel);
+            AddTestOrder(testOrder);
+        }
+        
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
         return this;
     }
 
-    public Accession RemovePanelOrder(PanelOrder panelOrder)
+    public Accession RemovePanel(Panel panel)
     {
         // TODO unit test
-        GuardIfInFinalState("Panel orders");
+        GuardIfInFinalState("Panel");
 
-        var alreadyExists = PanelOrders.Any(x => panelOrder.Panel.Id == x.Panel.Id);
+        var alreadyExists = TestOrders.Any(x => panel.Id == x.AssociatedPanelId);
         if (!alreadyExists)
             return this;
+
+        var testsToRemove = TestOrders.Where(x => x.AssociatedPanelId == panel.Id).ToList();
+        foreach (var testOrder in testsToRemove)
+        {
+            RemoveTestOrder(testOrder);
+        }
         
-        PanelOrders.Remove(panelOrder);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
         return this;
     }

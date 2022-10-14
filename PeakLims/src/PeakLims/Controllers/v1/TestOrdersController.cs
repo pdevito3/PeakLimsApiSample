@@ -131,39 +131,14 @@ public sealed class TestOrdersController: ControllerBase
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost(Name = "AddTestOrder")]
-    public async Task<ActionResult<TestOrderDto>> AddTestOrder([FromBody]TestOrderForCreationDto testOrderForCreation)
+    public async Task<ActionResult<TestOrderDto>> AddTestOrder([FromBody]Guid testId)
     {
-        var command = new AddTestOrder.Command(testOrderForCreation);
+        var command = new AddTestOrder.Command(testId);
         var commandResponse = await _mediator.Send(command);
 
         return CreatedAtRoute("GetTestOrder",
             new { commandResponse.Id },
             commandResponse);
-    }
-
-
-    /// <summary>
-    /// Updates an entire existing TestOrder.
-    /// </summary>
-    /// <response code="204">TestOrder updated.</response>
-    /// <response code="400">TestOrder has missing/invalid values.</response>
-    /// <response code="401">This request was not able to be authenticated.</response>
-    /// <response code="403">The required permissions to access this resource were not present in the given request.</response>
-    /// <response code="500">There was an error on the server while creating the TestOrder.</response>
-    [ProducesResponseType(204)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(500)]
-    [Authorize]
-    [Produces("application/json")]
-    [HttpPut("{id:guid}", Name = "UpdateTestOrder")]
-    public async Task<IActionResult> UpdateTestOrder(Guid id, TestOrderForUpdateDto testOrder)
-    {
-        var command = new UpdateTestOrder.Command(id, testOrder);
-        await _mediator.Send(command);
-
-        return NoContent();
     }
 
 

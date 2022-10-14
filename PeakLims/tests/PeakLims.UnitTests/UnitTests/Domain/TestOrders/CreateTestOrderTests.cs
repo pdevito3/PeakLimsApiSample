@@ -22,13 +22,15 @@ public class CreateTestOrderTests
     [Test]
     public void can_create_valid_testOrder()
     {
-        // Arrange + Act
-        var testOrderToCreate = new FakeTestOrderForCreationDto().Generate();
-        var fakeTestOrder = FakeTestOrder.Generate(testOrderToCreate);
+        // Arrange
+        var id = Guid.NewGuid();
+        
+        // Act
+        var fakeTestOrder = FakeTestOrder.Generate(id);
 
         // Assert
         fakeTestOrder.Status.Should().Be(TestOrderStatus.Pending());
-        fakeTestOrder.TestId.Should().Be(testOrderToCreate.TestId);
+        fakeTestOrder.TestId.Should().Be(id);
     }
 
     [Test]

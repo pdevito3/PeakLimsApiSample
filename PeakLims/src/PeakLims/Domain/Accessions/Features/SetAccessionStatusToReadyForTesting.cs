@@ -1,16 +1,11 @@
 namespace PeakLims.Domain.Accessions.Features;
 
-using HealthcareOrganizationContacts.Services;
-using PeakLims.Domain.Accessions.Dtos;
 using PeakLims.Domain.Accessions.Services;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using PanelOrders.Services;
 
 public static class SetAccessionStatusToReadyForTesting
 {

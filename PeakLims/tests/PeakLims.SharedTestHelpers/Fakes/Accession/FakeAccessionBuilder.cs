@@ -1,12 +1,9 @@
 namespace PeakLims.SharedTestHelpers.Fakes.Accession;
 
 using Domain.HealthcareOrganizationContacts;
-using Domain.PanelOrders;
-using Domain.Panels.Services;
+using Domain.Panels;
 using Domain.TestOrders;
 using HealthcareOrganizationContact;
-using Panel;
-using PanelOrder;
 using PeakLims.Domain.Accessions;
 using PeakLims.Domain.Accessions.Dtos;
 using Test;
@@ -18,9 +15,8 @@ public class FakeAccessionBuilder :
 {
     private AccessionForCreationDto _accessionData = new FakeAccessionForCreationDto().Generate();
     private readonly List<HealthcareOrganizationContact> _contacts = new List<HealthcareOrganizationContact>();
-    private readonly List<PanelOrder> _panelOrders = new List<PanelOrder>();
+    private readonly List<Panel> _panels = new List<Panel>();
     private readonly List<TestOrder> _testOrders = new List<TestOrder>();
-    private bool _includeAPanelOrder = true;
     private bool _includeATestOrder = true;
     private bool _includeAContact = true;
 
@@ -52,21 +48,15 @@ public class FakeAccessionBuilder :
         return this;
     }
     
-    public FakeAccessionBuilder WithPanelOrder(PanelOrder panelOrder)
+    public FakeAccessionBuilder WithPanel(Panel panel)
     {
-        _panelOrders.Add(panelOrder);
+        _panels.Add(panel);
         return this;
     }
     
     public FakeAccessionBuilder WithTestOrder(TestOrder testOrder)
     {
         _testOrders.Add(testOrder);
-        return this;
-    }
-    
-    public FakeAccessionBuilder ExcludePanelOrders()
-    {
-        _includeAPanelOrder = false;
         return this;
     }
     
@@ -95,7 +85,7 @@ public class FakeAccessionBuilder :
         return this;
     }
     
-    public Accession Build(IPanelRepository panelRepository)
+    public Accession Build()
     {
         var accession = Accession.Create(_accessionData);
         
@@ -103,25 +93,11 @@ public class FakeAccessionBuilder :
             _contacts.Add(FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto()
                 .RuleFor(x => x.HealthcareOrganizationId, _accessionData.HealthcareOrganizationId)
                 .Generate()));
-        
-        if (_panelOrders.Count <= 0 && _includeAPanelOrder)
-        {
-            var fakeTest = FakeTest.GenerateActivated();
-            var fakePanel = new FakePanelBuilder()
-                .WithRepository(panelRepository)
-                .Activate()
-                .Build();
-            fakePanel.AddTest(fakeTest);
-            var fakePanelOrder = FakePanelOrder.Generate();
-            fakePanelOrder.SetPanel(fakePanel);
-            _panelOrders.Add(fakePanelOrder);
-        }
-        
+
         if (_testOrders.Count <= 0 && _includeATestOrder)
         {
             var fakeTest = FakeTest.GenerateActivated();
-            var fakeTestOrder = FakeTestOrder.Generate();
-            fakeTestOrder.SetTest(fakeTest);
+            var fakeTestOrder = TestOrder.Create(fakeTest);
             _testOrders.Add(fakeTestOrder);
         }
         
@@ -129,9 +105,9 @@ public class FakeAccessionBuilder :
         {
             accession.AddContact(contact);
         }
-        foreach (var panelOrder in _panelOrders)
+        foreach (var panel in _panels)
         {
-            accession.AddPanelOrder(panelOrder);
+            accession.AddPanel(panel);
         }
         foreach (var testOrder in _testOrders)
         {

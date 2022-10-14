@@ -19,8 +19,7 @@ public class DeleteTestOrderCommandTests : TestBase
         var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
         await InsertAsync(fakeTestOne);
 
-        var fakeTestOrderOne = FakeTestOrder.Generate(new FakeTestOrderForCreationDto()
-            .RuleFor(t => t.TestId, _ => fakeTestOne.Id).Generate());
+        var fakeTestOrderOne = FakeTestOrder.Generate(fakeTestOne.Id);
         await InsertAsync(fakeTestOrderOne);
         var testOrder = await ExecuteDbContextAsync(db => db.TestOrders
             .FirstOrDefaultAsync(t => t.Id == fakeTestOrderOne.Id));
@@ -35,28 +34,13 @@ public class DeleteTestOrderCommandTests : TestBase
     }
 
     [Test]
-    public async Task delete_testorder_throws_notfoundexception_when_record_does_not_exist()
-    {
-        // Arrange
-        var badId = Guid.NewGuid();
-
-        // Act
-        var command = new DeleteTestOrder.Command(badId);
-        Func<Task> act = () => SendAsync(command);
-
-        // Assert
-        await act.Should().ThrowAsync<NotFoundException>();
-    }
-
-    [Test]
     public async Task can_softdelete_testorder_from_db()
     {
         // Arrange
         var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
         await InsertAsync(fakeTestOne);
 
-        var fakeTestOrderOne = FakeTestOrder.Generate(new FakeTestOrderForCreationDto()
-            .RuleFor(t => t.TestId, _ => fakeTestOne.Id).Generate());
+        var fakeTestOrderOne = FakeTestOrder.Generate(fakeTestOne.Id);
         await InsertAsync(fakeTestOrderOne);
         var testOrder = await ExecuteDbContextAsync(db => db.TestOrders
             .FirstOrDefaultAsync(t => t.Id == fakeTestOrderOne.Id));

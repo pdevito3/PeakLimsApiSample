@@ -3,6 +3,7 @@ namespace PeakLims.SharedTestHelpers.Fakes.Panel;
 using AutoBogus;
 using Domain.Panels.Services;
 using Domain.PanelStatuses;
+using Domain.Tests;
 using Moq;
 using PeakLims.Domain.Panels;
 using PeakLims.Domain.Panels.Dtos;
@@ -12,6 +13,7 @@ public class FakePanelBuilder
     private PanelForCreationDto _panelData = new FakePanelForCreationDto().Generate();
     private IPanelRepository _panelRepository = null;
     private PanelStatus _status;
+    private readonly List<Test> _tests = new List<Test>();
 
     public FakePanelBuilder WithDto(PanelForCreationDto panelDto)
     {
@@ -42,6 +44,12 @@ public class FakePanelBuilder
         return this;
     }
 
+    public FakePanelBuilder WithTest(Test test)
+    {
+        _tests.Add(test);
+        return this;
+    }
+
     public FakePanelBuilder Deactivate()
     {
         _status = PanelStatus.Inactive();
@@ -54,6 +62,10 @@ public class FakePanelBuilder
             throw new Exception("A panel repository must be provided");
         
         var panel = Panel.Create(_panelData, _panelRepository);
+        foreach (var test in _tests)
+        {
+            panel.AddTest(test);
+        }
 
         if (_status == PanelStatus.Inactive())
             panel.Deactivate();

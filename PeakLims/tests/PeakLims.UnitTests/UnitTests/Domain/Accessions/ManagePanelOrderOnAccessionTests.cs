@@ -5,7 +5,6 @@ using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
 using SharedTestHelpers.Fakes.Panel;
-using SharedTestHelpers.Fakes.PanelOrder;
 using SharedTestHelpers.Fakes.Test;
 
 [Parallelizable]
@@ -28,44 +27,44 @@ public class ManagePanelOrderOnAccessionTests
         var panel = new FakePanelBuilder()
             .WithMockRepository()
             .Activate()
+            .WithTest(test)
             .Build();
-        panel.AddTest(test);
-        var panelOrder = FakePanelOrder.Generate();
-        panelOrder.SetPanel(panel);
         
         // Act - Add
-        fakeAccession.AddPanelOrder(panelOrder);
+        fakeAccession.AddPanel(panel);
 
         // Assert - Add
-        fakeAccession.PanelOrders.Count.Should().Be(1);
-        fakeAccession.PanelOrders.Should().ContainEquivalentOf(panelOrder);
+        fakeAccession.TestOrders.Count.Should().Be(1);
+        
+        var orderedTest = fakeAccession.TestOrders.FirstOrDefault();
+        orderedTest.Test.TestCode.Should().Be(test.TestCode);
+        orderedTest.AssociatedPanel.PanelCode.Should().Be(panel.PanelCode);
         
         // Act - Can remove idempotently
-        fakeAccession.RemovePanelOrder(panelOrder)
-            .RemovePanelOrder(panelOrder)
-            .RemovePanelOrder(panelOrder);
+        fakeAccession.RemovePanel(panel)
+            .RemovePanel(panel)
+            .RemovePanel(panel);
 
         // Assert - Remove
-        fakeAccession.PanelOrders.Count.Should().Be(0);
+        fakeAccession.TestOrders.Count.Should().Be(0);
     }
     
     [Test]
-    public void can_not_add_inactive_panelorder()
+    public void can_not_add_inactive_panel()
     {
         // Arrange
         var fakeAccession = FakeAccession.Generate();
 
         var test = FakeTest.Generate();
-        test.Deactivate();
+        test.Activate();
         var panel = new FakePanelBuilder()
             .WithMockRepository()
+            .WithTest(test)
+            .Deactivate()
             .Build();
-        panel.AddTest(test);
-        var panelOrder = FakePanelOrder.Generate();
-        panelOrder.SetPanel(panel);
         
         // Act
-        var act = () => fakeAccession.AddPanelOrder(panelOrder);
+        var act = () => fakeAccession.AddPanel(panel);
 
         // Assert
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>()
@@ -83,13 +82,11 @@ public class ManagePanelOrderOnAccessionTests
         var panel = new FakePanelBuilder()
             .WithMockRepository()
             .Activate()
+            .WithTest(test)
             .Build();
-        panel.AddTest(test);
-        var panelOrder = FakePanelOrder.Generate();
-        panelOrder.SetPanel(panel);
         
         // Act
-        var act = () => fakeAccession.AddPanelOrder(panelOrder);
+        var act = () => fakeAccession.AddPanel(panel);
 
         // Assert
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>()

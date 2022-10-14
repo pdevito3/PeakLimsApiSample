@@ -21,20 +21,17 @@ public class AddTestOrderCommandTests : TestBase
         var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
         await InsertAsync(fakeTestOne);
 
-        var fakeTestOrderOne = new FakeTestOrderForCreationDto()
-            .RuleFor(t => t.TestId, _ => fakeTestOne.Id).Generate();
-
         // Act
-        var command = new AddTestOrder.Command(fakeTestOrderOne);
+        var command = new AddTestOrder.Command(fakeTestOne.Id);
         var testOrderReturned = await SendAsync(command);
         var testOrderCreated = await ExecuteDbContextAsync(db => db.TestOrders
             .FirstOrDefaultAsync(t => t.Id == testOrderReturned.Id));
 
         // Assert
         testOrderReturned.Status.Should().Be(TestOrderStatus.Pending().Value);
-        testOrderReturned.TestId.Should().Be(fakeTestOrderOne.TestId);
+        testOrderReturned.TestId.Should().Be(fakeTestOne.Id);
 
         testOrderCreated.Status.Should().Be(TestOrderStatus.Pending());
-        testOrderCreated.TestId.Should().Be(fakeTestOrderOne.TestId);
+        testOrderCreated.TestId.Should().Be(fakeTestOne.Id);
     }
 }

@@ -20,8 +20,7 @@ public class TestOrderQueryTests : TestBase
         var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
         await InsertAsync(fakeTestOne);
 
-        var fakeTestOrderOne = FakeTestOrder.Generate(new FakeTestOrderForCreationDto()
-            .RuleFor(t => t.TestId, _ => fakeTestOne.Id).Generate());
+        var fakeTestOrderOne = FakeTestOrder.Generate(fakeTestOne.Id);
         await InsertAsync(fakeTestOrderOne);
 
         // Act

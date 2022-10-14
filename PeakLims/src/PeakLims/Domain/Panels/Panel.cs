@@ -98,6 +98,8 @@ public class Panel : BaseEntity
 
     public void RemoveTest(Test test)
     {        
+        // TODO add repository check to make sure that no panels have been used with this config?
+        
         Tests.Remove(test);
         QueueDomainEvent(new PanelUpdated(){ Id = Id });
     }

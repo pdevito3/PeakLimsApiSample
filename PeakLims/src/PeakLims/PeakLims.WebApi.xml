@@ -369,78 +369,6 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the HealthcareOrganization.</response>
         </member>
-        <member name="M:PeakLims.Controllers.v1.PanelOrdersController.GetPanelOrders(PeakLims.Domain.PanelOrders.Dtos.PanelOrderParametersDto)">
-             <summary>
-             Gets a list of all PanelOrders.
-             </summary>
-             <response code="200">PanelOrder list returned successfully.</response>
-             <response code="400">PanelOrder has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the PanelOrder.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.PanelOrdersController.GetPanelOrder(System.Guid)">
-            <summary>
-            Gets a single PanelOrder by ID.
-            </summary>
-            <response code="200">PanelOrder record returned successfully.</response>
-            <response code="400">PanelOrder has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the PanelOrder.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.PanelOrdersController.AddPanelOrder(PeakLims.Domain.PanelOrders.Dtos.PanelOrderForCreationDto)">
-            <summary>
-            Creates a new PanelOrder record.
-            </summary>
-            <response code="201">PanelOrder created.</response>
-            <response code="400">PanelOrder has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the PanelOrder.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.PanelOrdersController.UpdatePanelOrder(System.Guid,PeakLims.Domain.PanelOrders.Dtos.PanelOrderForUpdateDto)">
-            <summary>
-            Updates an entire existing PanelOrder.
-            </summary>
-            <response code="204">PanelOrder updated.</response>
-            <response code="400">PanelOrder has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the PanelOrder.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.PanelOrdersController.DeletePanelOrder(System.Guid)">
-            <summary>
-            Deletes an existing PanelOrder record.
-            </summary>
-            <response code="204">PanelOrder deleted.</response>
-            <response code="400">PanelOrder has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the PanelOrder.</response>
-        </member>
         <member name="M:PeakLims.Controllers.v1.PanelsController.GetPanels(PeakLims.Domain.Panels.Dtos.PanelParametersDto)">
              <summary>
              Gets a list of all Panels.
@@ -792,21 +720,11 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the TestOrder.</response>
         </member>
-        <member name="M:PeakLims.Controllers.v1.TestOrdersController.AddTestOrder(PeakLims.Domain.TestOrders.Dtos.TestOrderForCreationDto)">
+        <member name="M:PeakLims.Controllers.v1.TestOrdersController.AddTestOrder(System.Guid)">
             <summary>
             Creates a new TestOrder record.
             </summary>
             <response code="201">TestOrder created.</response>
-            <response code="400">TestOrder has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the TestOrder.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.TestOrdersController.UpdateTestOrder(System.Guid,PeakLims.Domain.TestOrders.Dtos.TestOrderForUpdateDto)">
-            <summary>
-            Updates an entire existing TestOrder.
-            </summary>
-            <response code="204">TestOrder updated.</response>
             <response code="400">TestOrder has missing/invalid values.</response>
             <response code="401">This request was not able to be authenticated.</response>
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
@@ -1014,11 +932,6 @@
         <member name="M:PeakLims.Databases.EntityConfigurations.PanelConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{PeakLims.Domain.Panels.Panel})">
             <summary>
             The database configuration for Panels. 
-            </summary>
-        </member>
-        <member name="M:PeakLims.Databases.EntityConfigurations.PanelOrderConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{PeakLims.Domain.PanelOrders.PanelOrder})">
-            <summary>
-            The database configuration for PanelOrders. 
             </summary>
         </member>
         <member name="M:PeakLims.Databases.EntityConfigurations.PatientConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{PeakLims.Domain.Patients.Patient})">
