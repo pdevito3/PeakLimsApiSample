@@ -6,6 +6,7 @@ using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.TestOrderStatuses;
 using PeakLims.Domain.TestOrders.Features;
 using static TestFixture;
 using SharedKernel.Exceptions;
@@ -30,10 +31,10 @@ public class AddTestOrderCommandTests : TestBase
             .FirstOrDefaultAsync(t => t.Id == testOrderReturned.Id));
 
         // Assert
-        testOrderReturned.Status.Should().Be(fakeTestOrderOne.Status);
+        testOrderReturned.Status.Should().Be(TestOrderStatus.Pending().Value);
         testOrderReturned.TestId.Should().Be(fakeTestOrderOne.TestId);
 
-        testOrderCreated.Status.Should().Be(fakeTestOrderOne.Status);
+        testOrderCreated.Status.Should().Be(TestOrderStatus.Pending());
         testOrderCreated.TestId.Should().Be(fakeTestOrderOne.TestId);
     }
 }

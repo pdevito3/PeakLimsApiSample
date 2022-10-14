@@ -1,8 +1,6 @@
 namespace PeakLims.Domain.TestOrders.Features;
 
-using PeakLims.Domain.TestOrders;
 using PeakLims.Domain.TestOrders.Dtos;
-using PeakLims.Domain.TestOrders.Validators;
 using PeakLims.Domain.TestOrders.Services;
 using PeakLims.Services;
 using SharedKernel.Exceptions;

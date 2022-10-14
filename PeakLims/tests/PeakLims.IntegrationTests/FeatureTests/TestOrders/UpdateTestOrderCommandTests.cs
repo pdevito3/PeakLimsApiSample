@@ -37,7 +37,7 @@ public class UpdateTestOrderCommandTests : TestBase
         var updatedTestOrder = await ExecuteDbContextAsync(db => db.TestOrders.FirstOrDefaultAsync(t => t.Id == id));
 
         // Assert
-        updatedTestOrder.Status.Should().Be(updatedTestOrderDto.Status);
+        updatedTestOrder.Status.Value.Should().Be(fakeTestOrderOne.Status.Value);
         updatedTestOrder.TestId.Should().Be(updatedTestOrderDto.TestId);
     }
 }

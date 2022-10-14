@@ -52,6 +52,7 @@ public class PanelOrder : BaseEntity
     public void SetPanel(Panel panel)
     {        
         Panel = panel;
+        PanelId = panel.Id;
         QueueDomainEvent(new PanelOrderUpdated(){ Id = Id });
     }
     

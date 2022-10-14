@@ -58,6 +58,12 @@ public class FakeAccessionBuilder :
         return this;
     }
     
+    public FakeAccessionBuilder WithTestOrder(TestOrder testOrder)
+    {
+        _testOrders.Add(testOrder);
+        return this;
+    }
+    
     public FakeAccessionBuilder ExcludePanelOrders()
     {
         _includeAPanelOrder = false;
@@ -73,6 +79,19 @@ public class FakeAccessionBuilder :
     public FakeAccessionBuilder ExcludeContacts()
     {
         _includeAContact = false;
+        return this;
+    }
+    
+    public FakeAccessionBuilder ExcludePatient()
+    {
+        _accessionData.PatientId = null;
+        return this;
+    }
+    
+    public FakeAccessionBuilder ExcludeOrg()
+    {
+        _accessionData.HealthcareOrganizationId = null;
+        ExcludeContacts();
         return this;
     }
     

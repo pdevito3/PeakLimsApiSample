@@ -5,12 +5,15 @@ using PeakLims.Domain.Accessions.DomainEvents;
 using Bogus;
 using FakeItEasy;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using PeakLims.Domain.Accessions;
 using PeakLims.Domain.AccessionStatuses;
 using PeakLims.Domain.HealthcareOrganizationContacts;
 using PeakLims.Domain.PanelOrders;
+using PeakLims.Domain.Panels.Services;
 using PeakLims.Domain.TestOrders;
+using PeakLims.Domain.TestOrderStatuses;
 using SharedTestHelpers.Fakes.HealthcareOrganizationContact;
 using SharedTestHelpers.Fakes.PanelOrder;
 using SharedTestHelpers.Fakes.TestOrder;
@@ -24,49 +27,17 @@ public class AccessionReadyForTestingTests
     {
         _faker = new Faker();
     }
-
-    private static Accession CreateFakeAccessionForTransitionToReadyForTesting(Guid patientId,
-        Guid healthcareOrganizationId,
-        PanelOrder panelOrder = null,
-        TestOrder testOrder = null,
-        HealthcareOrganizationContact healthcareOrganizationContact = null
-    )
-    {
-        var accessionToCreate = new FakeAccessionForCreationDto().Generate();
-        accessionToCreate.PatientId = patientId;
-        accessionToCreate.HealthcareOrganizationId = healthcareOrganizationId;
-
-        var fakeAccession = A.Fake<Accession>(x => x.Wrapping(Accession.Create(accessionToCreate)));
-        if(testOrder != null)
-            A.CallTo(() => fakeAccession.TestOrders)
-                .Returns(new List<TestOrder>()
-                {
-                    testOrder
-                });
-        if(panelOrder != null)
-            A.CallTo(() => fakeAccession.PanelOrders)
-                .Returns(new List<PanelOrder>()
-                {
-                    panelOrder
-                });
-        if(healthcareOrganizationContact != null)
-            A.CallTo(() => fakeAccession.Contacts)
-                .Returns(new List<HealthcareOrganizationContact>()
-                {
-                    healthcareOrganizationContact
-                });
-        return fakeAccession;
-    }
     
     [Test]
     public void can_change_to_readyForTesting()
     {
         // Arrange
-        var fakeAccession = CreateFakeAccessionForTransitionToReadyForTesting(Guid.NewGuid(), 
-            Guid.NewGuid(),
-            FakePanelOrder.Generate(),
-            FakeTestOrder.Generate(),
-            FakeHealthcareOrganizationContact.Generate());
+        var mockPanelRepository = GetMockPanelRepository();
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithPatientId(Guid.NewGuid())
+            .WithHealthcareOrganizationId(Guid.NewGuid())
+            .Build(mockPanelRepository.Object);
         fakeAccession.DomainEvents.Clear();
         
         // Act
@@ -77,16 +48,41 @@ public class AccessionReadyForTestingTests
         fakeAccession.DomainEvents.Count.Should().Be(1);
         fakeAccession.DomainEvents.FirstOrDefault().Should().BeOfType(typeof(AccessionUpdated));
     }
+    
+    [Test]
+    public void associated_test_order_state_changed()
+    {
+        // Arrange
+        var mockPanelRepository = GetMockPanelRepository();
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithPatientId(Guid.NewGuid())
+            .WithHealthcareOrganizationId(Guid.NewGuid())
+            .Build(mockPanelRepository.Object);
+        fakeAccession.DomainEvents.Clear();
+        
+        // Act
+        fakeAccession.SetStatusToReadyForTesting();
+
+        // Assert
+        fakeAccession.TestOrders
+            .Count(x => x.Status == TestOrderStatus.ReadyForTesting())
+            .Should()
+            .Be(fakeAccession.TestOrders.Count);
+    }
 
     [Test]
     public void can_not_transition_without_patient()
     {
         // Arrange
-        var fakeAccession = CreateFakeAccessionForTransitionToReadyForTesting(Guid.Empty, 
-            Guid.NewGuid(),
-            FakePanelOrder.Generate(),
-            FakeTestOrder.Generate(),
-            FakeHealthcareOrganizationContact.Generate());
+        var mockPanelRepository = GetMockPanelRepository();
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithPatientId(Guid.NewGuid())
+            .WithHealthcareOrganizationId(Guid.NewGuid())
+            .ExcludePatient()
+            .Build(mockPanelRepository.Object);
+        fakeAccession.DomainEvents.Clear();
         
         // Act
         var act = () => fakeAccession.SetStatusToReadyForTesting();
@@ -99,11 +95,13 @@ public class AccessionReadyForTestingTests
     public void can_not_transition_without_org()
     {
         // Arrange
-        var fakeAccession = CreateFakeAccessionForTransitionToReadyForTesting(Guid.NewGuid(),
-            Guid.Empty, 
-            FakePanelOrder.Generate(),
-            FakeTestOrder.Generate(),
-            FakeHealthcareOrganizationContact.Generate());
+        var mockPanelRepository = GetMockPanelRepository();
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithPatientId(Guid.NewGuid())
+            .WithHealthcareOrganizationId(Guid.NewGuid())
+            .ExcludeOrg()
+            .Build(mockPanelRepository.Object);
         
         // Act
         var act = () => fakeAccession.SetStatusToReadyForTesting();
@@ -116,11 +114,14 @@ public class AccessionReadyForTestingTests
     public void can_not_transition_without_panel_or_test()
     {
         // Arrange
-        var fakeAccession = CreateFakeAccessionForTransitionToReadyForTesting(Guid.NewGuid(),
-            Guid.NewGuid(),
-            null,
-            null,
-             FakeHealthcareOrganizationContact.Generate());
+        var mockPanelRepository = GetMockPanelRepository();
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithPatientId(Guid.NewGuid())
+            .WithHealthcareOrganizationId(Guid.NewGuid())
+            .ExcludePanelOrders()
+            .ExcludeTestOrders()
+            .Build(mockPanelRepository.Object);
         
         // Act
         var act = () => fakeAccession.SetStatusToReadyForTesting();
@@ -133,15 +134,27 @@ public class AccessionReadyForTestingTests
     public void can_not_transition_without_orgContact()
     {
         // Arrange
-        var fakeAccession = CreateFakeAccessionForTransitionToReadyForTesting(Guid.NewGuid(),
-            Guid.NewGuid(),
-            FakePanelOrder.Generate(),
-            FakeTestOrder.Generate());
+        var mockPanelRepository = GetMockPanelRepository();
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithPatientId(Guid.NewGuid())
+            .WithHealthcareOrganizationId(Guid.NewGuid())
+            .ExcludeContacts()
+            .Build(mockPanelRepository.Object);
         
         // Act
         var act = () => fakeAccession.SetStatusToReadyForTesting();
 
         // Assert
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>();
+    }
+
+    private static Mock<IPanelRepository> GetMockPanelRepository()
+    {
+        var mockPanelRepository = new Mock<IPanelRepository>();
+        mockPanelRepository
+            .Setup(x => x.Exists(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+        return mockPanelRepository;
     }
 }

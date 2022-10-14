@@ -20,7 +20,7 @@ public class Accession : BaseEntity
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string AccessionNumber { get; }
 
-    public AccessionStatus Status { get; private set; }
+    public virtual AccessionStatus Status { get; private set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
@@ -89,7 +89,18 @@ public class Accession : BaseEntity
             throw new ValidationException(nameof(Accession),
                 $"At least 1 organization contact is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}");
         
+        // TODO unit test
+        if (Status != AccessionStatus.Draft())
+            throw new ValidationException(nameof(Accession),
+                $"Test orders in a '{Status?.Value}' state can not be set to '{AccessionStatus.ReadyForTesting().Value}'");
+
         Status = AccessionStatus.ReadyForTesting();
+        
+        foreach (var testOrder in TestOrders)
+        {
+            testOrder.SetStatusToReadyForTesting();
+        }
+
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
         return this;
     }
@@ -113,6 +124,8 @@ public class Accession : BaseEntity
     {
         // TODO unit test
         GuardIfInFinalState("Test orders");
+        
+        // TODO if test order status is not in one of the pending states, guard
 
         var alreadyExists = TestOrders.Any(x => testOrder.Id == x.Id);
         if (!alreadyExists)
@@ -127,6 +140,8 @@ public class Accession : BaseEntity
     {
         // TODO unit test
         GuardIfInFinalState("Panel orders");
+        
+        // TODO if any of the panel order test statuses is not in one of the pending states, guard
         
         var hasInactivePanel = !panelOrder.Panel.Status.IsActive();
         if(hasInactivePanel)
@@ -179,11 +194,8 @@ public class Accession : BaseEntity
         return this;
     }
 
-    private bool HealthcareOrganizationContactAlreadyExists(HealthcareOrganizationContact contact)
-    {
-        var alreadyExists = Contacts.Any(x => contact.Id == x.Id);
-        return alreadyExists;
-    }
+    private bool HealthcareOrganizationContactAlreadyExists(HealthcareOrganizationContact contact) 
+        => Contacts.Any(x => contact.Id == x.Id);
 
     private void GuardIfInFinalState(string subject)
     {

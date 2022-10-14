@@ -7,6 +7,7 @@ using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using NUnit.Framework;
+using PeakLims.Domain.TestOrderStatuses;
 
 [Parallelizable]
 public class CreateTestOrderTests
@@ -26,7 +27,7 @@ public class CreateTestOrderTests
         var fakeTestOrder = FakeTestOrder.Generate(testOrderToCreate);
 
         // Assert
-        fakeTestOrder.Status.Should().Be(testOrderToCreate.Status);
+        fakeTestOrder.Status.Should().Be(TestOrderStatus.Pending());
         fakeTestOrder.TestId.Should().Be(testOrderToCreate.TestId);
     }
 
