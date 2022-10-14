@@ -10,10 +10,6 @@ using Domain.AccessionStatuses;
 using Domain.Panels.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
-using SharedTestHelpers.Fakes.HealthcareOrganizationContact;
-using SharedTestHelpers.Fakes.Panel;
-using SharedTestHelpers.Fakes.PanelOrder;
-using SharedTestHelpers.Fakes.Test;
 using static TestFixture;
 
 public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
@@ -22,27 +18,16 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
     public async Task can_change_status_to_readyfortesting()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate();
         await InsertAsync(fakePatientOne);
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
+        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
         await InsertAsync(fakeHealthcareOrganizationOne);
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
-        
-        var fakeContact = FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto()
-            .RuleFor(x => x.HealthcareOrganizationId, fakeHealthcareOrganizationOne.Id)
-            .Generate());
-        fakeAccessionOne.AddContact(fakeContact);
-        
-        var fakeTest = FakeTest.GenerateActivated();
-        var fakePanel = new FakePanelBuilder()
-            .WithRepository(GetService<IPanelRepository>())
-            .Build();
-        fakePanel.AddTest(fakeTest);
-        var fakePanelOrder = FakePanelOrder.Generate();
-        fakePanelOrder.SetPanel(fakePanel);
-        fakeAccessionOne.AddPanelOrder(fakePanelOrder);
+
+        var fakeAccessionOne = FakeAccessionBuilder
+            .Initialize()
+            .WithPatientId(fakePatientOne.Id)
+            .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
+            .Build(GetService<IPanelRepository>());
         
         await InsertAsync(fakeAccessionOne);
 
