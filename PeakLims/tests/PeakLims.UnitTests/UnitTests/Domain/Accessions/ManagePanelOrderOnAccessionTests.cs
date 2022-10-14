@@ -50,7 +50,7 @@ public class ManagePanelOrderOnAccessionTests
     }
     
     [Test]
-    public void can_not_add_panel_order_with_inactive_test()
+    public void can_not_add_inactive_panelorder()
     {
         // Arrange
         var fakeAccession = FakeAccession.Generate();
@@ -68,6 +68,31 @@ public class ManagePanelOrderOnAccessionTests
         var act = () => fakeAccession.AddPanelOrder(panelOrder);
 
         // Assert
-        act.Should().Throw<SharedKernel.Exceptions.ValidationException>();
+        act.Should().Throw<SharedKernel.Exceptions.ValidationException>()
+            .WithMessage("This panel is not active. Only active panels can be added to an accession.");
+    }
+    
+    [Test]
+    public void can_not_add_panel_order_with_inactive_test()
+    {
+        // Arrange
+        var fakeAccession = FakeAccession.Generate();
+
+        var test = FakeTest.Generate();
+        test.Deactivate();
+        var panel = new FakePanelBuilder()
+            .WithMockRepository()
+            .Activate()
+            .Build();
+        panel.AddTest(test);
+        var panelOrder = FakePanelOrder.Generate();
+        panelOrder.SetPanel(panel);
+        
+        // Act
+        var act = () => fakeAccession.AddPanelOrder(panelOrder);
+
+        // Assert
+        act.Should().Throw<SharedKernel.Exceptions.ValidationException>()
+            .WithMessage("This panel has one or more tests that are not active. Only active tests can be added to an accession.");
     }
 }
