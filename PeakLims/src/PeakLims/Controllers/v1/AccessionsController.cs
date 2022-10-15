@@ -259,11 +259,28 @@ public sealed class AccessionsController: ControllerBase
     [ProducesResponseType(403)]
     [ProducesResponseType(500)]
     [Authorize]
-    [Produces("application/json")]
-    [HttpPost("{accessionId:guid}/RemoveTestOrder/{testOrderId:guid}", Name = "RemoveTestOrderFromAccession")]
+    [HttpDelete("{accessionId:guid}/RemoveTestOrder/{testOrderId:guid}", Name = "RemoveTestOrderFromAccession")]
     public async Task<IActionResult> RemoveTestOrderFromAccession(Guid accessionId, Guid testOrderId)
     {
         var command = new RemoveTestOrderFromAccession.Command(accessionId, testOrderId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Removes a panel and all it's associated tests from an accession
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [HttpDelete("{accessionId:guid}/RemovePanel/{testOrderId:guid}", Name = "RemovePanelFromAccession")]
+    public async Task<IActionResult> RemovePanelFromAccession(Guid accessionId, Guid panelId)
+    {
+        var command = new RemovePanelFromAccession.Command(accessionId, panelId);
         await _mediator.Send(command);
         return NoContent();
     }

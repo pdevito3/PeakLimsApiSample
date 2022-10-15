@@ -120,7 +120,7 @@ public class FakeAccessionBuilder :
                 .RuleFor(x => x.HealthcareOrganizationId, _accessionData.HealthcareOrganizationId)
                 .Generate()));
 
-        if (_tests.Count <= 0 && _includeATestOrder)
+        if (_tests.Count <= 0 && _panels.Count <= 0 && _includeATestOrder)
         {
             var test = new FakeTestBuilder()
                 .WithRepository(_testRepository)

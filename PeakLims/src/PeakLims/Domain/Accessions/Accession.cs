@@ -120,23 +120,28 @@ public class Accession : BaseEntity
 
     public Accession RemoveTestOrder(TestOrder testOrder)
     {
-        // TODO unit test
-        GuardIfInFinalState("Test orders");
-        
-        // TODO if test order status is not in one of the pending states, guard
-
         var alreadyExists = TestOrders.Any(x => testOrder.Id == x.Id);
         if (!alreadyExists)
             return this;
-
+        
         // TODO unit test
         if(testOrder.IsPartOfPanel())
             throw new ValidationException(nameof(Accession),
                 $"Test orders that are part of a panel can not be selectively removed.");
-
-        TestOrders.Remove(testOrder);
+        
+        RemoveTestOrderForTestOrPanel(testOrder);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
         return this;
+    }
+
+    private void RemoveTestOrderForTestOrPanel(TestOrder testOrder)
+    {
+        // TODO unit test
+        GuardIfInFinalState("Test orders");
+
+        // TODO if test order status is not in one of the pending states, guard
+
+        TestOrders.Remove(testOrder);
     }
 
     public Accession AddPanel(Panel panel)
@@ -184,7 +189,7 @@ public class Accession : BaseEntity
         var testsToRemove = TestOrders.Where(x => x.AssociatedPanelId == panel.Id).ToList();
         foreach (var testOrder in testsToRemove)
         {
-            RemoveTestOrder(testOrder);
+            RemoveTestOrderForTestOrPanel(testOrder);
         }
         
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
