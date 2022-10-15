@@ -158,6 +158,11 @@
             Adds a test to an accession
             </summary>
         </member>
+        <member name="M:PeakLims.Controllers.v1.AccessionsController.AddPanelToAccession(System.Guid,System.Guid)">
+            <summary>
+            Adds a panel to an accession
+            </summary>
+        </member>
         <member name="M:PeakLims.Controllers.v1.ContainersController.GetContainers(PeakLims.Domain.Containers.Dtos.ContainerParametersDto)">
              <summary>
              Gets a list of all Containers.
@@ -682,6 +687,16 @@
             <response code="401">This request was not able to be authenticated.</response>
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the Sample.</response>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.TestOrdersController.GetTestOrder(System.Guid)">
+            <summary>
+            Gets a single Test Order by ID.
+            </summary>
+            <response code="200">Test Order record returned successfully.</response>
+            <response code="400">Test Order has missing/invalid values.</response>
+            <response code="401">This request was not able to be authenticated.</response>
+            <response code="403">The required permissions to access this resource were not present in the given request.</response>
+            <response code="500">There was an error on the server while getting the Test Order.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.TestsController.GetTests(PeakLims.Domain.Tests.Dtos.TestParametersDto)">
              <summary>

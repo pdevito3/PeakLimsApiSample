@@ -241,10 +241,10 @@ public sealed class AccessionsController: ControllerBase
     [ProducesResponseType(500)]
     [Authorize]
     [Produces("application/json")]
-    [HttpPost("{accessionId:guid}/addpanel/{testId:guid}", Name = "AddPanelToAccession")]
-    public async Task<IActionResult> AddPanelToAccession(Guid accessionId, Guid testId)
+    [HttpPost("{accessionId:guid}/addpanel/{panelId:guid}", Name = "AddPanelToAccession")]
+    public async Task<IActionResult> AddPanelToAccession(Guid accessionId, Guid panelId)
     {
-        var command = new AddPanelToAccession.Command(accessionId, testId);
+        var command = new AddPanelToAccession.Command(accessionId, panelId);
         await _mediator.Send(command);
         return NoContent();
     }
