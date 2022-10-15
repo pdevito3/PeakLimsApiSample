@@ -35,7 +35,6 @@ public class UpdatePanelCommandTests : TestBase
 
         // Assert
         updatedPanel.PanelName.Should().Be(updatedPanelDto.PanelName);
-        updatedPanel.TurnAroundTime.Should().Be(updatedPanelDto.TurnAroundTime);
         updatedPanel.Type.Should().Be(updatedPanelDto.Type);
         updatedPanel.Version.Should().Be(updatedPanelDto.Version);
     }

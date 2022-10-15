@@ -29,7 +29,6 @@ public class PanelQueryTests : TestBase
         // Assert
         panel.PanelCode.Should().Be(fakePanelOne.PanelCode);
         panel.PanelName.Should().Be(fakePanelOne.PanelName);
-        panel.TurnAroundTime.Should().Be(fakePanelOne.TurnAroundTime);
         panel.Type.Should().Be(fakePanelOne.Type);
         panel.Version.Should().Be(fakePanelOne.Version);
     }

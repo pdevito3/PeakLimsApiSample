@@ -22,9 +22,6 @@ public class Panel : BaseEntity
     public virtual string PanelName { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
-    public virtual int TurnAroundTime { get; private set; }
-
-    [Sieve(CanFilter = true, CanSort = true)]
     public virtual string Type { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
@@ -46,7 +43,6 @@ public class Panel : BaseEntity
 
         newPanel.PanelCode = panelForCreationDto.PanelCode;
         newPanel.PanelName = panelForCreationDto.PanelName;
-        newPanel.TurnAroundTime = panelForCreationDto.TurnAroundTime;
         newPanel.Type = panelForCreationDto.Type;
         newPanel.Version = panelForCreationDto.Version;
         newPanel.Status = PanelStatus.Draft();
@@ -62,7 +58,6 @@ public class Panel : BaseEntity
         GuardWhenExists(PanelCode, panelForUpdateDto.Version, panelRepository);
 
         PanelName = panelForUpdateDto.PanelName;
-        TurnAroundTime = panelForUpdateDto.TurnAroundTime;
         Type = panelForUpdateDto.Type;
         Version = panelForUpdateDto.Version;
 

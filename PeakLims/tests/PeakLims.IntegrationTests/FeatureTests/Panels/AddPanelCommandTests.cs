@@ -27,13 +27,11 @@ public class AddPanelCommandTests : TestBase
         // Assert
         panelReturned.PanelCode.Should().Be(fakePanelOne.PanelCode);
         panelReturned.PanelName.Should().Be(fakePanelOne.PanelName);
-        panelReturned.TurnAroundTime.Should().Be(fakePanelOne.TurnAroundTime);
         panelReturned.Type.Should().Be(fakePanelOne.Type);
         panelReturned.Version.Should().Be(fakePanelOne.Version);
         
         panelCreated.PanelCode.Should().Be(fakePanelOne.PanelCode);
         panelCreated.PanelName.Should().Be(fakePanelOne.PanelName);
-        panelCreated.TurnAroundTime.Should().Be(fakePanelOne.TurnAroundTime);
         panelCreated.Type.Should().Be(fakePanelOne.Type);
         panelCreated.Version.Should().Be(fakePanelOne.Version);
     }

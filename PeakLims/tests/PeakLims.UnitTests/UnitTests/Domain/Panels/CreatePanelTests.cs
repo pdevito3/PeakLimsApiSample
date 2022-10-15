@@ -34,7 +34,6 @@ public class CreatePanelTests
         // Assert
         fakePanel.PanelCode.Should().Be(panelToCreate.PanelCode);
         fakePanel.PanelName.Should().Be(panelToCreate.PanelName);
-        fakePanel.TurnAroundTime.Should().Be(panelToCreate.TurnAroundTime);
         fakePanel.Type.Should().Be(panelToCreate.Type);
         fakePanel.Version.Should().Be(panelToCreate.Version);
         fakePanel.Status.Should().Be(PanelStatus.Draft());
