@@ -6,8 +6,11 @@ using PeakLims.Domain.Tests.DomainEvents;
 using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using Moq;
 using NUnit.Framework;
+using PeakLims.Domain.Tests.Services;
 using PeakLims.Domain.TestStatuses;
+using ValidationException = SharedKernel.Exceptions.ValidationException;
 
 [Parallelizable]
 public class CreateTestTests
@@ -49,5 +52,47 @@ public class CreateTestTests
         // Assert
         fakeTest.DomainEvents.Count.Should().Be(1);
         fakeTest.DomainEvents.FirstOrDefault().Should().BeOfType(typeof(TestCreated));
+    }
+    
+    [Test]
+    public void test_must_have_name()
+    {
+        // Arrange
+        var testToCreate = new FakeTestForCreationDto().Generate();
+        testToCreate.TestName = null;
+        
+        // Act
+        var fakeTest = () => Test.Create(testToCreate, Mock.Of<ITestRepository>());
+
+        // Assert
+        fakeTest.Should().Throw<FluentValidation.ValidationException>();
+    }
+    
+    [Test]
+    public void test_must_have_code()
+    {
+        // Arrange
+        var testToCreate = new FakeTestForCreationDto().Generate();
+        testToCreate.TestCode = null;
+        
+        // Act
+        var fakeTest = () => Test.Create(testToCreate, Mock.Of<ITestRepository>());
+
+        // Assert
+        fakeTest.Should().Throw<FluentValidation.ValidationException>();
+    }
+    
+    [Test]
+    public void test_must_have_version_greater_than_or_equal_to_zero()
+    {
+        // Arrange
+        var testToCreate = new FakeTestForCreationDto().Generate();
+        testToCreate.Version = -1;
+        
+        // Act
+        var fakeTest = () => Test.Create(testToCreate, Mock.Of<ITestRepository>());
+
+        // Assert
+        fakeTest.Should().Throw<FluentValidation.ValidationException>();
     }
 }

@@ -28,10 +28,9 @@ public class UpdateTestTests
             .WithMockRepository()
             .Build();
         var updatedTest = new FakeTestForUpdateDto().Generate();
-        var mockTestRepository = new Mock<ITestRepository>();
-        
+
         // Act
-        fakeTest.Update(updatedTest, mockTestRepository.Object);
+        fakeTest.Update(updatedTest, Mock.Of<ITestRepository>());
 
         // Assert
         fakeTest.TestCode.Should().Be(fakeTest.TestCode);
@@ -52,13 +51,45 @@ public class UpdateTestTests
         var updatedTest = new FakeTestForUpdateDto().Generate();
         fakeTest.DomainEvents.Clear();
         
-        var mockTestRepository = new Mock<ITestRepository>();
-        
         // Act
-        fakeTest.Update(updatedTest, mockTestRepository.Object);
+        fakeTest.Update(updatedTest, Mock.Of<ITestRepository>());
 
         // Assert
         fakeTest.DomainEvents.Count.Should().Be(1);
         fakeTest.DomainEvents.FirstOrDefault().Should().BeOfType(typeof(TestUpdated));
+    }
+    
+    [Test]
+    public void test_must_have_name()
+    {
+        // Arrange + Act
+        var fakeTest = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
+        var updatedTest = new FakeTestForUpdateDto().Generate();
+        updatedTest.TestName = null;
+        
+        // Act
+        var act = () => fakeTest.Update(updatedTest, Mock.Of<ITestRepository>());
+
+        // Assert
+        act.Should().Throw<FluentValidation.ValidationException>();
+    }
+    
+    [Test]
+    public void test_must_have_version_greater_than_or_equal_to_zero()
+    {
+        // Arrange
+        var fakeTest = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
+        var updatedTest = new FakeTestForUpdateDto().Generate();
+        updatedTest.Version = -1;
+        
+        // Act
+        var act = () => fakeTest.Update(updatedTest, Mock.Of<ITestRepository>());
+
+        // Assert
+        act.Should().Throw<FluentValidation.ValidationException>();
     }
 }

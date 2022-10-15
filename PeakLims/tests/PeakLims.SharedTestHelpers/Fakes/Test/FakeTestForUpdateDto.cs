@@ -9,8 +9,6 @@ public class FakeTestForUpdateDto : AutoFaker<TestForUpdateDto>
 {
     public FakeTestForUpdateDto()
     {
-        // if you want default values on any of your properties (e.g. an int between a certain range or a date always in the past), you can add `RuleFor` lines describing those defaults
-        //RuleFor(t => t.ExampleIntProperty, t => t.Random.Number(50, 100000));
-        //RuleFor(t => t.ExampleDateProperty, t => t.Date.Past());
+        RuleFor(x => x.Version, f => f.Random.Int(0));
     }
 }
