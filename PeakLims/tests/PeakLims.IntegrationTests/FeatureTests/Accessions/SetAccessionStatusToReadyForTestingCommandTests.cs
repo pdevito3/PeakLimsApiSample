@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.AccessionStatuses;
 using Domain.Panels.Services;
+using Domain.TestOrderStatuses;
 using Domain.Tests.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
@@ -44,5 +45,8 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
 
         // Assert
         updatedAccession?.Status.Should().Be(AccessionStatus.ReadyForTesting());
+        updatedAccession.TestOrders
+            .Count(x => x.Status == TestOrderStatus.ReadyForTesting())
+            .Should().Be(updatedAccession.TestOrders.Count);
     }
 }
