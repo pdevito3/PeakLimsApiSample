@@ -46,7 +46,10 @@ public class SetAccessionStatusToReadyForTestingTests
         
         //Act
         var query = new SetAccessionStatusToReadyForTesting.Command(Guid.NewGuid());
-        var handler = new SetAccessionStatusToReadyForTesting.Handler(AccessionRepository.Object, UnitOfWork.Object, HeimGuard.Object);
+        var handler = new SetAccessionStatusToReadyForTesting.Handler(AccessionRepository.Object, 
+            UnitOfWork.Object, 
+            HeimGuard.Object, 
+            Mock.Of<IDateTimeProvider>());
         var act = () => handler.Handle(query, CancellationToken.None);
 
         // Assert

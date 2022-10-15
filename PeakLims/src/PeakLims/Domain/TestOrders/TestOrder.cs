@@ -1,19 +1,20 @@
 namespace PeakLims.Domain.TestOrders;
 
-using PeakLims.Domain.TestOrders.Dtos;
 using PeakLims.Domain.TestOrders.DomainEvents;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
-using AccessionStatuses;
 using Panels;
 using PeakLims.Domain.Tests;
+using PeakLims.Services;
 using TestOrderStatuses;
 using SharedKernel.Exceptions;
 
 public class TestOrder : BaseEntity
 {
     public virtual TestOrderStatus Status { get; private set; }
+    public virtual DateOnly? DueDate { get; private set; }
+    public virtual int? TatSnapshot { get; private set; }
     
     [JsonIgnore]
     [IgnoreDataMember]
@@ -81,7 +82,7 @@ public class TestOrder : BaseEntity
         return newTestOrder;
     }
 
-    public TestOrder SetStatusToReadyForTesting()
+    public TestOrder SetStatusToReadyForTesting(IDateTimeProvider dateTimeProvider)
     {
         // TODO unit test
         new ValidationException(nameof(TestOrder),
@@ -94,6 +95,8 @@ public class TestOrder : BaseEntity
                 $"Test orders in a {Status.Value} state can not be set to {TestOrderStatus.ReadyForTesting().Value}");
         
         Status = TestOrderStatus.ReadyForTesting();
+        TatSnapshot = Test.TurnAroundTime;
+        DueDate = dateTimeProvider.DateOnlyUtcNow.AddDays(Test.TurnAroundTime);
         QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
         return this;
     }

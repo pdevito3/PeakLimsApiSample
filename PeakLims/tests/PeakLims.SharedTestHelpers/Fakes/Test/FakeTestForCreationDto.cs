@@ -10,5 +10,6 @@ public class FakeTestForCreationDto : AutoFaker<TestForCreationDto>
     public FakeTestForCreationDto()
     {
         RuleFor(x => x.Version, f => f.Random.Int(0));
+        RuleFor(x => x.TurnAroundTime, f => f.Random.Int(0, 600));
     }
 }

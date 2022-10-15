@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PeakLims.Databases;
@@ -11,9 +12,10 @@ using PeakLims.Databases;
 namespace PeakLims.Migrations
 {
     [DbContext(typeof(PeakLimsDbContext))]
-    partial class PeakLimsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221015050637_AddTatToTest")]
+    partial class AddTatToTest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -566,10 +568,6 @@ namespace PeakLims.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
-                    b.Property<DateOnly?>("DueDate")
-                        .HasColumnType("date")
-                        .HasColumnName("due_date");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
@@ -585,10 +583,6 @@ namespace PeakLims.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("text")
                         .HasColumnName("status");
-
-                    b.Property<int?>("TatSnapshot")
-                        .HasColumnType("integer")
-                        .HasColumnName("tat_snapshot");
 
                     b.Property<Guid?>("TestId")
                         .HasColumnType("uuid")

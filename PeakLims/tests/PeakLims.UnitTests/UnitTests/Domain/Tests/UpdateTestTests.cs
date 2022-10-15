@@ -39,6 +39,7 @@ public class UpdateTestTests
         fakeTest.Platform.Should().Be(updatedTest.Platform);
         fakeTest.Version.Should().Be(updatedTest.Version);
         fakeTest.Status.Should().Be(fakeTest.Status);
+        fakeTest.TurnAroundTime.Should().Be(updatedTest.TurnAroundTime);
     }
     
     [Test]
@@ -85,6 +86,23 @@ public class UpdateTestTests
             .Build();
         var updatedTest = new FakeTestForUpdateDto().Generate();
         updatedTest.Version = -1;
+        
+        // Act
+        var act = () => fakeTest.Update(updatedTest, Mock.Of<ITestRepository>());
+
+        // Assert
+        act.Should().Throw<FluentValidation.ValidationException>();
+    }
+    
+    [Test]
+    public void test_must_have_tat_greater_than_or_equal_to_zero()
+    {
+        // Arrange
+        var fakeTest = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
+        var updatedTest = new FakeTestForUpdateDto().Generate();
+        updatedTest.TurnAroundTime = -1;
         
         // Act
         var act = () => fakeTest.Update(updatedTest, Mock.Of<ITestRepository>());

@@ -3,6 +3,7 @@ namespace PeakLims.SharedTestHelpers.Fakes.Accession;
 using Domain.HealthcareOrganizationContacts;
 using Domain.Panels;
 using Domain.TestOrders;
+using Domain.Tests;
 using Domain.Tests.Services;
 using HealthcareOrganizationContact;
 using Moq;
@@ -57,6 +58,13 @@ public class FakeAccessionBuilder :
     public FakeAccessionBuilder WithPanel(Panel panel)
     {
         _panels.Add(panel);
+        return this;
+    }
+    
+    public FakeAccessionBuilder WithTest(Test test)
+    {
+        var testOrder = TestOrder.Create(test);
+        WithTestOrder(testOrder);
         return this;
     }
     

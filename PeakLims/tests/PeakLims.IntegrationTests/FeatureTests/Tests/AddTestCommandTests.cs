@@ -30,12 +30,14 @@ public class AddTestCommandTests : TestBase
         testReturned.Methodology.Should().Be(fakeTestOne.Methodology);
         testReturned.Platform.Should().Be(fakeTestOne.Platform);
         testReturned.Version.Should().Be(fakeTestOne.Version);
+        testReturned.TurnAroundTime.Should().Be(fakeTestOne.TurnAroundTime);
         
         testCreated.TestCode.Should().Be(fakeTestOne.TestCode);
         testCreated.TestName.Should().Be(fakeTestOne.TestName);
         testCreated.Methodology.Should().Be(fakeTestOne.Methodology);
         testCreated.Platform.Should().Be(fakeTestOne.Platform);
         testCreated.Version.Should().Be(fakeTestOne.Version);
+        testCreated.TurnAroundTime.Should().Be(fakeTestOne.TurnAroundTime);
     }
     
     [Test]

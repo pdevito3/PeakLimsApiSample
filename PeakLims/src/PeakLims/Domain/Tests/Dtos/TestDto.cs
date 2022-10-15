@@ -9,4 +9,5 @@ public sealed class TestDto
         public string Platform { get; set; }
         public int Version { get; set; }
         public string Status { get; set; }
+        public int TurnAroundTime { get; set; }
 }

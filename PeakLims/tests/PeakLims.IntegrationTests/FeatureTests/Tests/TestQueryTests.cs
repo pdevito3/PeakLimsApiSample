@@ -32,6 +32,8 @@ public class TestQueryTests : TestBase
         test.Methodology.Should().Be(fakeTestOne.Methodology);
         test.Platform.Should().Be(fakeTestOne.Platform);
         test.Version.Should().Be(fakeTestOne.Version);
+        test.Status.Should().Be(fakeTestOne.Status);
+        test.TurnAroundTime.Should().Be(fakeTestOne.TurnAroundTime);
     }
 
     [Test]

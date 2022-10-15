@@ -7,8 +7,9 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using PeakLims.Domain.AccessionStatuses;
-using PeakLims.Domain.Panels.Services;
 using PeakLims.Domain.TestOrderStatuses;
+using Services;
+using SharedTestHelpers.Fakes.Test;
 
 [Parallelizable]
 public class AccessionReadyForTestingTests
@@ -33,7 +34,7 @@ public class AccessionReadyForTestingTests
         fakeAccession.DomainEvents.Clear();
         
         // Act
-        fakeAccession.SetStatusToReadyForTesting();
+        fakeAccession.SetStatusToReadyForTesting(Mock.Of<IDateTimeProvider>());
 
         // Assert
         fakeAccession.Status.Should().Be(AccessionStatus.ReadyForTesting());
@@ -45,22 +46,29 @@ public class AccessionReadyForTestingTests
     public void associated_test_order_state_changed()
     {
         // Arrange
+        var test = new FakeTestBuilder()
+            .WithMockRepository()
+            .Activate()
+            .Build();
         var fakeAccession = FakeAccessionBuilder
             .Initialize()
             .WithPatientId(Guid.NewGuid())
             .WithHealthcareOrganizationId(Guid.NewGuid())
             .WithMockTestRepository()
+            .WithTest(test)
             .Build();
         fakeAccession.DomainEvents.Clear();
+        var dateTimeProvider = Mock.Of<IDateTimeProvider>();
         
         // Act
-        fakeAccession.SetStatusToReadyForTesting();
+        fakeAccession.SetStatusToReadyForTesting(dateTimeProvider);
 
         // Assert
-        fakeAccession.TestOrders
-            .Count(x => x.Status == TestOrderStatus.ReadyForTesting())
-            .Should()
-            .Be(fakeAccession.TestOrders.Count);
+        fakeAccession.TestOrders.Count().Should().Be(1);
+        var testOrder = fakeAccession.TestOrders.FirstOrDefault();
+        testOrder.Status.Should().Be(TestOrderStatus.ReadyForTesting());
+        testOrder.TatSnapshot.Should().Be(test.TurnAroundTime);
+        testOrder.DueDate.Should().Be(dateTimeProvider.DateOnlyUtcNow.AddDays(test.TurnAroundTime));
     }
 
     [Test]
@@ -77,7 +85,7 @@ public class AccessionReadyForTestingTests
         fakeAccession.DomainEvents.Clear();
         
         // Act
-        var act = () => fakeAccession.SetStatusToReadyForTesting();
+        var act = () => fakeAccession.SetStatusToReadyForTesting(Mock.Of<IDateTimeProvider>());
 
         // Assert
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>();
@@ -96,7 +104,7 @@ public class AccessionReadyForTestingTests
             .Build();
         
         // Act
-        var act = () => fakeAccession.SetStatusToReadyForTesting();
+        var act = () => fakeAccession.SetStatusToReadyForTesting(Mock.Of<IDateTimeProvider>());
 
         // Assert
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>();
@@ -115,7 +123,7 @@ public class AccessionReadyForTestingTests
             .Build();
         
         // Act
-        var act = () => fakeAccession.SetStatusToReadyForTesting();
+        var act = () => fakeAccession.SetStatusToReadyForTesting(Mock.Of<IDateTimeProvider>());
 
         // Assert
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>();
@@ -134,7 +142,7 @@ public class AccessionReadyForTestingTests
             .Build();
         
         // Act
-        var act = () => fakeAccession.SetStatusToReadyForTesting();
+        var act = () => fakeAccession.SetStatusToReadyForTesting(Mock.Of<IDateTimeProvider>());
 
         // Assert
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>();

@@ -29,6 +29,9 @@ public class Test : BaseEntity
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual int Version { get; private set; }
 
+    [Sieve(CanFilter = true, CanSort = true)]
+    public virtual int TurnAroundTime { get; private set; }
+
     public virtual TestStatus Status { get; private set; }
 
     [JsonIgnore]
@@ -45,6 +48,7 @@ public class Test : BaseEntity
         
         newTest.TestCode = testForCreationDto.TestCode;
         newTest.TestName = testForCreationDto.TestName;
+        newTest.TurnAroundTime = testForCreationDto.TurnAroundTime;
         newTest.Methodology = testForCreationDto.Methodology;
         newTest.Platform = testForCreationDto.Platform;
         newTest.Version = testForCreationDto.Version;
@@ -70,6 +74,7 @@ public class Test : BaseEntity
         GuardWhenExists(TestCode, testForUpdateDto.Version, testRepository);
         
         TestName = testForUpdateDto.TestName;
+        TurnAroundTime = testForUpdateDto.TurnAroundTime;
         Methodology = testForUpdateDto.Methodology;
         Platform = testForUpdateDto.Platform;
         Version = testForUpdateDto.Version;

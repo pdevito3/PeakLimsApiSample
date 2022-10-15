@@ -13,6 +13,7 @@ using PeakLims.Domain.HealthcareOrganizations;
 using PeakLims.Domain.HealthcareOrganizationContacts;
 using PeakLims.Domain.TestOrders;
 using PeakLims.Domain.AccessionComments;
+using PeakLims.Services;
 using SharedKernel.Exceptions;
 
 public class Accession : BaseEntity
@@ -70,7 +71,7 @@ public class Accession : BaseEntity
         return this;
     }
 
-    public Accession SetStatusToReadyForTesting()
+    public Accession SetStatusToReadyForTesting(IDateTimeProvider dateTimeProvider)
     {
         new ValidationException(nameof(Accession),
                 $"A patient is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}")
@@ -94,7 +95,7 @@ public class Accession : BaseEntity
         
         foreach (var testOrder in TestOrders)
         {
-            testOrder.SetStatusToReadyForTesting();
+            testOrder.SetStatusToReadyForTesting(dateTimeProvider);
         }
 
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
