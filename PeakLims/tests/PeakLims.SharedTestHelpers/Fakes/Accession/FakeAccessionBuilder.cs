@@ -19,12 +19,14 @@ public class FakeAccessionBuilder :
     private readonly List<TestOrder> _testOrders = new List<TestOrder>();
     private bool _includeATestOrder = true;
     private bool _includeAContact = true;
+    private Guid? _patientId;
+    private Guid? _orgId;
 
     private FakeAccessionBuilder() { }
     
     public static IPatientSelectionStage Initialize() => new FakeAccessionBuilder();
 
-    public IPatientSelectionStage WithDto(AccessionForCreationDto data)
+    public FakeAccessionBuilder WithDto(AccessionForCreationDto data)
     {
         _accessionData = data;
         return this;
@@ -32,13 +34,13 @@ public class FakeAccessionBuilder :
     
     public IOrganizationSelectionStage WithPatientId(Guid patientId)
     {
-        _accessionData.PatientId = patientId;
+        _patientId = patientId;
         return this;
     }
     
     public FakeAccessionBuilder WithHealthcareOrganizationId(Guid orgId)
     {
-        _accessionData.HealthcareOrganizationId = orgId;
+        _orgId = orgId;
         return this;
     }
     
@@ -74,19 +76,21 @@ public class FakeAccessionBuilder :
     
     public FakeAccessionBuilder ExcludePatient()
     {
-        _accessionData.PatientId = null;
+        _patientId = null;
         return this;
     }
     
     public FakeAccessionBuilder ExcludeOrg()
     {
-        _accessionData.HealthcareOrganizationId = null;
+        _orgId = null;
         ExcludeContacts();
         return this;
     }
     
     public Accession Build()
     {
+        _accessionData.PatientId = _patientId;
+        _accessionData.HealthcareOrganizationId = _orgId;
         var accession = Accession.Create(_accessionData);
         
         if(_contacts.Count <= 0 && _includeAContact)
