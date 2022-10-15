@@ -20,7 +20,7 @@ public class FakeAccessionBuilder :
     private AccessionForCreationDto _accessionData = new FakeAccessionForCreationDto().Generate();
     private readonly List<HealthcareOrganizationContact> _contacts = new List<HealthcareOrganizationContact>();
     private readonly List<Panel> _panels = new List<Panel>();
-    private readonly List<TestOrder> _testOrders = new List<TestOrder>();
+    private readonly List<Test> _tests = new List<Test>();
     private bool _includeATestOrder = true;
     private bool _includeAContact = true;
     private Guid? _patientId;
@@ -63,14 +63,7 @@ public class FakeAccessionBuilder :
     
     public FakeAccessionBuilder WithTest(Test test)
     {
-        var testOrder = TestOrder.Create(test);
-        WithTestOrder(testOrder);
-        return this;
-    }
-    
-    public FakeAccessionBuilder WithTestOrder(TestOrder testOrder)
-    {
-        _testOrders.Add(testOrder);
+        _tests.Add(test);
         return this;
     }
     
@@ -127,14 +120,13 @@ public class FakeAccessionBuilder :
                 .RuleFor(x => x.HealthcareOrganizationId, _accessionData.HealthcareOrganizationId)
                 .Generate()));
 
-        if (_testOrders.Count <= 0 && _includeATestOrder)
+        if (_tests.Count <= 0 && _includeATestOrder)
         {
-            var fakeTest = new FakeTestBuilder()
+            var test = new FakeTestBuilder()
                 .WithRepository(_testRepository)
                 .Activate()
                 .Build();
-            var fakeTestOrder = TestOrder.Create(fakeTest);
-            _testOrders.Add(fakeTestOrder);
+            accession.AddTest(test);
         }
         
         foreach (var contact in _contacts)
@@ -145,9 +137,9 @@ public class FakeAccessionBuilder :
         {
             accession.AddPanel(panel);
         }
-        foreach (var testOrder in _testOrders)
+        foreach (var testOrder in _tests)
         {
-            accession.AddTestOrder(testOrder);
+            accession.AddTest(testOrder);
         }
 
         return accession;

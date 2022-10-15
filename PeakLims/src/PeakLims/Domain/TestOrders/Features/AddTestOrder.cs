@@ -40,7 +40,7 @@ public static class AddTestOrder
 
         public async Task<TestOrderDto> Handle(Command request, CancellationToken cancellationToken)
         {
-            await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddTestOrders);
+            await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddTestToAccessions);
 
             var testOrder = TestOrder.Create(request.TestId);
             await _testOrderRepository.Add(testOrder, cancellationToken);

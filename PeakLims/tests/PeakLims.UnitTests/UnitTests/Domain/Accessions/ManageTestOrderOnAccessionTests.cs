@@ -28,14 +28,18 @@ public class ManageTestOrderOnAccessionTests
             .WithMockRepository()
             .Activate()
             .Build();
-        var testOrder = TestOrder.Create(test);
         
         // Act - Add
-        fakeAccession.AddTestOrder(testOrder);
+        fakeAccession.AddTest(test);
 
         // Assert - Add
         fakeAccession.TestOrders.Count.Should().Be(1);
-        fakeAccession.TestOrders.Should().ContainEquivalentOf(testOrder);
+        fakeAccession.TestOrders
+            .FirstOrDefault(x => x.TestId == test.Id)!
+            .Test.Should().BeEquivalentTo(test);
+        
+        // Arrange - Remove
+        var testOrder = fakeAccession.TestOrders.FirstOrDefault(x => x.TestId == test.Id);
         
         // Act - Can remove idempotently
         fakeAccession.RemoveTestOrder(testOrder)
@@ -58,7 +62,7 @@ public class ManageTestOrderOnAccessionTests
         var testOrder = TestOrder.Create(test);
         
         // Act
-        var act = () => fakeAccession.AddTestOrder(testOrder);
+        var act = () => fakeAccession.AddTest(test);
 
         // Assert
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>();

@@ -211,5 +211,24 @@ public sealed class AccessionsController: ControllerBase
         return NoContent();
     }
 
+
+    /// <summary>
+    /// Adds a test to an accession
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPost("{accessionId:guid}/addtest/{testId:guid}", Name = "AddTestToAccession")]
+    public async Task<IActionResult> AddTestToAccession(Guid accessionId, Guid testId)
+    {
+        var command = new AddTestToAccession.Command(accessionId, testId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
     // endpoint marker - do not delete this comment
 }

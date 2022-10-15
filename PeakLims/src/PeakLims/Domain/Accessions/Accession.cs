@@ -15,6 +15,7 @@ using PeakLims.Domain.TestOrders;
 using PeakLims.Domain.AccessionComments;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
+using Tests;
 
 public class Accession : BaseEntity
 {
@@ -102,16 +103,17 @@ public class Accession : BaseEntity
         return this;
     }
 
-    public Accession AddTestOrder(TestOrder testOrder)
+    public Accession AddTest(Test test)
     {
         // TODO unit test
-        GuardIfInFinalState("Test orders");
+        GuardIfInFinalState("Tests");
         
-        var hasNonActiveTests = !testOrder.Test.Status.IsActive();
+        var hasNonActiveTests = !test.Status.IsActive();
         if(hasNonActiveTests)
             throw new ValidationException(nameof(Accession),
                 $"This test is not active. Only active tests can be added to an accession.");
 
+        var testOrder = TestOrder.Create(test);
         TestOrders.Add(testOrder);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
         return this;
@@ -136,7 +138,7 @@ public class Accession : BaseEntity
     public Accession AddPanel(Panel panel)
     {
         // TODO unit test
-        GuardIfInFinalState("Panel");
+        GuardIfInFinalState("Panels");
         
         // TODO if any of the panel order test statuses is not in one of the pending states, guard
         
@@ -159,7 +161,7 @@ public class Accession : BaseEntity
         foreach (var test in panel.Tests)
         {
             var testOrder = TestOrder.Create(test, panel);
-            AddTestOrder(testOrder);
+            TestOrders.Add(testOrder);
         }
         
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
@@ -169,7 +171,7 @@ public class Accession : BaseEntity
     public Accession RemovePanel(Panel panel)
     {
         // TODO unit test
-        GuardIfInFinalState("Panel");
+        GuardIfInFinalState("Panels");
 
         var alreadyExists = TestOrders.Any(x => panel.Id == x.AssociatedPanelId);
         if (!alreadyExists)
