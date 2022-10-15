@@ -36,9 +36,10 @@ public class Test : BaseEntity
     public virtual ICollection<Panel> Panels { get; private set; }
 
 
-    public static Test Create(TestForCreationDto testForCreationDto)
+    public static Test Create(TestForCreationDto testForCreationDto, ITestRepository testRepository)
     {
         new TestForCreationDtoValidator().ValidateAndThrow(testForCreationDto);
+        GuardWhenExists(testForCreationDto.TestCode, testForCreationDto.Version, testRepository);
 
         var newTest = new Test();
         
@@ -63,9 +64,10 @@ public class Test : BaseEntity
 
     public static bool Exists(string testCode, int version, ITestRepository testRepository) => testRepository.Exists(testCode, version);
 
-    public void Update(TestForUpdateDto testForUpdateDto)
+    public void Update(TestForUpdateDto testForUpdateDto, ITestRepository testRepository)
     {
         new TestForUpdateDtoValidator().ValidateAndThrow(testForUpdateDto);
+        GuardWhenExists(TestCode, testForUpdateDto.Version, testRepository);
         
         TestName = testForUpdateDto.TestName;
         Methodology = testForUpdateDto.Methodology;

@@ -7,6 +7,7 @@ using PeakLims.Domain.Tests.Features;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Tests.Services;
 using static TestFixture;
 
 public class TestListQueryTests : TestBase
@@ -16,8 +17,12 @@ public class TestListQueryTests : TestBase
     public async Task can_get_test_list()
     {
         // Arrange
-        var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
-        var fakeTestTwo = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTestOne = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
+        var fakeTestTwo = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
         var queryParameters = new TestParametersDto();
 
         await InsertAsync(fakeTestOne, fakeTestTwo);

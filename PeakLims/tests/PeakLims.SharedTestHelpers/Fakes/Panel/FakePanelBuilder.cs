@@ -31,8 +31,8 @@ public class FakePanelBuilder
     {
         var mockPanelRepository = new Mock<IPanelRepository>();
         mockPanelRepository
-            .Setup(x => x.Exists(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(panelExists);
+            .Setup(x => x.Exists(It.IsAny<string>(), It.IsAny<int>()))
+            .Returns(panelExists);
         
         _panelRepository = mockPanelRepository.Object;
         return this;

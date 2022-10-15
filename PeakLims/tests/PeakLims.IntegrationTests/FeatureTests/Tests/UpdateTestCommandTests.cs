@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Tests.Services;
 using static TestFixture;
 
 public class UpdateTestCommandTests : TestBase
@@ -15,7 +16,9 @@ public class UpdateTestCommandTests : TestBase
     public async Task can_update_existing_test_in_db()
     {
         // Arrange
-        var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTestOne = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
         var updatedTestDto = new FakeTestForUpdateDto().Generate();
         await InsertAsync(fakeTestOne);
 
@@ -40,7 +43,9 @@ public class UpdateTestCommandTests : TestBase
     public async Task can_not_update_test_with_same_code_and_version()
     {
         // Arrange
-        var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTestOne = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
         await InsertAsync(fakeTestOne);
         var fakeTestTwo = new FakeTestForUpdateDto().Generate();
         fakeTestTwo.Version = fakeTestOne.Version;

@@ -22,7 +22,9 @@ public class TestStateChangeTests
     public void can_activate_test()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate();
+        var fakeTest = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
         fakeTest.DomainEvents.Clear();
         
         // Act
@@ -38,7 +40,9 @@ public class TestStateChangeTests
     public void can_deactivate_test()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate();
+        var fakeTest = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
         fakeTest.DomainEvents.Clear();
         
         // Act

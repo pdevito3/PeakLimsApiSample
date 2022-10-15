@@ -28,6 +28,7 @@ public class AccessionReadyForTestingTests
             .Initialize()
             .WithPatientId(Guid.NewGuid())
             .WithHealthcareOrganizationId(Guid.NewGuid())
+            .WithMockTestRepository()
             .Build();
         fakeAccession.DomainEvents.Clear();
         
@@ -48,6 +49,7 @@ public class AccessionReadyForTestingTests
             .Initialize()
             .WithPatientId(Guid.NewGuid())
             .WithHealthcareOrganizationId(Guid.NewGuid())
+            .WithMockTestRepository()
             .Build();
         fakeAccession.DomainEvents.Clear();
         
@@ -69,6 +71,7 @@ public class AccessionReadyForTestingTests
             .Initialize()
             .WithPatientId(Guid.NewGuid())
             .WithHealthcareOrganizationId(Guid.NewGuid())
+            .WithMockTestRepository()
             .ExcludePatient()
             .Build();
         fakeAccession.DomainEvents.Clear();
@@ -88,6 +91,7 @@ public class AccessionReadyForTestingTests
             .Initialize()
             .WithPatientId(Guid.NewGuid())
             .WithHealthcareOrganizationId(Guid.NewGuid())
+            .WithMockTestRepository()
             .ExcludeOrg()
             .Build();
         
@@ -106,6 +110,7 @@ public class AccessionReadyForTestingTests
             .Initialize()
             .WithPatientId(Guid.NewGuid())
             .WithHealthcareOrganizationId(Guid.NewGuid())
+            .WithMockTestRepository()
             .ExcludeTestOrders()
             .Build();
         
@@ -124,6 +129,7 @@ public class AccessionReadyForTestingTests
             .Initialize()
             .WithPatientId(Guid.NewGuid())
             .WithHealthcareOrganizationId(Guid.NewGuid())
+            .WithMockTestRepository()
             .ExcludeContacts()
             .Build();
         

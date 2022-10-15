@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.TestOrderStatuses;
+using Domain.Tests.Services;
 using PeakLims.Domain.TestOrders.Features;
 using static TestFixture;
 using SharedKernel.Exceptions;
@@ -18,7 +19,9 @@ public class AddTestOrderCommandTests : TestBase
     public async Task can_add_new_testorder_to_db()
     {
         // Arrange
-        var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTestOne = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
         await InsertAsync(fakeTestOne);
 
         // Act

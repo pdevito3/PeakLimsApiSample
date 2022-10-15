@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.AccessionStatuses;
 using Domain.Panels.Services;
+using Domain.Tests.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using static TestFixture;
@@ -27,6 +28,7 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
             .Initialize()
             .WithPatientId(fakePatientOne.Id)
             .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
+            .WithTestRepository(GetService<ITestRepository>())
             .Build();
         
         await InsertAsync(fakeAccessionOne);

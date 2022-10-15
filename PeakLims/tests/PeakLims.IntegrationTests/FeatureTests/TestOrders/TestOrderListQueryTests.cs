@@ -7,6 +7,7 @@ using PeakLims.Domain.TestOrders.Features;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Tests.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Test;
 
@@ -17,8 +18,12 @@ public class TestOrderListQueryTests : TestBase
     public async Task can_get_testorder_list()
     {
         // Arrange
-        var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
-        var fakeTestTwo = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTestOne = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
+        var fakeTestTwo = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
         await InsertAsync(fakeTestOne, fakeTestTwo);
 
         var fakeTestOrderOne = FakeTestOrder.Generate(fakeTestOne.Id);

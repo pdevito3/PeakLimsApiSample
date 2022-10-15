@@ -41,8 +41,7 @@ public static class AddTest
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddTests);
 
-            Test.GuardWhenExists(request.TestToAdd.TestCode, request.TestToAdd.Version, _testRepository);
-            var test = Test.Create(request.TestToAdd);
+            var test = Test.Create(request.TestToAdd, _testRepository);
             await _testRepository.Add(test, cancellationToken);
 
             await _unitOfWork.CommitChanges(cancellationToken);

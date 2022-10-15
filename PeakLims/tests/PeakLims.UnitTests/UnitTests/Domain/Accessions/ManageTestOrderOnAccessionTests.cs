@@ -24,7 +24,10 @@ public class ManageTestOrderOnAccessionTests
         // Arrange
         var fakeAccession = FakeAccession.Generate();
 
-        var test = FakeTest.GenerateActivated();
+        var test = new FakeTestBuilder()
+            .WithMockRepository()
+            .Activate()
+            .Build();
         var testOrder = TestOrder.Create(test);
         
         // Act - Add
@@ -48,9 +51,10 @@ public class ManageTestOrderOnAccessionTests
     {
         // Arrange
         var fakeAccession = FakeAccession.Generate();
-
-        var test = FakeTest.Generate();
-        test.Deactivate();
+        var test = new FakeTestBuilder()
+            .WithMockRepository()
+            .Deactivate()
+            .Build();
         var testOrder = TestOrder.Create(test);
         
         // Act

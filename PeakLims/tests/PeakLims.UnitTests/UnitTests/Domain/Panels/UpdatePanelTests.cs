@@ -55,9 +55,6 @@ public class UpdatePanelTests
         fakePanel.DomainEvents.Clear();
         
         var mockPanelRepository = new Mock<IPanelRepository>();
-        mockPanelRepository
-            .Setup(x => x.Exists(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
         
         // Act
         fakePanel.Update(updatedPanel, mockPanelRepository.Object);

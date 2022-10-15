@@ -1,31 +1,32 @@
 namespace PeakLims.SharedTestHelpers.Fakes.Test;
 
 using AutoBogus;
+using Domain.Tests.Services;
 using PeakLims.Domain.Tests;
 using PeakLims.Domain.Tests.Dtos;
 
 public class FakeTest
 {
-    public static Test Generate(TestForCreationDto testForCreationDto)
+    public static Test Generate(TestForCreationDto panelForCreationDto, ITestRepository testRepository)
     {
-        var test = Test.Create(testForCreationDto);
-        return test;
+        return Test.Create(panelForCreationDto, testRepository);
     }
-    
-    public static Test GenerateActivated(TestForCreationDto testForCreationDto)
+    public static Test GenerateActivated(TestForCreationDto panelForCreationDto, ITestRepository testRepository)
     {
-        var test = Test.Create(testForCreationDto);
-        test.Activate();
-        return test;
+        var panel = Test.Create(panelForCreationDto, testRepository);
+        panel.Activate();
+        return panel;
     }
 
-    public static Test Generate()
+    public static Test Generate(ITestRepository testRepository)
     {
-        return Generate(new FakeTestForCreationDto().Generate());
+        return Generate(new FakeTestForCreationDto().Generate(), testRepository);
     }
-    
-    public static Test GenerateActivated()
+
+    public static Test GenerateActivated(ITestRepository testRepository)
     {
-        return GenerateActivated(new FakeTestForCreationDto().Generate());
+        var panel = Generate(new FakeTestForCreationDto().Generate(), testRepository);
+        panel.Activate();
+        return panel;
     }
 }

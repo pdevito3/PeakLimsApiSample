@@ -37,9 +37,15 @@ public class GetTestListTests
     public async Task can_get_paged_list_of_test()
     {
         //Arrange
-        var fakeTestOne = FakeTest.Generate();
-        var fakeTestTwo = FakeTest.Generate();
-        var fakeTestThree = FakeTest.Generate();
+        var fakeTestOne = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
+        var fakeTestTwo = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
+        var fakeTestThree = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
         var test = new List<Test>();
         test.Add(fakeTestOne);
         test.Add(fakeTestTwo);

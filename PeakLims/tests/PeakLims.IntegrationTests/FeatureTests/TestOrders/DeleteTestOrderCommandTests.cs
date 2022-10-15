@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Domain.Tests.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Test;
 
@@ -16,7 +17,9 @@ public class DeleteTestOrderCommandTests : TestBase
     public async Task can_delete_testorder_from_db()
     {
         // Arrange
-        var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTestOne = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
         await InsertAsync(fakeTestOne);
 
         var fakeTestOrderOne = FakeTestOrder.Generate(fakeTestOne.Id);
@@ -37,7 +40,9 @@ public class DeleteTestOrderCommandTests : TestBase
     public async Task can_softdelete_testorder_from_db()
     {
         // Arrange
-        var fakeTestOne = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTestOne = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
         await InsertAsync(fakeTestOne);
 
         var fakeTestOrderOne = FakeTestOrder.Generate(fakeTestOne.Id);

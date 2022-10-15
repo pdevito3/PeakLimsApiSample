@@ -2,6 +2,7 @@ namespace PeakLims.IntegrationTests.FeatureTests.Tests;
 
 using System.Threading.Tasks;
 using Domain.Tests.Features;
+using Domain.Tests.Services;
 using Domain.TestStatuses;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,9 @@ public class DeactivateTestTests : TestBase
     public async Task can_deactivate_test()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate();
+        var fakeTest = new FakeTestBuilder()
+            .WithRepository(GetService<ITestRepository>())
+            .Build();
         await InsertAsync(fakeTest);
 
         // Act

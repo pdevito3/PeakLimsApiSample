@@ -6,7 +6,9 @@ using PeakLims.Domain.Tests.DomainEvents;
 using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using Moq;
 using NUnit.Framework;
+using PeakLims.Domain.Tests.Services;
 
 [Parallelizable]
 public class UpdateTestTests
@@ -22,11 +24,14 @@ public class UpdateTestTests
     public void can_update_test()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate();
+        var fakeTest = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
         var updatedTest = new FakeTestForUpdateDto().Generate();
+        var mockTestRepository = new Mock<ITestRepository>();
         
         // Act
-        fakeTest.Update(updatedTest);
+        fakeTest.Update(updatedTest, mockTestRepository.Object);
 
         // Assert
         fakeTest.TestCode.Should().Be(fakeTest.TestCode);
@@ -41,12 +46,16 @@ public class UpdateTestTests
     public void queue_domain_event_on_update()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate();
+        var fakeTest = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
         var updatedTest = new FakeTestForUpdateDto().Generate();
         fakeTest.DomainEvents.Clear();
         
+        var mockTestRepository = new Mock<ITestRepository>();
+        
         // Act
-        fakeTest.Update(updatedTest);
+        fakeTest.Update(updatedTest, mockTestRepository.Object);
 
         // Assert
         fakeTest.DomainEvents.Count.Should().Be(1);

@@ -3,7 +3,9 @@ namespace PeakLims.SharedTestHelpers.Fakes.Accession;
 using Domain.HealthcareOrganizationContacts;
 using Domain.Panels;
 using Domain.TestOrders;
+using Domain.Tests.Services;
 using HealthcareOrganizationContact;
+using Moq;
 using PeakLims.Domain.Accessions;
 using PeakLims.Domain.Accessions.Dtos;
 using Test;
@@ -11,7 +13,8 @@ using TestOrder;
 
 public class FakeAccessionBuilder :
     IPatientSelectionStage,
-    IOrganizationSelectionStage
+    IOrganizationSelectionStage,
+    ITestRepositorySetterStage
 {
     private AccessionForCreationDto _accessionData = new FakeAccessionForCreationDto().Generate();
     private readonly List<HealthcareOrganizationContact> _contacts = new List<HealthcareOrganizationContact>();
@@ -21,6 +24,7 @@ public class FakeAccessionBuilder :
     private bool _includeAContact = true;
     private Guid? _patientId;
     private Guid? _orgId;
+    private ITestRepository _testRepository = null;
 
     private FakeAccessionBuilder() { }
     
@@ -38,7 +42,7 @@ public class FakeAccessionBuilder :
         return this;
     }
     
-    public FakeAccessionBuilder WithHealthcareOrganizationId(Guid orgId)
+    public ITestRepositorySetterStage WithHealthcareOrganizationId(Guid orgId)
     {
         _orgId = orgId;
         return this;
@@ -87,6 +91,23 @@ public class FakeAccessionBuilder :
         return this;
     }
     
+    public FakeAccessionBuilder WithTestRepository(ITestRepository testRepository)
+    {
+        _testRepository = testRepository;
+        return this;
+    }
+    
+    public FakeAccessionBuilder WithMockTestRepository(bool testExists = false)
+    {
+        var mockTestRepository = new Mock<ITestRepository>();
+        mockTestRepository
+            .Setup(x => x.Exists(It.IsAny<string>(), It.IsAny<int>()))
+            .Returns(testExists);
+        
+        _testRepository = mockTestRepository.Object;
+        return this;
+    }
+    
     public Accession Build()
     {
         _accessionData.PatientId = _patientId;
@@ -100,7 +121,10 @@ public class FakeAccessionBuilder :
 
         if (_testOrders.Count <= 0 && _includeATestOrder)
         {
-            var fakeTest = FakeTest.GenerateActivated();
+            var fakeTest = new FakeTestBuilder()
+                .WithRepository(_testRepository)
+                .Activate()
+                .Build();
             var fakeTestOrder = TestOrder.Create(fakeTest);
             _testOrders.Add(fakeTestOrder);
         }
@@ -127,7 +151,13 @@ public interface IPatientSelectionStage
     public IOrganizationSelectionStage WithPatientId(Guid patientId);
 }
 
+public interface ITestRepositorySetterStage
+{
+    public FakeAccessionBuilder WithTestRepository(ITestRepository testRepository);
+    public FakeAccessionBuilder WithMockTestRepository(bool testExists = false);
+}
+
 public interface IOrganizationSelectionStage
 {
-    public FakeAccessionBuilder WithHealthcareOrganizationId(Guid orgId);
+    public ITestRepositorySetterStage WithHealthcareOrganizationId(Guid orgId);
 }

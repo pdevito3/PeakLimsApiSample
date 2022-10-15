@@ -24,7 +24,10 @@ public class CreateTestTests
     {
         // Arrange + Act
         var testToCreate = new FakeTestForCreationDto().Generate();
-        var fakeTest = FakeTest.Generate(testToCreate);
+        var fakeTest = new FakeTestBuilder()
+            .WithDto(testToCreate)
+            .WithMockRepository()
+            .Build();
 
         // Assert
         fakeTest.TestCode.Should().Be(testToCreate.TestCode);
@@ -39,7 +42,9 @@ public class CreateTestTests
     public void queue_domain_event_on_create()
     {
         // Arrange + Act
-        var fakeTest = FakeTest.Generate();
+        var fakeTest = new FakeTestBuilder()
+            .WithMockRepository()
+            .Build();
 
         // Assert
         fakeTest.DomainEvents.Count.Should().Be(1);
