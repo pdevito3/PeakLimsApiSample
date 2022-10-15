@@ -9,7 +9,7 @@ using PeakLims.Domain.TestOrders;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 
-public static class AddPanelOrder
+public static class AddPanelToAccession
 {
     public sealed class Command : IRequest<bool>
     {
@@ -40,7 +40,7 @@ public static class AddPanelOrder
 
         public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
         {
-            await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddPanelOrders);
+            await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddPanelToAccession);
 
             var panel = await _panelRepository.GetById(request.PanelId, false, cancellationToken);
             var accession = await _accessionRepository.GetWithTestOrderWithChildren(request.AccessionId, true, cancellationToken);

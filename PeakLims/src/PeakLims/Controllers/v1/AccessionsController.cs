@@ -230,5 +230,24 @@ public sealed class AccessionsController: ControllerBase
         return NoContent();
     }
 
+
+    /// <summary>
+    /// Adds a panel to an accession
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPost("{accessionId:guid}/addpanel/{testId:guid}", Name = "AddPanelToAccession")]
+    public async Task<IActionResult> AddPanelToAccession(Guid accessionId, Guid testId)
+    {
+        var command = new AddPanelToAccession.Command(accessionId, testId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
     // endpoint marker - do not delete this comment
 }
