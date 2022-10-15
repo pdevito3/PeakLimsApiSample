@@ -249,5 +249,24 @@ public sealed class AccessionsController: ControllerBase
         return NoContent();
     }
 
+
+    /// <summary>
+    /// Removes a test order from an accession
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPost("{accessionId:guid}/RemoveTestOrder/{testOrderId:guid}", Name = "RemoveTestOrderFromAccession")]
+    public async Task<IActionResult> RemoveTestOrderFromAccession(Guid accessionId, Guid testOrderId)
+    {
+        var command = new RemoveTestOrderFromAccession.Command(accessionId, testOrderId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
     // endpoint marker - do not delete this comment
 }

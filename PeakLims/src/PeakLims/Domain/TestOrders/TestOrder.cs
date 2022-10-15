@@ -4,6 +4,7 @@ using PeakLims.Domain.TestOrders.DomainEvents;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
+using Accessions;
 using Panels;
 using PeakLims.Domain.Tests;
 using PeakLims.Services;
@@ -27,6 +28,12 @@ public class TestOrder : BaseEntity
     [ForeignKey("Test")]
     public virtual Guid? TestId { get; private set; }
     public virtual Test Test { get; private set; }
+
+    [JsonIgnore]
+    [IgnoreDataMember]
+    [ForeignKey("Accession")]
+    public virtual Guid? AccessionId { get; private set; }
+    public virtual Accession Accession { get; private set; }
 
 
     public static TestOrder Create(Test test)

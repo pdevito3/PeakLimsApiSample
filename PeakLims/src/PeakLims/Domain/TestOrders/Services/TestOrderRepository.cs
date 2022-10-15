@@ -6,6 +6,7 @@ using PeakLims.Services;
 
 public interface ITestOrderRepository : IGenericRepository<TestOrder>
 {
+    void CleanupOrphanedTestOrders();
 }
 
 public sealed class TestOrderRepository : GenericRepository<TestOrder>, ITestOrderRepository
@@ -15,5 +16,11 @@ public sealed class TestOrderRepository : GenericRepository<TestOrder>, ITestOrd
     public TestOrderRepository(PeakLimsDbContext dbContext) : base(dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public void CleanupOrphanedTestOrders()
+    {
+        var testOrders = _dbContext.TestOrders.Where(x => x.AccessionId == null).ToList();
+        _dbContext.TestOrders.RemoveRange(testOrders);
     }
 }
