@@ -35,6 +35,8 @@ public class TestOrder : BaseEntity
     public virtual Guid? AccessionId { get; private set; }
     public virtual Accession Accession { get; private set; }
 
+    public bool IsPartOfPanel() => AssociatedPanelId.HasValue;
+
 
     public static TestOrder Create(Test test)
     {

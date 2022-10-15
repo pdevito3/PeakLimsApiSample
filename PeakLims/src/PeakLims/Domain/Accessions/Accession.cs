@@ -48,7 +48,6 @@ public class Accession : BaseEntity
     [IgnoreDataMember]
     public virtual ICollection<AccessionComment> Comments { get; private set; } = new List<AccessionComment>();
 
-
     public static Accession Create(AccessionForCreationDto accessionForCreationDto)
     {
         var newAccession = new Accession();
@@ -129,7 +128,12 @@ public class Accession : BaseEntity
         var alreadyExists = TestOrders.Any(x => testOrder.Id == x.Id);
         if (!alreadyExists)
             return this;
-        
+
+        // TODO unit test
+        if(testOrder.IsPartOfPanel())
+            throw new ValidationException(nameof(Accession),
+                $"Test orders that are part of a panel can not be selectively removed.");
+
         TestOrders.Remove(testOrder);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
         return this;

@@ -5,6 +5,7 @@ using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
 using PeakLims.Domain.TestOrders;
+using SharedTestHelpers.Fakes.Panel;
 using SharedTestHelpers.Fakes.Test;
 using SharedTestHelpers.Fakes.TestOrder;
 
@@ -66,5 +67,30 @@ public class ManageTestOrderOnAccessionTests
 
         // Assert
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>();
+    }
+
+    [Test]
+    public void can_not_remove_testorder_when_part_of_panel()
+    {
+        // Arrange
+        var fakeAccession = FakeAccession.Generate();
+        var test = new FakeTestBuilder()
+            .WithMockRepository()
+            .Activate()
+            .Build();
+        var panel = new FakePanelBuilder()
+            .WithMockRepository()
+            .WithTest(test)
+            .Activate()
+            .Build();
+        fakeAccession.AddPanel(panel);
+        var testOrder = fakeAccession.TestOrders.First();
+        
+        // Act
+        var act = () => fakeAccession.RemoveTestOrder(testOrder);
+
+        // Assert
+        act.Should().Throw<SharedKernel.Exceptions.ValidationException>()
+            .WithMessage("Test orders that are part of a panel can not be selectively removed.");
     }
 }
