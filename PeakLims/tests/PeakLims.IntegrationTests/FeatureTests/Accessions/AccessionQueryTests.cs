@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using Services;
 
 public class AccessionQueryTests : TestBase
 {
@@ -18,7 +19,7 @@ public class AccessionQueryTests : TestBase
     public async Task can_get_existing_accession_with_accurate_props()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate(), GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());

@@ -11,6 +11,7 @@ using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.Sample;
 using PeakLims.SharedTestHelpers.Fakes.Container;
+using Services;
 
 public class DeleteSampleCommandTests : TestBase
 {
@@ -18,7 +19,7 @@ public class DeleteSampleCommandTests : TestBase
     public async Task can_delete_sample_from_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
@@ -62,7 +63,7 @@ public class DeleteSampleCommandTests : TestBase
     public async Task can_softdelete_sample_from_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());

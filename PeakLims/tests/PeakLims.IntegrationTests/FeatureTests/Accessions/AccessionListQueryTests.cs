@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using Services;
 
 public class AccessionListQueryTests : TestBase
 {
@@ -18,8 +19,8 @@ public class AccessionListQueryTests : TestBase
     public async Task can_get_accession_list()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
-        var fakePatientTwo = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate(), GetService<IDateTimeProvider>());
+        var fakePatientTwo = FakePatient.Generate(new FakePatientForCreationDto().Generate(), GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne, fakePatientTwo);
 
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());

@@ -12,6 +12,7 @@ using static TestFixture;
 using SharedKernel.Exceptions;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using Services;
 
 public class AddAccessionCommandTests : TestBase
 {
@@ -19,7 +20,7 @@ public class AddAccessionCommandTests : TestBase
     public async Task can_add_new_accession_to_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate(), GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());

@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.Lifespans;
 using PeakLims.Domain.Patients.Features;
+using Services;
 using static TestFixture;
 using SharedKernel.Exceptions;
 
@@ -18,6 +19,7 @@ public class AddPatientCommandTests : TestBase
     {
         // Arrange
         var fakePatientOne = new FakePatientForCreationDto().Generate();
+        var dtp = GetService<IDateTimeProvider>();
 
         // Act
         var command = new AddPatient.Command(fakePatientOne);
@@ -26,7 +28,7 @@ public class AddPatientCommandTests : TestBase
             .FirstOrDefaultAsync(p => p.Id == patientReturned.Id));
 
         // Assert
-        var expectedLifespan = new Lifespan((DateOnly)fakePatientOne.Lifespan.DateOfBirth);
+        var expectedLifespan = new Lifespan((DateOnly)fakePatientOne.Lifespan.DateOfBirth, dtp);
         patientReturned.FirstName.Should().Be(fakePatientOne.FirstName);
         patientReturned.LastName.Should().Be(fakePatientOne.LastName);
         patientReturned.Lifespan.DateOfBirth.Should().Be(expectedLifespan.DateOfBirth);

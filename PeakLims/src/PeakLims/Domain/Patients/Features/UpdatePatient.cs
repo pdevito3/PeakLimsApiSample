@@ -30,12 +30,14 @@ public static class UpdatePatient
         private readonly IPatientRepository _patientRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHeimGuardClient _heimGuard;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public Handler(IPatientRepository patientRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard)
+        public Handler(IPatientRepository patientRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard, IDateTimeProvider dateTimeProvider)
         {
             _patientRepository = patientRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
@@ -44,7 +46,7 @@ public static class UpdatePatient
 
             var patientToUpdate = await _patientRepository.GetById(request.Id, cancellationToken: cancellationToken);
 
-            patientToUpdate.Update(request.PatientToUpdate);
+            patientToUpdate.Update(request.PatientToUpdate, _dateTimeProvider);
             _patientRepository.Update(patientToUpdate);
             return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
         }

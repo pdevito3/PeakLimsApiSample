@@ -28,20 +28,22 @@ public static class AddPatient
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public Handler(IPatientRepository patientRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IPatientRepository patientRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard, IDateTimeProvider dateTimeProvider)
         {
             _mapper = mapper;
             _patientRepository = patientRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<PatientDto> Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddPatients);
 
-            var patient = Patient.Create(request.PatientToAdd);
+            var patient = Patient.Create(request.PatientToAdd, _dateTimeProvider);
             await _patientRepository.Add(patient, cancellationToken);
 
             await _unitOfWork.CommitChanges(cancellationToken);

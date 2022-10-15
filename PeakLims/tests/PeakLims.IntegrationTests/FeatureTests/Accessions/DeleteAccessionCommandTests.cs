@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using Services;
 
 public class DeleteAccessionCommandTests : TestBase
 {
@@ -17,7 +18,7 @@ public class DeleteAccessionCommandTests : TestBase
     public async Task can_delete_accession_from_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
@@ -57,7 +58,7 @@ public class DeleteAccessionCommandTests : TestBase
     public async Task can_softdelete_accession_from_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());

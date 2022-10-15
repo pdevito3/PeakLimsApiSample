@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Services;
 using static TestFixture;
 
 public class DeletePatientCommandTests : TestBase
@@ -15,7 +16,7 @@ public class DeletePatientCommandTests : TestBase
     public async Task can_delete_patient_from_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
         var patient = await ExecuteDbContextAsync(db => db.Patients
             .FirstOrDefaultAsync(p => p.Id == fakePatientOne.Id));
@@ -47,7 +48,7 @@ public class DeletePatientCommandTests : TestBase
     public async Task can_softdelete_patient_from_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
         var patient = await ExecuteDbContextAsync(db => db.Patients
             .FirstOrDefaultAsync(p => p.Id == fakePatientOne.Id));

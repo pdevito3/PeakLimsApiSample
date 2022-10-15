@@ -13,6 +13,7 @@ using PeakLims.Domain.Patients.Features;
 using PeakLims.Domain.Patients.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.UnitTests.UnitTests.TestHelpers;
+using Services;
 using Sieve.Models;
 using Sieve.Services;
 
@@ -36,9 +37,10 @@ public class GetPatientListTests
     public async Task can_get_paged_list_of_patient()
     {
         //Arrange
-        var fakePatientOne = FakePatient.Generate();
-        var fakePatientTwo = FakePatient.Generate();
-        var fakePatientThree = FakePatient.Generate();
+        var dtp = Mock.Of<IDateTimeProvider>();
+        var fakePatientOne = FakePatient.Generate(dtp);
+        var fakePatientTwo = FakePatient.Generate(dtp);
+        var fakePatientThree = FakePatient.Generate(dtp);
         var patient = new List<Patient>();
         patient.Add(fakePatientOne);
         patient.Add(fakePatientTwo);

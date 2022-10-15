@@ -12,6 +12,7 @@ using SharedKernel.Exceptions;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.Sample;
 using PeakLims.SharedTestHelpers.Fakes.Container;
+using Services;
 
 public class AddSampleCommandTests : TestBase
 {
@@ -19,7 +20,7 @@ public class AddSampleCommandTests : TestBase
     public async Task can_add_new_sample_to_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());

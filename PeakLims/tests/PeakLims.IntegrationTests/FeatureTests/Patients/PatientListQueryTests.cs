@@ -7,6 +7,7 @@ using PeakLims.Domain.Patients.Features;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Services;
 using static TestFixture;
 
 public class PatientListQueryTests : TestBase
@@ -16,8 +17,8 @@ public class PatientListQueryTests : TestBase
     public async Task can_get_patient_list()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
-        var fakePatientTwo = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
+        var fakePatientTwo = FakePatient.Generate(GetService<IDateTimeProvider>());
         var queryParameters = new PatientParametersDto();
 
         await InsertAsync(fakePatientOne, fakePatientTwo);

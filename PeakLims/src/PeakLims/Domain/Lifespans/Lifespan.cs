@@ -1,5 +1,6 @@
 namespace PeakLims.Domain.Lifespans;
 
+using Services;
 using SharedKernel.Domain;
 using SharedKernel.Exceptions;
 
@@ -11,30 +12,30 @@ public sealed class Lifespan : ValueObject
     public int? Age { get; private set; }
     public DateOnly? DateOfBirth { get; private set; }
 
-    public int? GetAgeInDays()
+    public int? GetAgeInDays(IDateTimeProvider dateTimeProvider)
     {
         if (DateOfBirth.HasValue)
-            return GetAgeInDays(DateOfBirth.Value);
+            return GetAgeInDays(DateOfBirth.Value, dateTimeProvider);
 
         return null;
     }
 
-    private static int GetAgeInDays(DateOnly dob)
+    private static int GetAgeInDays(DateOnly dob, IDateTimeProvider dateTimeProvider)
     {
-        var dateSpan = DateTime.UtcNow - dob.ToDateTime(TimeOnly.MinValue);
+        var dateSpan = dateTimeProvider.DateTimeUtcNow - dob.ToDateTime(TimeOnly.MinValue);
         return dateSpan.Days;
     }
     
-    private static int GetAgeInYears(DateOnly dob)
+    private static int GetAgeInYears(DateOnly dob, IDateTimeProvider dateTimeProvider)
     {
-        var ageInYears = DateTime.UtcNow.Year - dob.ToDateTime(TimeOnly.MinValue).Year;
+        var ageInYears = dateTimeProvider.DateTimeUtcNow.Year - dob.ToDateTime(TimeOnly.MinValue).Year;
         if (dob.ToDateTime(TimeOnly.MinValue).AddYears(ageInYears) > DateTime.UtcNow)
             ageInYears--;
 
         return ageInYears;
     }
 
-    public Lifespan(int? exactAge, DateOnly? dateOfBirth)
+    public Lifespan(int? exactAge, DateOnly? dateOfBirth, IDateTimeProvider dateTimeProvider)
     {
         DateOfBirth = null;
         Age = null;
@@ -45,11 +46,11 @@ public sealed class Lifespan : ValueObject
         if(hasAge && !hasDob)
             CreateLifespanFromAge(age);
         if(hasDob)
-            CreateLifespanFromDateOfBirth(dob);
+            CreateLifespanFromDateOfBirth(dob, dateTimeProvider);
     }
     
     public Lifespan(int exactAge) => CreateLifespanFromAge(exactAge);
-    public Lifespan(DateOnly dob) => CreateLifespanFromDateOfBirth(dob);
+    public Lifespan(DateOnly dob, IDateTimeProvider dateTimeProvider) => CreateLifespanFromDateOfBirth(dob, dateTimeProvider);
 
     private void CreateLifespanFromAge(int ageInYears)
     {
@@ -62,14 +63,14 @@ public sealed class Lifespan : ValueObject
         DateOfBirth = null;
     }
 
-    private void CreateLifespanFromDateOfBirth(DateOnly dob)
+    private void CreateLifespanFromDateOfBirth(DateOnly dob, IDateTimeProvider dateTimeProvider)
     {
         if (dob.ToDateTime(TimeOnly.MinValue) > DateTime.UtcNow)
             throw new ValidationException(nameof(Lifespan), "Date of birth must be in the past");
         
         
         DateOfBirth = dob;
-        Age = GetAgeInYears(dob);
+        Age = GetAgeInYears(dob, dateTimeProvider);
     }
 
     protected Lifespan() { } // EF Core

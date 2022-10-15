@@ -12,6 +12,7 @@ using Domain.Tests.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using Services;
 using SharedTestHelpers.Fakes.Test;
 
 public class AddTestToAccessionCommandTests : TestBase
@@ -20,7 +21,7 @@ public class AddTestToAccessionCommandTests : TestBase
     public async Task can_add_test_to_accession()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate();
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
         await InsertAsync(fakeHealthcareOrganizationOne);
@@ -56,7 +57,7 @@ public class AddTestToAccessionCommandTests : TestBase
     public async Task can_add_test_to_accession_with_existing_test_orders()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate();
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
         await InsertAsync(fakeHealthcareOrganizationOne);

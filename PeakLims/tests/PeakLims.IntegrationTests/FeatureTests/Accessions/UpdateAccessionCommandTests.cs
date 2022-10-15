@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using Services;
 
 public class UpdateAccessionCommandTests : TestBase
 {
@@ -19,7 +20,7 @@ public class UpdateAccessionCommandTests : TestBase
     public async Task can_update_existing_accession_in_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());

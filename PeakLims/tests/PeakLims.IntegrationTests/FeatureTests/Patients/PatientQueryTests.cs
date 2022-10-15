@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Services;
 using static TestFixture;
 
 public class PatientQueryTests : TestBase
@@ -16,7 +17,7 @@ public class PatientQueryTests : TestBase
     public async Task can_get_existing_patient_with_accurate_props()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         // Act

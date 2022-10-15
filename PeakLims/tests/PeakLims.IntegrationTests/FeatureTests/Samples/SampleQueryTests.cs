@@ -12,6 +12,7 @@ using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.Sample;
 using PeakLims.SharedTestHelpers.Fakes.Container;
+using Services;
 
 public class SampleQueryTests : TestBase
 {
@@ -19,7 +20,7 @@ public class SampleQueryTests : TestBase
     public async Task can_get_existing_sample_with_accurate_props()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
         var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());

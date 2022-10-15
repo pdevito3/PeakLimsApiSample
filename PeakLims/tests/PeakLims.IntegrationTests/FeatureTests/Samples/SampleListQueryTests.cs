@@ -11,6 +11,7 @@ using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.Sample;
 using PeakLims.SharedTestHelpers.Fakes.Container;
+using Services;
 
 public class SampleListQueryTests : TestBase
 {
@@ -19,8 +20,8 @@ public class SampleListQueryTests : TestBase
     public async Task can_get_sample_list()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
-        var fakePatientTwo = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
+        var fakePatientTwo = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne, fakePatientTwo);
 
         var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());

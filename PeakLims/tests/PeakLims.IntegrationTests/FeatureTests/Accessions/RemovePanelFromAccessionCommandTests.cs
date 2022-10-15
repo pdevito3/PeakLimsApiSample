@@ -13,6 +13,7 @@ using Domain.Tests.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using Services;
 using SharedTestHelpers.Fakes.Panel;
 using SharedTestHelpers.Fakes.Test;
 
@@ -22,7 +23,7 @@ public class RemovePanelFromAccessionCommandTests : TestBase
     public async Task can_remove_panel()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate();
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
         await InsertAsync(fakeHealthcareOrganizationOne);

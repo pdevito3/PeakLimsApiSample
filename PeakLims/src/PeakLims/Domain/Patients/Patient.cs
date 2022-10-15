@@ -6,6 +6,7 @@ using PeakLims.Domain.Patients.Validators;
 using PeakLims.Domain.Patients.DomainEvents;
 using FluentValidation;
 using Lifespans;
+using PeakLims.Services;
 using Races;
 using Sexes;
 using Sieve.Attributes;
@@ -26,7 +27,7 @@ public class Patient : BaseEntity
     public virtual string InternalId { get; }
 
 
-    public static Patient Create(PatientForCreationDto patientForCreationDto)
+    public static Patient Create(PatientForCreationDto patientForCreationDto, IDateTimeProvider dateTimeProvider)
     {
         new PatientForCreationDtoValidator().ValidateAndThrow(patientForCreationDto);
 
@@ -34,7 +35,7 @@ public class Patient : BaseEntity
 
         newPatient.FirstName = patientForCreationDto.FirstName;
         newPatient.LastName = patientForCreationDto.LastName;
-        newPatient.Lifespan = new Lifespan(patientForCreationDto.Lifespan.Age, patientForCreationDto.Lifespan.DateOfBirth);
+        newPatient.Lifespan = new Lifespan(patientForCreationDto.Lifespan.Age, patientForCreationDto.Lifespan.DateOfBirth, dateTimeProvider);
         newPatient.Race = new Race(patientForCreationDto.Race);
         newPatient.Ethnicity = new Ethnicity(patientForCreationDto.Ethnicity);
         newPatient.Sex = new Sex(patientForCreationDto.Sex);
@@ -44,13 +45,13 @@ public class Patient : BaseEntity
         return newPatient;
     }
 
-    public void Update(PatientForUpdateDto patientForUpdateDto)
+    public void Update(PatientForUpdateDto patientForUpdateDto, IDateTimeProvider dateTimeProvider)
     {
         new PatientForUpdateDtoValidator().ValidateAndThrow(patientForUpdateDto);
 
         FirstName = patientForUpdateDto.FirstName;
         LastName = patientForUpdateDto.LastName;
-        Lifespan = new Lifespan(patientForUpdateDto.Lifespan.Age, patientForUpdateDto.Lifespan.DateOfBirth);
+        Lifespan = new Lifespan(patientForUpdateDto.Lifespan.Age, patientForUpdateDto.Lifespan.DateOfBirth, dateTimeProvider);
         Race = new Race(patientForUpdateDto.Race);
         Ethnicity = new Ethnicity(patientForUpdateDto.Ethnicity);
         Sex = new Sex(patientForUpdateDto.Sex);

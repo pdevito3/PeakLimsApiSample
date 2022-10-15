@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.Lifespans;
+using Services;
 using static TestFixture;
 
 public class UpdatePatientCommandTests : TestBase
@@ -18,7 +19,7 @@ public class UpdatePatientCommandTests : TestBase
     public async Task can_update_existing_patient_in_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         var updatedPatientDto = new FakePatientForUpdateDto().Generate();
         await InsertAsync(fakePatientOne);
 
@@ -34,7 +35,7 @@ public class UpdatePatientCommandTests : TestBase
         // Assert
         updatedPatient.FirstName.Should().Be(updatedPatientDto.FirstName);
         updatedPatient.LastName.Should().Be(updatedPatientDto.LastName);
-        updatedPatient.Lifespan.Should().Be(new Lifespan((DateOnly)updatedPatientDto.Lifespan.DateOfBirth));
+        updatedPatient.Lifespan.Should().Be(new Lifespan((DateOnly)updatedPatientDto.Lifespan.DateOfBirth, GetService<IDateTimeProvider>()));
         updatedPatient.Race.Value.Should().Be(updatedPatientDto.Race);
         updatedPatient.Ethnicity.Value.Should().Be(updatedPatientDto.Ethnicity);
         updatedPatient.Sex.Value.Should().Be(updatedPatientDto.Sex);

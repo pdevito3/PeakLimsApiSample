@@ -12,6 +12,7 @@ using Domain.TestOrderStatuses;
 using Domain.Tests.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using Services;
 using static TestFixture;
 
 public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
@@ -20,7 +21,7 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
     public async Task can_change_status_to_readyfortesting()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate();
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
         await InsertAsync(fakeHealthcareOrganizationOne);

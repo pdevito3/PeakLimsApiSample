@@ -2,9 +2,11 @@ namespace PeakLims.UnitTests.UnitTests.Domain.Patients;
 
 using Bogus;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using PeakLims.Domain.Patients.DomainEvents;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
+using Services;
 
 [Parallelizable]
 public class CreatePatientTests
@@ -20,7 +22,7 @@ public class CreatePatientTests
     public void can_create_valid_patient()
     {
         // Arrange + Act
-        var fakePatient = FakePatient.Generate();
+        var fakePatient = FakePatient.Generate(Mock.Of<IDateTimeProvider>());
 
         // Assert
         fakePatient.Should().NotBeNull();
@@ -30,7 +32,7 @@ public class CreatePatientTests
     public void queue_domain_event_on_create()
     {
         // Arrange + Act
-        var fakePatient = FakePatient.Generate();
+        var fakePatient = FakePatient.Generate(Mock.Of<IDateTimeProvider>());
 
         // Assert
         fakePatient.DomainEvents.Count.Should().Be(1);

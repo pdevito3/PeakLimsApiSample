@@ -12,6 +12,7 @@ using Domain.Tests.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
+using Services;
 using SharedTestHelpers.Fakes.Test;
 
 public class RemoveTestOrderFromAccessionCommandTests : TestBase
@@ -20,7 +21,7 @@ public class RemoveTestOrderFromAccessionCommandTests : TestBase
     public async Task can_remove_testorder()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate();
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
         await InsertAsync(fakeHealthcareOrganizationOne);

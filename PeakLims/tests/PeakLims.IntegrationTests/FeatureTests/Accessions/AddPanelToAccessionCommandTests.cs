@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using PeakLims.Domain.Accessions.Features;
 using PeakLims.Domain.Panels.Services;
+using Services;
 using SharedTestHelpers.Fakes.Accession;
 using SharedTestHelpers.Fakes.HealthcareOrganization;
 using SharedTestHelpers.Fakes.Panel;
@@ -21,7 +22,7 @@ public class AddPanelToAccessionCommandPanels : TestBase
     public async Task can_add_panel_to_accession()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate();
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
         await InsertAsync(fakeHealthcareOrganizationOne);
@@ -63,7 +64,7 @@ public class AddPanelToAccessionCommandPanels : TestBase
     public async Task can_add_panel_to_accession_with_existing_test_orders()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate();
+        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
         await InsertAsync(fakeHealthcareOrganizationOne);
