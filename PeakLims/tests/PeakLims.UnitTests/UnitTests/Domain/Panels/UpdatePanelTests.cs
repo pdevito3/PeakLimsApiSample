@@ -62,4 +62,38 @@ public class UpdatePanelTests
         fakePanel.DomainEvents.Count.Should().Be(1);
         fakePanel.DomainEvents.FirstOrDefault().Should().BeOfType(typeof(PanelUpdated));
     }
+    
+    [Test]
+    public void panel_must_have_name()
+    {
+        // Arrange + Act
+        var fakePanel = new FakePanelBuilder()
+            .WithMockRepository()
+            .Build();
+        var updatedPanel = new FakePanelForUpdateDto().Generate();
+        updatedPanel.PanelName = null;
+        
+        // Act
+        var act = () => fakePanel.Update(updatedPanel, Mock.Of<IPanelRepository>());
+
+        // Assert
+        act.Should().Throw<FluentValidation.ValidationException>();
+    }
+    
+    [Test]
+    public void panel_must_have_version_greater_than_or_equal_to_zero()
+    {
+        // Arrange
+        var fakePanel = new FakePanelBuilder()
+            .WithMockRepository()
+            .Build();
+        var updatedPanel = new FakePanelForUpdateDto().Generate();
+        updatedPanel.Version = -1;
+        
+        // Act
+        var act = () => fakePanel.Update(updatedPanel, Mock.Of<IPanelRepository>());
+
+        // Assert
+        act.Should().Throw<FluentValidation.ValidationException>();
+    }
 }

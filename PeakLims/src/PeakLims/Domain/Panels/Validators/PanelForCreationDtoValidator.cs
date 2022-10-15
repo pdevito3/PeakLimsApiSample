@@ -7,7 +7,6 @@ public sealed class PanelForCreationDtoValidator: PanelForManipulationDtoValidat
 {
     public PanelForCreationDtoValidator()
     {
-        // add fluent validation rules that should only be run on creation operations here
-        //https://fluentvalidation.net/
+        RuleFor(x => x.PanelCode).NotEmpty();
     }
 }

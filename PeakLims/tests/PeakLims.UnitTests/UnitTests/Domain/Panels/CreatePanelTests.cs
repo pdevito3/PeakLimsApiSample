@@ -51,4 +51,46 @@ public class CreatePanelTests
         fakePanel.DomainEvents.Count.Should().Be(1);
         fakePanel.DomainEvents.FirstOrDefault().Should().BeOfType(typeof(PanelCreated));
     }
+    
+    [Test]
+    public void panel_must_have_name()
+    {
+        // Arrange
+        var panelToCreate = new FakePanelForCreationDto().Generate();
+        panelToCreate.PanelName = null;
+        
+        // Act
+        var fakePanel = () => Panel.Create(panelToCreate, Mock.Of<IPanelRepository>());
+
+        // Assert
+        fakePanel.Should().Throw<FluentValidation.ValidationException>();
+    }
+    
+    [Test]
+    public void panel_must_have_code()
+    {
+        // Arrange
+        var panelToCreate = new FakePanelForCreationDto().Generate();
+        panelToCreate.PanelCode = null;
+        
+        // Act
+        var fakePanel = () => Panel.Create(panelToCreate, Mock.Of<IPanelRepository>());
+
+        // Assert
+        fakePanel.Should().Throw<FluentValidation.ValidationException>();
+    }
+    
+    [Test]
+    public void panel_must_have_version_greater_than_or_equal_to_zero()
+    {
+        // Arrange
+        var panelToCreate = new FakePanelForCreationDto().Generate();
+        panelToCreate.Version = -1;
+        
+        // Act
+        var fakePanel = () => Panel.Create(panelToCreate, Mock.Of<IPanelRepository>());
+
+        // Assert
+        fakePanel.Should().Throw<FluentValidation.ValidationException>();
+    }
 }

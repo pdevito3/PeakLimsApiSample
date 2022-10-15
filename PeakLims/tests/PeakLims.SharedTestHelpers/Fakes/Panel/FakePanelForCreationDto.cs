@@ -9,8 +9,6 @@ public class FakePanelForCreationDto : AutoFaker<PanelForCreationDto>
 {
     public FakePanelForCreationDto()
     {
-        // if you want default values on any of your properties (e.g. an int between a certain range or a date always in the past), you can add `RuleFor` lines describing those defaults
-        //RuleFor(p => p.ExampleIntProperty, p => p.Random.Number(50, 100000));
-        //RuleFor(p => p.ExampleDateProperty, p => p.Date.Past());
+        RuleFor(x => x.Version, f => f.Random.Int(0));
     }
 }
