@@ -8,6 +8,7 @@ using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
 using Domain.Panels.Services;
+using Domain.TestOrders.Services;
 using static TestFixture;
 
 public class DeletePanelCommandTests : TestBase
@@ -16,8 +17,10 @@ public class DeletePanelCommandTests : TestBase
     public async Task can_delete_panel_from_db()
     {
         // Arrange
-        var fakePanelOne = new FakePanelBuilder()
-            .WithRepository(GetService<IPanelRepository>())
+        var fakePanelOne = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Build();
         await InsertAsync(fakePanelOne);
         var panel = await ExecuteDbContextAsync(db => db.Panels
@@ -50,8 +53,10 @@ public class DeletePanelCommandTests : TestBase
     public async Task can_softdelete_panel_from_db()
     {
         // Arrange
-        var fakePanelOne = new FakePanelBuilder()
-            .WithRepository(GetService<IPanelRepository>())
+        var fakePanelOne = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Build();
         await InsertAsync(fakePanelOne);
         var panel = await ExecuteDbContextAsync(db => db.Panels

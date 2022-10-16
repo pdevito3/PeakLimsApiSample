@@ -191,5 +191,42 @@ public sealed class PanelsController: ControllerBase
         return NoContent();
     }
 
+
+    /// <summary>
+    /// Adds a test to a panel
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{panelId:guid}/AddTest/{testId:guid}", Name = "AddTestToPanel")]
+    public async Task<IActionResult> AddTestToPanel(Guid panelId, Guid testId)
+    {
+        var command = new AddTestToPanel.Command(panelId, testId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Removes a test from a panel
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [HttpDelete("{panelId:guid}/RemoveTest/{testId:guid}", Name = "RemoveTestFromPanel")]
+    public async Task<IActionResult> RemoveTestFromPanel(Guid panelId, Guid testId)
+    {
+        var command = new RemoveTestFromPanel.Command(panelId, testId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
     // endpoint marker - do not delete this comment
 }

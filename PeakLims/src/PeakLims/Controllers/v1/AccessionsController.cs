@@ -222,7 +222,7 @@ public sealed class AccessionsController: ControllerBase
     [ProducesResponseType(500)]
     [Authorize]
     [Produces("application/json")]
-    [HttpPost("{accessionId:guid}/addtest/{testId:guid}", Name = "AddTestToAccession")]
+    [HttpPut("{accessionId:guid}/AddTest/{testId:guid}", Name = "AddTestToAccession")]
     public async Task<IActionResult> AddTestToAccession(Guid accessionId, Guid testId)
     {
         var command = new AddTestToAccession.Command(accessionId, testId);
@@ -241,7 +241,7 @@ public sealed class AccessionsController: ControllerBase
     [ProducesResponseType(500)]
     [Authorize]
     [Produces("application/json")]
-    [HttpPost("{accessionId:guid}/addpanel/{panelId:guid}", Name = "AddPanelToAccession")]
+    [HttpPut("{accessionId:guid}/AddPanel/{panelId:guid}", Name = "AddPanelToAccession")]
     public async Task<IActionResult> AddPanelToAccession(Guid accessionId, Guid panelId)
     {
         var command = new AddPanelToAccession.Command(accessionId, panelId);
@@ -259,7 +259,7 @@ public sealed class AccessionsController: ControllerBase
     [ProducesResponseType(403)]
     [ProducesResponseType(500)]
     [Authorize]
-    [HttpDelete("{accessionId:guid}/RemoveTestOrder/{testOrderId:guid}", Name = "RemoveTestOrderFromAccession")]
+    [HttpPut("{accessionId:guid}/RemoveTestOrder/{testOrderId:guid}", Name = "RemoveTestOrderFromAccession")]
     public async Task<IActionResult> RemoveTestOrderFromAccession(Guid accessionId, Guid testOrderId)
     {
         var command = new RemoveTestOrderFromAccession.Command(accessionId, testOrderId);
@@ -277,7 +277,7 @@ public sealed class AccessionsController: ControllerBase
     [ProducesResponseType(403)]
     [ProducesResponseType(500)]
     [Authorize]
-    [HttpDelete("{accessionId:guid}/RemovePanel/{testOrderId:guid}", Name = "RemovePanelFromAccession")]
+    [HttpPut("{accessionId:guid}/RemovePanel/{testOrderId:guid}", Name = "RemovePanelFromAccession")]
     public async Task<IActionResult> RemovePanelFromAccession(Guid accessionId, Guid panelId)
     {
         var command = new RemovePanelFromAccession.Command(accessionId, panelId);

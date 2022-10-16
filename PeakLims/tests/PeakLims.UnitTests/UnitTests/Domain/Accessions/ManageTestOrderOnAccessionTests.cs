@@ -78,8 +78,9 @@ public class ManageTestOrderOnAccessionTests
             .WithMockRepository()
             .Activate()
             .Build();
-        var panel = new FakePanelBuilder()
-            .WithMockRepository()
+        var panel = FakePanelBuilder.Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .WithTest(test)
             .Activate()
             .Build();

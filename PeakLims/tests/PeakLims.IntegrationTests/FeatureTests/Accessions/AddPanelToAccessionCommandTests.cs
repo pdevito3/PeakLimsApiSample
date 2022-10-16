@@ -2,6 +2,7 @@ namespace PeakLims.IntegrationTests.FeatureTests.Accessions;
 
 using System.Threading.Tasks;
 using Domain.Panels;
+using Domain.TestOrders.Services;
 using Domain.Tests.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -30,10 +31,12 @@ public class AddPanelToAccessionCommandPanels : TestBase
             .Activate()
             .WithRepository(GetService<ITestRepository>())
             .Build();
-        var fakePanel = new FakePanelBuilder()
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Activate()
             .WithTest(fakeTest)
-            .WithRepository(GetService<IPanelRepository>())
             .Build();
         await InsertAsync(fakePanel);
 
@@ -76,10 +79,12 @@ public class AddPanelToAccessionCommandPanels : TestBase
             .Activate()
             .WithRepository(GetService<ITestRepository>())
             .Build();
-        var fakePanel = new FakePanelBuilder()
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Activate()
             .WithTest(fakeTest)
-            .WithRepository(GetService<IPanelRepository>())
             .Build();
         await InsertAsync(fakePanel);
 

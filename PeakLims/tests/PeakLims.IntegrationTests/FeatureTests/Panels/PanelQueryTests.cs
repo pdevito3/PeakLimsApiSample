@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
 using Domain.Panels.Services;
+using Domain.TestOrders.Services;
 using static TestFixture;
 
 public class PanelQueryTests : TestBase
@@ -17,8 +18,10 @@ public class PanelQueryTests : TestBase
     public async Task can_get_existing_panel_with_accurate_props()
     {
         // Arrange
-        var fakePanelOne = new FakePanelBuilder()
-            .WithRepository(GetService<IPanelRepository>())
+        var fakePanelOne = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Build();
         await InsertAsync(fakePanelOne);
 

@@ -9,10 +9,6 @@ using SharedKernel.Exceptions;
 public interface IPanelRepository : IGenericRepository<Panel>
 {
     bool Exists(string panelCode, int version);
-    Task<Panel> GetByIdWithTestsOrDefault(Guid id, bool withTracking = true,
-        CancellationToken cancellationToken = default);
-    Task<Panel> GetByIdWithTests(Guid id, bool withTracking = true,
-        CancellationToken cancellationToken = default);
 }
 
 public sealed class PanelRepository : GenericRepository<Panel>, IPanelRepository
@@ -29,7 +25,7 @@ public sealed class PanelRepository : GenericRepository<Panel>, IPanelRepository
         return _dbContext.Panels.Any(x => x.PanelCode == panelCode && x.Version == version);
     }
 
-    public async Task<Panel> GetByIdWithTestsOrDefault(Guid id, bool withTracking = true, CancellationToken cancellationToken = default)
+    public override async Task<Panel> GetByIdOrDefault(Guid id, bool withTracking = true, CancellationToken cancellationToken = default)
     {
         return withTracking 
             ? await _dbContext.Panels
@@ -41,9 +37,9 @@ public sealed class PanelRepository : GenericRepository<Panel>, IPanelRepository
                 .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    public async Task<Panel> GetByIdWithTests(Guid id, bool withTracking = true, CancellationToken cancellationToken = default)
+    public override async Task<Panel> GetById(Guid id, bool withTracking = true, CancellationToken cancellationToken = default)
     {
-        var entity = await GetByIdWithTestsOrDefault(id, withTracking, cancellationToken);
+        var entity = await GetByIdOrDefault(id, withTracking, cancellationToken);
         
         if(entity == null)
             throw new NotFoundException($"{nameof(Panel)} with an id '{id}' was not found.");

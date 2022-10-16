@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
 using Domain.Panels.Services;
+using Domain.TestOrders.Services;
 using Domain.Tests.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
@@ -31,10 +32,12 @@ public class RemovePanelFromAccessionCommandTests : TestBase
             .Activate()
             .WithRepository(GetService<ITestRepository>())
             .Build();
-        var fakePanel = new FakePanelBuilder()
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Activate()
             .WithTest(fakeTest)
-            .WithRepository(GetService<IPanelRepository>())
             .Build();
 
         var fakeAccessionOne = FakeAccessionBuilder

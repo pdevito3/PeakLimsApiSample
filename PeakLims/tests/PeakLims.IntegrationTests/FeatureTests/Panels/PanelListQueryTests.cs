@@ -8,6 +8,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.Panels.Services;
+using Domain.TestOrders.Services;
 using static TestFixture;
 
 public class PanelListQueryTests : TestBase
@@ -17,11 +18,15 @@ public class PanelListQueryTests : TestBase
     public async Task can_get_panel_list()
     {
         // Arrange
-        var fakePanelOne = new FakePanelBuilder()
-            .WithRepository(GetService<IPanelRepository>())
+        var fakePanelOne = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Build();
-        var fakePanelTwo = new FakePanelBuilder()
-            .WithRepository(GetService<IPanelRepository>())
+        var fakePanelTwo = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Build();
         var queryParameters = new PanelParametersDto();
 

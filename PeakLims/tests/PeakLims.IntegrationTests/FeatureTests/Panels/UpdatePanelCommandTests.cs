@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.Panels.Services;
+using Domain.TestOrders.Services;
 using static TestFixture;
 
 public class UpdatePanelCommandTests : TestBase
@@ -18,8 +19,10 @@ public class UpdatePanelCommandTests : TestBase
     public async Task can_update_existing_panel_in_db()
     {
         // Arrange
-        var fakePanelOne = new FakePanelBuilder()
-            .WithRepository(GetService<IPanelRepository>())
+        var fakePanelOne = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Build();
         var updatedPanelDto = new FakePanelForUpdateDto().Generate();
         await InsertAsync(fakePanelOne);
@@ -43,8 +46,10 @@ public class UpdatePanelCommandTests : TestBase
     public async Task can_not_update_panel_with_same_code_and_version()
     {
         // Arrange
-        var fakePanelOne = new FakePanelBuilder()
-            .WithRepository(GetService<IPanelRepository>())
+        var fakePanelOne = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Build();
         await InsertAsync(fakePanelOne);
         var fakePanelTwo = new FakePanelForUpdateDto().Generate();

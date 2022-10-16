@@ -1,6 +1,7 @@
 namespace PeakLims.IntegrationTests.FeatureTests.Panels;
 
 using System.Threading.Tasks;
+using Domain.TestOrders.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -16,8 +17,10 @@ public class DeactivatePanelTests : TestBase
     public async Task can_deactivate_test()
     {
         // Arrange
-        var fakePanel = new FakePanelBuilder()
-            .WithRepository(GetService<IPanelRepository>())
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithPanelRepository(GetService<IPanelRepository>())
+            .WithTestOrderRepository(GetService<ITestOrderRepository>())
             .Build();
         await InsertAsync(fakePanel);
 

@@ -461,6 +461,16 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the Panel.</response>
         </member>
+        <member name="M:PeakLims.Controllers.v1.PanelsController.AddTestToPanel(System.Guid,System.Guid)">
+            <summary>
+            Adds a test to a panel
+            </summary>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.PanelsController.RemoveTestFromPanel(System.Guid,System.Guid)">
+            <summary>
+            Removes a test from a panel
+            </summary>
+        </member>
         <member name="M:PeakLims.Controllers.v1.PatientsController.GetPatients(PeakLims.Domain.Patients.Dtos.PatientParametersDto)">
              <summary>
              Gets a list of all Patients.

@@ -26,9 +26,11 @@ public class CreatePanelTests
     {
         // Arrange + Act
         var panelToCreate = new FakePanelForCreationDto().Generate();
-        var fakePanel = new FakePanelBuilder()
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .WithDto(panelToCreate)
-            .WithMockRepository(false)
             .Build();
 
         // Assert
@@ -43,8 +45,10 @@ public class CreatePanelTests
     public void queue_domain_event_on_create()
     {
         // Arrange + Act
-        var fakePanel = new FakePanelBuilder()
-            .WithMockRepository(false)
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
 
         // Assert

@@ -10,6 +10,7 @@ using PanelStatuses;
 using Sieve.Attributes;
 using PeakLims.Domain.Tests;
 using Services;
+using TestOrders.Services;
 using ValidationException = SharedKernel.Exceptions.ValidationException;
 
 public class Panel : BaseEntity
@@ -79,25 +80,32 @@ public class Panel : BaseEntity
     public static void GuardWhenExists(string panelCode, int version, IPanelRepository panelRepository)
     {
         if (Exists(panelCode, version, panelRepository))
-            throw new ValidationException(nameof(Test),
+            throw new ValidationException(nameof(Panel),
                 $"A panel with the given panel code ('{panelCode}') and version ('{version}') already exists.");
     }
 
     public static bool Exists(string panelCode, int version, IPanelRepository panelRepository) => panelRepository.Exists(panelCode, version);
 
-    public void AddTest(Test test)
-    {        
+    public void AddTest(Test test, ITestOrderRepository testOrderRepository)
+    {
+        GuardWhenPanelIsAssignedToAnAccession(testOrderRepository);
         Tests.Add(test);
         QueueDomainEvent(new PanelUpdated(){ Id = Id });
     }
 
-    public void RemoveTest(Test test)
-    {        
-        // TODO add repository check to make sure that no panels have been used with this config?
-        
+    public void RemoveTest(Test test, ITestOrderRepository testOrderRepository)
+    {
+        GuardWhenPanelIsAssignedToAnAccession(testOrderRepository);
         Tests.Remove(test);
         QueueDomainEvent(new PanelUpdated(){ Id = Id });
     }
-    
+
+    private void GuardWhenPanelIsAssignedToAnAccession(ITestOrderRepository testOrderRepository)
+    {
+        if (testOrderRepository.HasPanelAssignedToAccession(this))
+            throw new ValidationException(nameof(Panel),
+                $"This panel has been assigned to one or more accessions. Tests can not be updated on a panel when the associated panel is in use.");
+    }
+
     protected Panel() { } // For EF + Mocking
 }

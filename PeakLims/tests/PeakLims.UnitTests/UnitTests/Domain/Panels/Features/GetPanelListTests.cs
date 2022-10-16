@@ -37,14 +37,17 @@ public class GetPanelListTests
     public async Task can_get_paged_list_of_panel()
     {
         //Arrange
-        var fakePanelOne = new FakePanelBuilder()
-            .WithMockRepository()
+        var fakePanelOne = FakePanelBuilder.Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
-        var fakePanelTwo = new FakePanelBuilder()
-            .WithMockRepository()
+        var fakePanelTwo = FakePanelBuilder.Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
-        var fakePanelThree = new FakePanelBuilder()
-            .WithMockRepository()
+        var fakePanelThree = FakePanelBuilder.Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
         var panel = new List<Panel>();
         panel.Add(fakePanelOne);

@@ -1,12 +1,16 @@
 namespace PeakLims.Domain.TestOrders.Services;
 
+using Microsoft.EntityFrameworkCore;
+using Panels;
 using PeakLims.Domain.TestOrders;
 using PeakLims.Databases;
 using PeakLims.Services;
+using Tests;
 
 public interface ITestOrderRepository : IGenericRepository<TestOrder>
 {
     void CleanupOrphanedTestOrders();
+    bool HasPanelAssignedToAccession(Panel panel);
 }
 
 public sealed class TestOrderRepository : GenericRepository<TestOrder>, ITestOrderRepository
@@ -22,5 +26,13 @@ public sealed class TestOrderRepository : GenericRepository<TestOrder>, ITestOrd
     {
         var testOrders = _dbContext.TestOrders.Where(x => x.AccessionId == null).ToList();
         _dbContext.TestOrders.RemoveRange(testOrders);
+    }
+
+    public bool HasPanelAssignedToAccession(Panel panel)
+    {
+        return _dbContext.TestOrders
+            .Include(x => x.Accession)
+            .Include(x => x.AssociatedPanel)
+            .Any(x => x.AccessionId != null && x.AssociatedPanel == panel);
     }
 }

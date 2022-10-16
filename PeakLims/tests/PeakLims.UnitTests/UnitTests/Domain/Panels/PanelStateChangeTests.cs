@@ -21,8 +21,10 @@ public class PanelStateChangeTests
     public void can_activate_panel()
     {
         // Arrange
-        var fakePanel = new FakePanelBuilder()
-            .WithMockRepository(false)
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
         fakePanel.DomainEvents.Clear();
         
@@ -39,8 +41,10 @@ public class PanelStateChangeTests
     public void can_deactivate_panel()
     {
         // Arrange
-        var fakePanel = new FakePanelBuilder()
-            .WithMockRepository(false)
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
         fakePanel.DomainEvents.Clear();
         

@@ -24,8 +24,10 @@ public class UpdatePanelTests
     public void can_update_panel()
     {
         // Arrange
-        var fakePanel = new FakePanelBuilder()
-            .WithMockRepository(false)
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
         var updatedPanel = new FakePanelForUpdateDto().Generate();
         
@@ -47,8 +49,10 @@ public class UpdatePanelTests
     public void queue_domain_event_on_update()
     {
         // Arrange
-        var fakePanel = new FakePanelBuilder()
-            .WithMockRepository(false)
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
         var updatedPanel = new FakePanelForUpdateDto().Generate();
         fakePanel.DomainEvents.Clear();
@@ -67,8 +71,10 @@ public class UpdatePanelTests
     public void panel_must_have_name()
     {
         // Arrange + Act
-        var fakePanel = new FakePanelBuilder()
-            .WithMockRepository()
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
         var updatedPanel = new FakePanelForUpdateDto().Generate();
         updatedPanel.PanelName = null;
@@ -84,8 +90,10 @@ public class UpdatePanelTests
     public void panel_must_have_version_greater_than_or_equal_to_zero()
     {
         // Arrange
-        var fakePanel = new FakePanelBuilder()
-            .WithMockRepository()
+        var fakePanel = FakePanelBuilder
+            .Initialize()
+            .WithMockPanelRepository()
+            .WithMockTestOrderRepository()
             .Build();
         var updatedPanel = new FakePanelForUpdateDto().Generate();
         updatedPanel.Version = -1;
