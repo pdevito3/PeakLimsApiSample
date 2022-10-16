@@ -177,7 +177,7 @@ public sealed class TestsController: ControllerBase
     [ProducesResponseType(500)]
     [Authorize]
     [Produces("application/json")]
-    [HttpPut("{id:guid}", Name = "SetTestStatusToActive")]
+    [HttpPut("{id:guid}/activate", Name = "SetTestStatusToActive")]
     public async Task<IActionResult> SetTestStatusToActive(Guid id)
     {
         var command = new ActivateTest.Command(id);
@@ -197,7 +197,7 @@ public sealed class TestsController: ControllerBase
     [ProducesResponseType(500)]
     [Authorize]
     [Produces("application/json")]
-    [HttpPut("{id:guid}", Name = "SetTestStatusToInactive")]
+    [HttpPut("{id:guid}/deactivate", Name = "SetTestStatusToInactive")]
     public async Task<IActionResult> SetTestStatusToInactive(Guid id)
     {
         var command = new DeactivateTest.Command(id);

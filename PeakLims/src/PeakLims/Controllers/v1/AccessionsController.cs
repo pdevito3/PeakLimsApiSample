@@ -202,7 +202,7 @@ public sealed class AccessionsController: ControllerBase
     [ProducesResponseType(500)]
     [Authorize]
     [Produces("application/json")]
-    [HttpPut("{id:guid}", Name = "SetAccessionStatusToReadyForTesting")]
+    [HttpPut("{id:guid}/SubmitForTesting", Name = "SetAccessionStatusToReadyForTesting")]
     public async Task<IActionResult> SetAccessionStatusToReadyForTesting(Guid id)
     {
         var command = new SetAccessionStatusToReadyForTesting.Command(id);
