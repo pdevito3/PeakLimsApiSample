@@ -451,16 +451,6 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the Panel.</response>
         </member>
-        <member name="M:PeakLims.Controllers.v1.PanelsController.DeletePanel(System.Guid)">
-            <summary>
-            Deletes an existing Panel record.
-            </summary>
-            <response code="204">Panel deleted.</response>
-            <response code="400">Panel has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Panel.</response>
-        </member>
         <member name="M:PeakLims.Controllers.v1.PanelsController.AddTestToPanel(System.Guid,System.Guid)">
             <summary>
             Adds a test to a panel
@@ -469,6 +459,16 @@
         <member name="M:PeakLims.Controllers.v1.PanelsController.RemoveTestFromPanel(System.Guid,System.Guid)">
             <summary>
             Removes a test from a panel
+            </summary>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.PanelsController.SetPanelStatusToActive(System.Guid)">
+            <summary>
+            Sets panel status to `Active`
+            </summary>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.PanelsController.SetPanelStatusToInactive(System.Guid)">
+            <summary>
+            Sets panel status to `Inactive`
             </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.PatientsController.GetPatients(PeakLims.Domain.Patients.Dtos.PatientParametersDto)">

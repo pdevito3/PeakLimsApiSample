@@ -162,7 +162,6 @@ public sealed class TestsController: ControllerBase
     {
         var command = new UpdateTest.Command(id, test);
         await _mediator.Send(command);
-
         return NoContent();
     }
 
@@ -182,7 +181,6 @@ public sealed class TestsController: ControllerBase
     {
         var command = new ActivateTest.Command(id);
         await _mediator.Send(command);
-
         return NoContent();
     }
 
@@ -202,7 +200,6 @@ public sealed class TestsController: ControllerBase
     {
         var command = new DeactivateTest.Command(id);
         await _mediator.Send(command);
-
         return NoContent();
     }
 

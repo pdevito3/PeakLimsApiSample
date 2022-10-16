@@ -168,31 +168,6 @@ public sealed class PanelsController: ControllerBase
 
 
     /// <summary>
-    /// Deletes an existing Panel record.
-    /// </summary>
-    /// <response code="204">Panel deleted.</response>
-    /// <response code="400">Panel has missing/invalid values.</response>
-    /// <response code="401">This request was not able to be authenticated.</response>
-    /// <response code="403">The required permissions to access this resource were not present in the given request.</response>
-    /// <response code="500">There was an error on the server while creating the Panel.</response>
-    [ProducesResponseType(204)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(500)]
-    [Authorize]
-    [Produces("application/json")]
-    [HttpDelete("{id:guid}", Name = "DeletePanel")]
-    public async Task<ActionResult> DeletePanel(Guid id)
-    {
-        var command = new DeletePanel.Command(id);
-        await _mediator.Send(command);
-
-        return NoContent();
-    }
-
-
-    /// <summary>
     /// Adds a test to a panel
     /// </summary>
     [ProducesResponseType(204)]
@@ -220,10 +195,48 @@ public sealed class PanelsController: ControllerBase
     [ProducesResponseType(403)]
     [ProducesResponseType(500)]
     [Authorize]
-    [HttpDelete("{panelId:guid}/RemoveTest/{testId:guid}", Name = "RemoveTestFromPanel")]
+    [HttpPut("{panelId:guid}/RemoveTest/{testId:guid}", Name = "RemoveTestFromPanel")]
     public async Task<IActionResult> RemoveTestFromPanel(Guid panelId, Guid testId)
     {
         var command = new RemoveTestFromPanel.Command(panelId, testId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Sets panel status to `Active`
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{id:guid}/activate", Name = "SetPanelStatusToActive")]
+    public async Task<IActionResult> SetPanelStatusToActive(Guid id)
+    {
+        var command = new ActivatePanel.Command(id);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Sets panel status to `Inactive`
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{id:guid}/deactivate", Name = "SetPanelStatusToInactive")]
+    public async Task<IActionResult> SetPanelStatusToInactive(Guid id)
+    {
+        var command = new DeactivatePanel.Command(id);
         await _mediator.Send(command);
         return NoContent();
     }
