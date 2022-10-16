@@ -19,7 +19,6 @@ public class HealthcareOrganization : BaseEntity
 {
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string Name { get; private set; }
-
     public virtual Email Email { get; private set; }
     public virtual Address PrimaryAddress { get; private set; }
 

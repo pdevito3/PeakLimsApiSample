@@ -12,5 +12,6 @@ public static class Consts
     {
         public const string PatientInternalIdPrefix = "PAT";
         public const string AccessionNumberPrefix = "ACC";
+        public const string SampleNumberPrefix = "SAM";
     }
 }

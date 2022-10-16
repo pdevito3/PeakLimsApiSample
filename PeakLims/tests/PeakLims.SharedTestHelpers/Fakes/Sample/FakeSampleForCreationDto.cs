@@ -1,6 +1,7 @@
 namespace PeakLims.SharedTestHelpers.Fakes.Sample;
 
 using AutoBogus;
+using Domain.SampleTypes;
 using PeakLims.Domain.Samples;
 using PeakLims.Domain.Samples.Dtos;
 
@@ -12,5 +13,6 @@ public class FakeSampleForCreationDto : AutoFaker<SampleForCreationDto>
         RuleFor(s => s.ParentSampleId, _ => null);
         RuleFor(s => s.ContainerId, _ => null);
         RuleFor(s => s.PatientId, _ => null);
+        RuleFor(x => x.Type, f => f.PickRandom(SampleType.ListNames()));
     }
 }

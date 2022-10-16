@@ -4,7 +4,6 @@ public sealed class SampleDto
 {
         public Guid Id { get; set; }
         public string SampleNumber { get; set; }
-        public string Status { get; set; }
         public string Type { get; set; }
         public decimal? Quantity { get; set; }
         public DateOnly? CollectionDate { get; set; }

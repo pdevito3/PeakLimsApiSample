@@ -13,18 +13,15 @@ using Sieve.Attributes;
 using PeakLims.Domain.Patients;
 using PeakLims.Domain.Samples;
 using PeakLims.Domain.Containers;
-
+using SampleTypes;
 
 public class Sample : BaseEntity
 {
     [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string SampleNumber { get; private set; }
+    public virtual string SampleNumber { get; }
 
     [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string Status { get; private set; }
-
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string Type { get; private set; }
+    public virtual SampleType Type { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual decimal? Quantity { get; private set; }
@@ -63,9 +60,7 @@ public class Sample : BaseEntity
 
         var newSample = new Sample();
 
-        newSample.SampleNumber = sampleForCreationDto.SampleNumber;
-        newSample.Status = sampleForCreationDto.Status;
-        newSample.Type = sampleForCreationDto.Type;
+        newSample.Type = new SampleType(sampleForCreationDto.Type);
         newSample.Quantity = sampleForCreationDto.Quantity;
         newSample.CollectionDate = sampleForCreationDto.CollectionDate;
         newSample.ReceivedDate = sampleForCreationDto.ReceivedDate;
@@ -83,9 +78,7 @@ public class Sample : BaseEntity
     {
         new SampleForUpdateDtoValidator().ValidateAndThrow(sampleForUpdateDto);
 
-        SampleNumber = sampleForUpdateDto.SampleNumber;
-        Status = sampleForUpdateDto.Status;
-        Type = sampleForUpdateDto.Type;
+        Type = new SampleType(sampleForUpdateDto.Type);
         Quantity = sampleForUpdateDto.Quantity;
         CollectionDate = sampleForUpdateDto.CollectionDate;
         ReceivedDate = sampleForUpdateDto.ReceivedDate;

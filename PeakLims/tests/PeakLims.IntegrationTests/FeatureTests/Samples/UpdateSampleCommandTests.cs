@@ -50,9 +50,7 @@ public class UpdateSampleCommandTests : TestBase
         var updatedSample = await ExecuteDbContextAsync(db => db.Samples.FirstOrDefaultAsync(s => s.Id == id));
 
         // Assert
-        updatedSample.SampleNumber.Should().Be(updatedSampleDto.SampleNumber);
-        updatedSample.Status.Should().Be(updatedSampleDto.Status);
-        updatedSample.Type.Should().Be(updatedSampleDto.Type);
+        updatedSample.Type.Value.Should().Be(updatedSampleDto.Type);
         updatedSample.Quantity.Should().Be(updatedSampleDto.Quantity);
         updatedSample.CollectionDate.Should().Be(updatedSampleDto.CollectionDate);
         updatedSample.ReceivedDate.Should().Be(updatedSampleDto.ReceivedDate);

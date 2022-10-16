@@ -125,7 +125,6 @@ public class Accession : BaseEntity
         if (!alreadyExists)
             return this;
         
-        // TODO unit test
         if(testOrder.IsPartOfPanel())
             throw new ValidationException(nameof(Accession),
                 $"Test orders that are part of a panel can not be selectively removed.");
@@ -149,8 +148,6 @@ public class Accession : BaseEntity
     {
         // TODO unit test
         GuardIfInFinalState("Panels");
-        
-        // TODO if any of the panel order test statuses is not in one of the pending states, guard
         
         var hasInactivePanel = !panel.Status.IsActive();
         if(hasInactivePanel)

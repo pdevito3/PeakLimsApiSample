@@ -9,6 +9,6 @@ public sealed class RaceMappings : IRegister
         config.NewConfig<string, Race>()
             .MapWith(value => new Race(value));
         config.NewConfig<Race, string>()
-            .MapWith(role => role.Value);
+            .MapWith(race => race.Value);
     }
 }

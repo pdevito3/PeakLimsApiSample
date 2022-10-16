@@ -26,9 +26,7 @@ public class CreateSampleTests
         var fakeSample = FakeSample.Generate(sampleToCreate);
 
         // Assert
-        fakeSample.SampleNumber.Should().Be(sampleToCreate.SampleNumber);
-        fakeSample.Status.Should().Be(sampleToCreate.Status);
-        fakeSample.Type.Should().Be(sampleToCreate.Type);
+        fakeSample.Type.Value.Should().Be(sampleToCreate.Type);
         fakeSample.Quantity.Should().Be(sampleToCreate.Quantity);
         fakeSample.CollectionDate.Should().Be(sampleToCreate.CollectionDate);
         fakeSample.ReceivedDate.Should().Be(sampleToCreate.ReceivedDate);

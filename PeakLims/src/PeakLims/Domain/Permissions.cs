@@ -18,7 +18,6 @@ public static class Permissions
     public const string CanUpdateTests = nameof(CanUpdateTests);
     public const string CanAddTests = nameof(CanAddTests);
     public const string CanReadTests = nameof(CanReadTests);
-    public const string CanDeletePanels = nameof(CanDeletePanels);
     public const string CanUpdatePanels = nameof(CanUpdatePanels);
     public const string CanAddPanels = nameof(CanAddPanels);
     public const string CanReadPanels = nameof(CanReadPanels);
