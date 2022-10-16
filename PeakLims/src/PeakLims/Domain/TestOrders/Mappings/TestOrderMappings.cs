@@ -9,9 +9,5 @@ public sealed class TestOrderMappings : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<TestOrder, TestOrderDto>();
-        config.NewConfig<TestOrderForCreationDto, TestOrder>()
-            .TwoWays();
-        config.NewConfig<TestOrderForUpdateDto, TestOrder>()
-            .TwoWays();
     }
 }

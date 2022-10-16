@@ -718,6 +718,11 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while getting the Test Order.</response>
         </member>
+        <member name="M:PeakLims.Controllers.v1.TestOrdersController.CancelTestOrder(System.Guid,PeakLims.Domain.TestOrders.Dtos.CancelTestOrderDto)">
+            <summary>
+            Cancels a test order
+            </summary>
+        </member>
         <member name="M:PeakLims.Controllers.v1.TestsController.GetTests(PeakLims.Domain.Tests.Dtos.TestParametersDto)">
              <summary>
              Gets a list of all Tests.

@@ -10,12 +10,15 @@ using PeakLims.Domain.Tests;
 using PeakLims.Services;
 using TestOrderStatuses;
 using SharedKernel.Exceptions;
+using TestOrderCancellationReasons;
 
 public class TestOrder : BaseEntity
 {
     public virtual TestOrderStatus Status { get; private set; }
     public virtual DateOnly? DueDate { get; private set; }
     public virtual int? TatSnapshot { get; private set; }
+    public virtual TestOrderCancellationReason CancellationReason { get; private set; }
+    public virtual string CancellationComments { get; private set; }
     
     [JsonIgnore]
     [IgnoreDataMember]
@@ -106,6 +109,25 @@ public class TestOrder : BaseEntity
         Status = TestOrderStatus.ReadyForTesting();
         TatSnapshot = Test.TurnAroundTime;
         DueDate = dateTimeProvider.DateOnlyUtcNow.AddDays(Test.TurnAroundTime);
+        QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
+        return this;
+    }
+
+    public TestOrder Cancel(TestOrderCancellationReason reason, string comments)
+    {
+        // TODO unit test
+        new ValidationException(nameof(TestOrder),
+            $"A comment must be provided detailing why the test order was cancelled.")
+            .ThrowWhenNullOrEmpty(comments);
+        
+        // TODO unit test
+        if (Status.IsFinalState())
+            throw new ValidationException(nameof(TestOrder),
+                $"Test orders in a {Status.Value} state can not be set to {TestOrderStatus.Cancelled().Value}");
+        
+        Status = TestOrderStatus.Cancelled();
+        CancellationReason = reason;
+        CancellationComments = comments;
         QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
         return this;
     }

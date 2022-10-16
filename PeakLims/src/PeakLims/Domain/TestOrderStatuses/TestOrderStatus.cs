@@ -32,7 +32,6 @@ public class TestOrderStatus : ValueObject
     public static implicit operator string(TestOrderStatus value) => value.Value;
     public static List<string> ListNames() => TestOrderStatusEnum.List.Select(x => x.Name).ToList();
 
-    public bool CanCancel() => Value == Pending().Value || Value == ReadyForTesting().Value;
     public static TestOrderStatus Pending() => new TestOrderStatus(TestOrderStatusEnum.Pending.Name);
     public static TestOrderStatus ReadyForTesting() => new TestOrderStatus(TestOrderStatusEnum.ReadyForTesting.Name);
     public static TestOrderStatus Testing() => new TestOrderStatus(TestOrderStatusEnum.Testing.Name);
@@ -40,9 +39,7 @@ public class TestOrderStatus : ValueObject
     public static TestOrderStatus ReportPending() => new TestOrderStatus(TestOrderStatusEnum.ReportPending.Name);
     public static TestOrderStatus ReportComplete() => new TestOrderStatus(TestOrderStatusEnum.ReportComplete.Name);
     public static TestOrderStatus Completed() => new TestOrderStatus(TestOrderStatusEnum.Completed.Name);
-    public static TestOrderStatus Abandoned() => new TestOrderStatus(TestOrderStatusEnum.Abandoned.Name);
     public static TestOrderStatus Cancelled() => new TestOrderStatus(TestOrderStatusEnum.Cancelled.Name);
-    public static TestOrderStatus Qns() => new TestOrderStatus(TestOrderStatusEnum.Qns.Name);
     public bool IsFinalState() => _status.IsFinalState();
 
     protected TestOrderStatus() { } // EF Core

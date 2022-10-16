@@ -43,5 +43,24 @@ public sealed class TestOrdersController: ControllerBase
         return Ok(queryResponse);
     }
 
+
+    /// <summary>
+    /// Cancels a test order
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{testOrderId:guid}/cancel", Name = "CancelTestOrder")]
+    public async Task<IActionResult> CancelTestOrder(Guid testOrderId, [FromBody] CancelTestOrderDto cancelTestOrderDto)
+    {
+        var command = new CancelTestOrder.Command(testOrderId, cancelTestOrderDto.Reason, cancelTestOrderDto.Comments);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
     // endpoint marker - do not delete this comment
 }
