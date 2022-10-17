@@ -23,16 +23,16 @@ public class SampleQueryTests : TestBase
         var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
-        var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
+        var fakeSampleParentOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
         await InsertAsync(fakeSampleParentOne);
 
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         await InsertAsync(fakeContainerOne);
 
-        var fakeSampleOne = FakeSample.Generate(new FakeSampleForCreationDto()
+        var fakeSampleOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
             .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
-            .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id).Generate());
+            .Generate());
         await InsertAsync(fakeSampleOne);
 
         // Act

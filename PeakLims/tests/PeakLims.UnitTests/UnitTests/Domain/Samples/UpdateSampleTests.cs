@@ -23,7 +23,7 @@ public class UpdateSampleTests
     {
         // Arrange
         var fakeSample = FakeSample.Generate();
-        var updatedSample = new FakeSampleForUpdateDto().Generate();
+        var updatedSample = new FakeContainerlessSampleForUpdateDto().Generate();
         
         // Act
         fakeSample.Update(updatedSample);
@@ -37,7 +37,7 @@ public class UpdateSampleTests
         fakeSample.CollectionSite.Should().Be(updatedSample.CollectionSite);
         fakeSample.PatientId.Should().Be(updatedSample.PatientId);
         fakeSample.ParentSampleId.Should().Be(updatedSample.ParentSampleId);
-        fakeSample.ContainerId.Should().Be(updatedSample.ContainerId);
+        fakeSample.ContainerId.Should().BeNull();
     }
     
     [Test]
@@ -45,7 +45,7 @@ public class UpdateSampleTests
     {
         // Arrange
         var fakeSample = FakeSample.Generate();
-        var updatedSample = new FakeSampleForUpdateDto().Generate();
+        var updatedSample = new FakeContainerlessSampleForUpdateDto().Generate();
         fakeSample.DomainEvents.Clear();
         
         // Act

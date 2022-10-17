@@ -19,6 +19,7 @@ public class Container : BaseEntity
     public virtual string Type { get; private set; }
     public virtual ContainerStatus Status { get; private set; }
     public virtual SampleType UsedFor { get; private set; }
+    public bool CanStore(SampleType sampleType) => UsedFor == sampleType;
 
 
     public static Container Create(ContainerForCreationDto containerForCreationDto)

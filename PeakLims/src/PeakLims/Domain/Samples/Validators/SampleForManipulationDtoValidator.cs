@@ -3,7 +3,7 @@ namespace PeakLims.Domain.Samples.Validators;
 using PeakLims.Domain.Samples.Dtos;
 using FluentValidation;
 
-public class SampleForManipulationDtoValidator<T> : AbstractValidator<T> where T : SampleForManipulationDto
+public class SampleForManipulationDtoValidator<T> : AbstractValidator<T> where T : ContainerlessSampleForManipulationDto
 {
     public SampleForManipulationDtoValidator()
     {

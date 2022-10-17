@@ -21,13 +21,13 @@ public class UpdateSampleRecordTests : TestBase
         var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
         await InsertAsync(fakePatientOne);
 
-        var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
+        var fakeSampleParentOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
         await InsertAsync(fakeSampleParentOne);
 
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         await InsertAsync(fakeContainerOne);
 
-        var fakeSample = FakeSample.Generate(new FakeSampleForCreationDto()
+        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
             .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
             .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id).Generate());
@@ -52,7 +52,7 @@ public class UpdateSampleRecordTests : TestBase
     public async Task put_sample_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeSample = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
+        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
         var updatedSampleDto = new FakeSampleForUpdateDto { }.Generate();
 
         await InsertAsync(fakeSample);
@@ -69,7 +69,7 @@ public class UpdateSampleRecordTests : TestBase
     public async Task put_sample_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeSample = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
+        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
         var updatedSampleDto = new FakeSampleForUpdateDto { }.Generate();
         FactoryClient.AddAuth();
 

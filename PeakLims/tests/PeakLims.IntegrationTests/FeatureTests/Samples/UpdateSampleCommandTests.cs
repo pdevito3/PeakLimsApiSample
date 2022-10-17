@@ -1,19 +1,15 @@
 namespace PeakLims.IntegrationTests.FeatureTests.Samples;
 
 using PeakLims.SharedTestHelpers.Fakes.Sample;
-using PeakLims.Domain.Samples.Dtos;
-using SharedKernel.Exceptions;
 using PeakLims.Domain.Samples.Features;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
-using static TestFixture;
-using PeakLims.SharedTestHelpers.Fakes.Patient;
-using PeakLims.SharedTestHelpers.Fakes.Sample;
+using Domain.Samples;
 using PeakLims.SharedTestHelpers.Fakes.Container;
-using Services;
+using static TestFixture;
 
 public class UpdateSampleCommandTests : TestBase
 {
@@ -21,42 +17,42 @@ public class UpdateSampleCommandTests : TestBase
     public async Task can_update_existing_sample_in_db()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
-        await InsertAsync(fakePatientOne);
+        var container = FakeContainer.Generate();
+        await InsertAsync(container);
+        
+        var sampleToCreate = new FakeContainerlessSampleForCreationDto().Generate();
+        sampleToCreate.Type = container.UsedFor.Value;
+        var sample = Sample.Create(sampleToCreate);
+        await InsertAsync(sample);
+        
+        var updatedSampleData = new FakeSampleForUpdateDto().Generate();
+        updatedSampleData.ContainerId = container.Id;
+        updatedSampleData.Type = container.UsedFor.Value;
 
-        var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
-        await InsertAsync(fakeSampleParentOne);
-
-        var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
-        await InsertAsync(fakeContainerOne);
-
-        var fakeSampleOne = FakeSample.Generate(new FakeSampleForCreationDto()
-            .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
-            .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id).Generate());
-        var updatedSampleDto = new FakeSampleForUpdateDto()
-            .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
-            .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id).Generate();
-        await InsertAsync(fakeSampleOne);
-
-        var sample = await ExecuteDbContextAsync(db => db.Samples
-            .FirstOrDefaultAsync(s => s.Id == fakeSampleOne.Id));
-        var id = sample.Id;
-
-        // Act
-        var command = new UpdateSample.Command(id, updatedSampleDto);
+        // Act - add container
+        var command = new UpdateSample.Command(sample.Id, updatedSampleData);
         await SendAsync(command);
-        var updatedSample = await ExecuteDbContextAsync(db => db.Samples.FirstOrDefaultAsync(s => s.Id == id));
+        var updatedSample = await ExecuteDbContextAsync(db => db.Samples.FirstOrDefaultAsync(s => s.Id == sample.Id));
 
-        // Assert
-        updatedSample.Type.Value.Should().Be(updatedSampleDto.Type);
-        updatedSample.Quantity.Should().Be(updatedSampleDto.Quantity);
-        updatedSample.CollectionDate.Should().Be(updatedSampleDto.CollectionDate);
-        updatedSample.ReceivedDate.Should().Be(updatedSampleDto.ReceivedDate);
-        updatedSample.CollectionSite.Should().Be(updatedSampleDto.CollectionSite);
-        updatedSample.PatientId.Should().Be(updatedSampleDto.PatientId);
-        updatedSample.ParentSampleId.Should().Be(updatedSampleDto.ParentSampleId);
-        updatedSample.ContainerId.Should().Be(updatedSampleDto.ContainerId);
+        // Assert - add container
+        updatedSample.Type.Value.Should().Be(updatedSampleData.Type);
+        updatedSample.Quantity.Should().Be(updatedSampleData.Quantity);
+        updatedSample.CollectionDate.Should().Be(updatedSampleData.CollectionDate);
+        updatedSample.ReceivedDate.Should().Be(updatedSampleData.ReceivedDate);
+        updatedSample.CollectionSite.Should().Be(updatedSampleData.CollectionSite);
+        updatedSample.PatientId.Should().Be(updatedSampleData.PatientId);
+        updatedSample.ParentSampleId.Should().Be(updatedSampleData.ParentSampleId);
+        updatedSample.ContainerId.Should().Be(updatedSampleData.ContainerId);
+
+        // Arrange - remove container
+        updatedSampleData.ContainerId = null;
+        
+        // Act - remove container
+        var removeCommand = new UpdateSample.Command(sample.Id, updatedSampleData);
+        await SendAsync(removeCommand);
+        updatedSample = await ExecuteDbContextAsync(db => db.Samples.FirstOrDefaultAsync(s => s.Id == sample.Id));
+
+        // Assert - remove container
+        updatedSample.ContainerId.Should().BeNull();
     }
 }

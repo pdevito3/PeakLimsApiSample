@@ -131,7 +131,7 @@ public sealed class SamplesController: ControllerBase
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost(Name = "AddSample")]
-    public async Task<ActionResult<SampleDto>> AddSample([FromBody]SampleForCreationDto sampleForCreation)
+    public async Task<ActionResult<SampleDto>> AddSample([FromBody] SampleForCreationDto sampleForCreation)
     {
         var command = new AddSample.Command(sampleForCreation);
         var commandResponse = await _mediator.Send(command);
@@ -158,9 +158,9 @@ public sealed class SamplesController: ControllerBase
     [Authorize]
     [Produces("application/json")]
     [HttpPut("{id:guid}", Name = "UpdateSample")]
-    public async Task<IActionResult> UpdateSample(Guid id, SampleForUpdateDto sample)
+    public async Task<IActionResult> UpdateSample(Guid id, SampleForUpdateDto sampleForUpdate)
     {
-        var command = new UpdateSample.Command(id, sample);
+        var command = new UpdateSample.Command(id, sampleForUpdate);
         await _mediator.Send(command);
 
         return NoContent();

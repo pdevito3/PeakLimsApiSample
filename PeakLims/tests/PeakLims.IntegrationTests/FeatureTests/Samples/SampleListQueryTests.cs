@@ -24,22 +24,22 @@ public class SampleListQueryTests : TestBase
         var fakePatientTwo = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne, fakePatientTwo);
 
-        var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
-        var fakeSampleParentTwo = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
+        var fakeSampleParentOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
+        var fakeSampleParentTwo = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
         await InsertAsync(fakeSampleParentOne, fakeSampleParentTwo);
 
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         var fakeContainerTwo = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         await InsertAsync(fakeContainerOne, fakeContainerTwo);
 
-        var fakeSampleOne = FakeSample.Generate(new FakeSampleForCreationDto()
+        var fakeSampleOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
             .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
-            .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id).Generate());
-        var fakeSampleTwo = FakeSample.Generate(new FakeSampleForCreationDto()
+            .Generate());
+        var fakeSampleTwo = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientTwo.Id)
             .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentTwo.Id)
-            .RuleFor(s => s.ContainerId, _ => fakeContainerTwo.Id).Generate());
+            .Generate());
         var queryParameters = new SampleParametersDto();
 
         await InsertAsync(fakeSampleOne, fakeSampleTwo);

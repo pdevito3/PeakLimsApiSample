@@ -22,7 +22,7 @@ public class CreateSampleTests
     public void can_create_valid_sample()
     {
         // Arrange + Act
-        var sampleToCreate = new FakeSampleForCreationDto().Generate();
+        var sampleToCreate = new FakeContainerlessSampleForCreationDto().Generate();
         var fakeSample = FakeSample.Generate(sampleToCreate);
 
         // Assert
@@ -33,7 +33,7 @@ public class CreateSampleTests
         fakeSample.CollectionSite.Should().Be(sampleToCreate.CollectionSite);
         fakeSample.PatientId.Should().Be(sampleToCreate.PatientId);
         fakeSample.ParentSampleId.Should().Be(sampleToCreate.ParentSampleId);
-        fakeSample.ContainerId.Should().Be(sampleToCreate.ContainerId);
+        fakeSample.ContainerId.Should().BeNull();
     }
 
     [Test]

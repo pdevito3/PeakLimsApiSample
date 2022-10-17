@@ -6,13 +6,13 @@ using PeakLims.Domain.Samples.Dtos;
 
 public class FakeSample
 {
-    public static Sample Generate(SampleForCreationDto sampleForCreationDto)
+    public static Sample Generate(ContainerlessSampleForCreationDto containerlessSampleForCreationDto)
     {
-        return Sample.Create(sampleForCreationDto);
+        return Sample.Create(containerlessSampleForCreationDto);
     }
 
     public static Sample Generate()
     {
-        return Sample.Create(new FakeSampleForCreationDto().Generate());
+        return Sample.Create(new FakeContainerlessSampleForCreationDto().Generate());
     }
 }

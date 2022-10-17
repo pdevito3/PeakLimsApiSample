@@ -21,13 +21,13 @@ public class DeleteSampleTests : TestBase
         var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
         await InsertAsync(fakePatientOne);
 
-        var fakeSampleParentOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
+        var fakeSampleParentOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
         await InsertAsync(fakeSampleParentOne);
 
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         await InsertAsync(fakeContainerOne);
 
-        var fakeSample = FakeSample.Generate(new FakeSampleForCreationDto()
+        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
             .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
             .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id).Generate());
@@ -48,7 +48,7 @@ public class DeleteSampleTests : TestBase
     public async Task delete_sample_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeSample = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
+        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
 
         await InsertAsync(fakeSample);
 
@@ -64,7 +64,7 @@ public class DeleteSampleTests : TestBase
     public async Task delete_sample_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeSample = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
+        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
         FactoryClient.AddAuth();
 
         await InsertAsync(fakeSample);

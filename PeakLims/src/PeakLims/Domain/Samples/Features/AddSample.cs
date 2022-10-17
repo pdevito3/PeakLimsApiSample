@@ -1,5 +1,6 @@
 namespace PeakLims.Domain.Samples.Features;
 
+using Containers.Services;
 using PeakLims.Domain.Samples.Services;
 using PeakLims.Domain.Samples;
 using PeakLims.Domain.Samples.Dtos;
@@ -25,29 +26,32 @@ public static class AddSample
     public sealed class Handler : IRequestHandler<Command, SampleDto>
     {
         private readonly ISampleRepository _sampleRepository;
+        private readonly IContainerRepository _containerRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(ISampleRepository sampleRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(ISampleRepository sampleRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard, IContainerRepository containerRepository)
         {
             _mapper = mapper;
             _sampleRepository = sampleRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
+            _containerRepository = containerRepository;
         }
 
         public async Task<SampleDto> Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddSamples);
 
-            var sample = Sample.Create(request.SampleToAdd);
+            var containerlessSampleToAdd = _mapper.Map<ContainerlessSampleForCreationDto>(request.SampleToAdd);
+            var sample = Sample.Create(containerlessSampleToAdd);
+            await sample.SetSampleContainer(request.SampleToAdd.ContainerId, _containerRepository, cancellationToken);
             await _sampleRepository.Add(sample, cancellationToken);
 
             await _unitOfWork.CommitChanges(cancellationToken);
-
-            var sampleAdded = await _sampleRepository.GetById(sample.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<SampleDto>(sampleAdded);
+            
+            return _mapper.Map<SampleDto>(sample);
         }
     }
 }

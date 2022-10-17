@@ -9,9 +9,13 @@ public sealed class SampleMappings : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Sample, SampleDto>();
-        config.NewConfig<SampleForCreationDto, Sample>()
+        config.NewConfig<ContainerlessSampleForCreationDto, Sample>()
             .TwoWays();
-        config.NewConfig<SampleForUpdateDto, Sample>()
+        config.NewConfig<ContainerlessSampleForUpdateDto, Sample>()
+            .TwoWays();
+        config.NewConfig<ContainerlessSampleForCreationDto, SampleForCreationDto>()
+            .TwoWays();
+        config.NewConfig<ContainerlessSampleForUpdateDto, SampleForUpdateDto>()
             .TwoWays();
     }
 }

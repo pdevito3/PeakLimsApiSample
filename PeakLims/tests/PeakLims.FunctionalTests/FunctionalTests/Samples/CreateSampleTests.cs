@@ -21,13 +21,13 @@ public class CreateSampleTests : TestBase
         var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
         await InsertAsync(fakePatientOne);
 
-        var fakeSampleOne = FakeSample.Generate(new FakeSampleForCreationDto().Generate());
+        var fakeSampleOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
         await InsertAsync(fakeSampleOne);
 
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         await InsertAsync(fakeContainerOne);
 
-        var fakeSample = new FakeSampleForCreationDto()
+        var fakeSample = new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
             
             .RuleFor(s => s.ParentSampleId, _ => fakeSampleOne.Id)
@@ -50,7 +50,7 @@ public class CreateSampleTests : TestBase
     public async Task create_sample_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeSample = new FakeSampleForCreationDto { }.Generate();
+        var fakeSample = new FakeContainerlessSampleForCreationDto { }.Generate();
 
         // Act
         var route = ApiRoutes.Samples.Create;
@@ -64,7 +64,7 @@ public class CreateSampleTests : TestBase
     public async Task create_sample_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeSample = new FakeSampleForCreationDto { }.Generate();
+        var fakeSample = new FakeContainerlessSampleForCreationDto { }.Generate();
         FactoryClient.AddAuth();
 
         // Act
