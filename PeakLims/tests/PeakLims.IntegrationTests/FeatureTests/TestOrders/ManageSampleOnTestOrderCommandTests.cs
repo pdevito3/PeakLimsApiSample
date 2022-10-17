@@ -14,6 +14,7 @@ using Domain.TestOrderStatuses;
 using Domain.Tests.Services;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Test;
+using SharedTestHelpers.Fakes.Container;
 using SharedTestHelpers.Fakes.Sample;
 
 public class ManageSampleOnTestOrderCommandTests : TestBase
@@ -29,8 +30,9 @@ public class ManageSampleOnTestOrderCommandTests : TestBase
     public async Task can_manage_sample()
     {
         // Arrange
-        var fakeSample = FakeSample.Generate();
-        await InsertAsync(fakeSample);
+        var container = FakeContainer.Generate();
+        var sample = FakeSample.Generate(container);
+        await InsertAsync(sample);
         var fakeTestOne = new FakeTestBuilder()
             .WithRepository(GetService<ITestRepository>())
             .Build();
@@ -39,13 +41,13 @@ public class ManageSampleOnTestOrderCommandTests : TestBase
         await InsertAsync(fakeTestOrderOne);
 
         // Act - set
-        var command = new SetSampleOnTestOrder.Command(fakeTestOrderOne.Id, fakeSample.Id);
+        var command = new SetSampleOnTestOrder.Command(fakeTestOrderOne.Id, sample.Id);
         await SendAsync(command);
         var testOrder = await ExecuteDbContextAsync(db => db.TestOrders
             .FirstOrDefaultAsync(x => x.Id == fakeTestOrderOne.Id));
 
         // Assert - set
-        testOrder.SampleId.Should().Be(fakeSample.Id);
+        testOrder.SampleId.Should().Be(sample.Id);
 
         // Act - remove
         var removeCommand = new RemoveSampleOnTestOrder.Command(fakeTestOrderOne.Id);

@@ -19,16 +19,13 @@ public class DeleteSampleCommandTests : TestBase
     public async Task can_delete_sample_from_db()
     {
         // Arrange
+        var container = FakeContainer.Generate();
         var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
-        var fakeSampleParentOne = FakeSample.Generate();
-        await InsertAsync(fakeSampleParentOne);
-
         var fakeSampleOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
-            .Generate());
+            .Generate(), container);
         await InsertAsync(fakeSampleOne);
         var sample = await ExecuteDbContextAsync(db => db.Samples
             .FirstOrDefaultAsync(s => s.Id == fakeSampleOne.Id));
@@ -60,19 +57,16 @@ public class DeleteSampleCommandTests : TestBase
     public async Task can_softdelete_sample_from_db()
     {
         // Arrange
+        var container = FakeContainer.Generate();
         var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
-
-        var fakeSampleParentOne = FakeSample.Generate();
-        await InsertAsync(fakeSampleParentOne);
 
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         await InsertAsync(fakeContainerOne);
 
         var fakeSampleOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
-            .Generate());
+            .Generate(), container);
         await InsertAsync(fakeSampleOne);
         var sample = await ExecuteDbContextAsync(db => db.Samples
             .FirstOrDefaultAsync(s => s.Id == fakeSampleOne.Id));

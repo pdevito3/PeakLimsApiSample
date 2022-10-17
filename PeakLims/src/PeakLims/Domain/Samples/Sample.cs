@@ -52,12 +52,12 @@ public class Sample : BaseEntity
     [JsonIgnore]
     [IgnoreDataMember]
     [ForeignKey("Container")]
-    public virtual Guid? ContainerId { get; private set; }
+    public virtual Guid ContainerId { get; private set; }
     public virtual Container Container { get; private set; }
     public virtual ICollection<TestOrder> TestOrders { get; private set; } = new List<TestOrder>();
 
 
-    public static Sample Create(ContainerlessSampleForCreationDto containerlessSampleForCreationDto)
+    public static Sample Create(ContainerlessSampleForCreationDto containerlessSampleForCreationDto, Container container)
     {
         new SampleForCreationDtoValidator().ValidateAndThrow(containerlessSampleForCreationDto);
 
@@ -70,13 +70,14 @@ public class Sample : BaseEntity
         newSample.CollectionSite = containerlessSampleForCreationDto.CollectionSite;
         newSample.PatientId = containerlessSampleForCreationDto.PatientId;
         newSample.ParentSampleId = containerlessSampleForCreationDto.ParentSampleId;
+        newSample.SetContainer(container);
 
         newSample.QueueDomainEvent(new SampleCreated(){ Sample = newSample });
         
         return newSample;
     }
 
-    public void Update(ContainerlessSampleForUpdateDto containerlessSampleForUpdateDto)
+    public void Update(ContainerlessSampleForUpdateDto containerlessSampleForUpdateDto, Container container)
     {
         new SampleForUpdateDtoValidator().ValidateAndThrow(containerlessSampleForUpdateDto);
 
@@ -87,11 +88,12 @@ public class Sample : BaseEntity
         CollectionSite = containerlessSampleForUpdateDto.CollectionSite;
         PatientId = containerlessSampleForUpdateDto.PatientId;
         ParentSampleId = containerlessSampleForUpdateDto.ParentSampleId;
+        SetContainer(container);
 
         QueueDomainEvent(new SampleUpdated(){ Id = Id });
     }
 
-    public Sample SetContainer(Container container)
+    private Sample SetContainer(Container container)
     {
         if (!container.CanStore(Type))
             throw new ValidationException(nameof(Sample),
@@ -99,30 +101,7 @@ public class Sample : BaseEntity
         
         Container = container;
         ContainerId = container.Id;
-        QueueDomainEvent(new SampleUpdated(){ Id = Id });
         return this;
-    }
-
-    public Sample RemoveContainer()
-    {
-        Container = null;
-        ContainerId = null;
-        QueueDomainEvent(new SampleUpdated(){ Id = Id });
-        return this;
-    }
-
-    public async Task SetSampleContainer(Guid? givenContainerId, IContainerRepository containerRepository, CancellationToken cancellationToken)
-    {
-        var passedContainerId = Guid.TryParse(givenContainerId.ToString(), out var containerId);
-        if (passedContainerId)
-        {
-            var container = await containerRepository.GetById(containerId, cancellationToken: cancellationToken);
-            SetContainer(container);
-        }
-        else
-        {
-            RemoveContainer();
-        }
     }
     
     protected Sample() { } // For EF + Mocking

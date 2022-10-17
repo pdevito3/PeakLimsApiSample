@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using PeakLims.Domain.TestOrderStatuses;
 using Services;
+using SharedTestHelpers.Fakes.Container;
 using SharedTestHelpers.Fakes.Sample;
 using SharedTestHelpers.Fakes.Test;
 
@@ -27,7 +28,8 @@ public class SetStatusToReadyForTestingTests
     public void can_set_to_ready_for_testing()
     {
         // Arrange
-        var sample = FakeSample.Generate();
+        var container = FakeContainer.Generate();
+        var sample = FakeSample.Generate(container);
         var test = new FakeTestBuilder()
             .WithMockRepository()
             .Activate()

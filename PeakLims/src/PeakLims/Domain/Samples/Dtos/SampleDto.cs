@@ -11,5 +11,5 @@ public sealed class SampleDto
         public string CollectionSite { get; set; }
         public Guid? PatientId { get; set; }
         public Guid? ParentSampleId { get; set; }
-        public Guid? ContainerId { get; set; }
+        public Guid ContainerId { get; set; }
 }

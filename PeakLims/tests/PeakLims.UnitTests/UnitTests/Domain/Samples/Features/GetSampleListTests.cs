@@ -16,6 +16,7 @@ using Sieve.Models;
 using Sieve.Services;
 using TestHelpers;
 using NUnit.Framework;
+using SharedTestHelpers.Fakes.Container;
 
 public class GetSampleListTests
 {
@@ -37,9 +38,10 @@ public class GetSampleListTests
     public async Task can_get_paged_list_of_sample()
     {
         //Arrange
-        var fakeSampleOne = FakeSample.Generate();
-        var fakeSampleTwo = FakeSample.Generate();
-        var fakeSampleThree = FakeSample.Generate();
+        var fakeContainer = FakeContainer.Generate();
+        var fakeSampleOne = FakeSample.Generate(fakeContainer);
+        var fakeSampleTwo = FakeSample.Generate(fakeContainer);
+        var fakeSampleThree = FakeSample.Generate(fakeContainer);
         var sample = new List<Sample>();
         sample.Add(fakeSampleOne);
         sample.Add(fakeSampleTwo);

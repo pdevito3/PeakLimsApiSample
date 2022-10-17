@@ -14,6 +14,7 @@ using Domain.Tests.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using Services;
+using SharedTestHelpers.Fakes.Container;
 using SharedTestHelpers.Fakes.Sample;
 using SharedTestHelpers.Fakes.Test;
 using static TestFixture;
@@ -28,6 +29,7 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
         await InsertAsync(fakePatientOne);
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
         await InsertAsync(fakeHealthcareOrganizationOne);
+        var container = FakeContainer.Generate();
 
         var fakeAccessionOne = FakeAccessionBuilder
             .Initialize()
@@ -35,7 +37,7 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
             .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
             .WithTestRepository(GetService<ITestRepository>())
             .Build();
-        fakeAccessionOne.TestOrders.FirstOrDefault().SetSample(FakeSample.Generate());
+        fakeAccessionOne.TestOrders.FirstOrDefault().SetSample(FakeSample.Generate(container));
         
         await InsertAsync(fakeAccessionOne);
 

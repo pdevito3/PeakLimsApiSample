@@ -11,7 +11,6 @@ public class FakeSampleForUpdateDto : AutoFaker<SampleForUpdateDto>
     public FakeSampleForUpdateDto()
     {
         RuleFor(s => s.ParentSampleId, _ => null);
-        RuleFor(s => s.ContainerId, _ => null);
         RuleFor(s => s.PatientId, _ => null);
         RuleFor(x => x.Type, f => f.PickRandom(SampleType.ListNames()));
     }

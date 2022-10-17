@@ -7,6 +7,8 @@ using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using NUnit.Framework;
+using PeakLims.Domain.Containers;
+using SharedTestHelpers.Fakes.Container;
 
 [Parallelizable]
 public class UpdateSampleTests
@@ -22,11 +24,13 @@ public class UpdateSampleTests
     public void can_update_sample()
     {
         // Arrange
-        var fakeSample = FakeSample.Generate();
+        var fakeContainer = FakeContainer.Generate();
+        var fakeSample = FakeSample.Generate(fakeContainer);
         var updatedSample = new FakeContainerlessSampleForUpdateDto().Generate();
+        updatedSample.Type = fakeContainer.UsedFor.Value;
         
         // Act
-        fakeSample.Update(updatedSample);
+        fakeSample.Update(updatedSample, fakeContainer);
 
         // Assert
         fakeSample.SampleNumber.Should().Be(fakeSample.SampleNumber);
@@ -37,19 +41,21 @@ public class UpdateSampleTests
         fakeSample.CollectionSite.Should().Be(updatedSample.CollectionSite);
         fakeSample.PatientId.Should().Be(updatedSample.PatientId);
         fakeSample.ParentSampleId.Should().Be(updatedSample.ParentSampleId);
-        fakeSample.ContainerId.Should().BeNull();
+        fakeSample.ContainerId.Should().Be(fakeContainer.Id);
     }
     
     [Test]
     public void queue_domain_event_on_update()
     {
         // Arrange
-        var fakeSample = FakeSample.Generate();
+        var fakeContainer = FakeContainer.Generate();
+        var fakeSample = FakeSample.Generate(fakeContainer);
         var updatedSample = new FakeContainerlessSampleForUpdateDto().Generate();
+        updatedSample.Type = fakeContainer.UsedFor.Value;
         fakeSample.DomainEvents.Clear();
         
         // Act
-        fakeSample.Update(updatedSample);
+        fakeSample.Update(updatedSample, fakeContainer);
 
         // Assert
         fakeSample.DomainEvents.Count.Should().Be(1);

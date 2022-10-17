@@ -9,6 +9,7 @@ using NUnit.Framework;
 using PeakLims.Domain.AccessionStatuses;
 using PeakLims.Domain.TestOrderStatuses;
 using Services;
+using SharedTestHelpers.Fakes.Container;
 using SharedTestHelpers.Fakes.Sample;
 using SharedTestHelpers.Fakes.Test;
 
@@ -32,7 +33,9 @@ public class AccessionReadyForTestingTests
             .WithHealthcareOrganizationId(Guid.NewGuid())
             .WithMockTestRepository()
             .Build();
-        fakeAccession.TestOrders.FirstOrDefault().SetSample(FakeSample.Generate());
+        var container = FakeContainer.Generate();
+        var sample = FakeSample.Generate(container);
+        fakeAccession.TestOrders.FirstOrDefault().SetSample(sample);
         fakeAccession.DomainEvents.Clear();
         
         // Act
@@ -59,7 +62,9 @@ public class AccessionReadyForTestingTests
             .WithMockTestRepository()
             .WithTest(test)
             .Build();
-        fakeAccession.TestOrders.FirstOrDefault().SetSample(FakeSample.Generate());
+        var container = FakeContainer.Generate();
+        var sample = FakeSample.Generate(container);
+        fakeAccession.TestOrders.FirstOrDefault().SetSample(sample);
         fakeAccession.DomainEvents.Clear();
         var dateTimeProvider = Mock.Of<IDateTimeProvider>();
         

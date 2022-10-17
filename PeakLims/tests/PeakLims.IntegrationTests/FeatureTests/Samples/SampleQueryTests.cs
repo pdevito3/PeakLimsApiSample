@@ -20,19 +20,16 @@ public class SampleQueryTests : TestBase
     public async Task can_get_existing_sample_with_accurate_props()
     {
         // Arrange
+        var container = FakeContainer.Generate();
         var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
-
-        var fakeSampleParentOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
-        await InsertAsync(fakeSampleParentOne);
 
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         await InsertAsync(fakeContainerOne);
 
         var fakeSampleOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
-            .Generate());
+            .Generate(), container);
         await InsertAsync(fakeSampleOne);
 
         // Act

@@ -49,8 +49,8 @@ public static class UpdateSample
 
             var sampleToUpdate = await _sampleRepository.GetById(request.Id, cancellationToken: cancellationToken);
             var containerlessUpdatedSample = _mapper.Map<ContainerlessSampleForUpdateDto>(request.SampleToUpdate);
-            sampleToUpdate.Update(containerlessUpdatedSample);
-            await sampleToUpdate.SetSampleContainer(request.SampleToUpdate.ContainerId, _containerRepository, cancellationToken);
+            var container = await _containerRepository.GetById(request.SampleToUpdate.ContainerId, cancellationToken: cancellationToken);
+            sampleToUpdate.Update(containerlessUpdatedSample, container);
             _sampleRepository.Update(sampleToUpdate);
             
             return await _unitOfWork.CommitChanges(cancellationToken) >= 1;

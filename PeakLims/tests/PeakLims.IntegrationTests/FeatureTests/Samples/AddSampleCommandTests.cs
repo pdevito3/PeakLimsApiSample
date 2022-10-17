@@ -23,14 +23,12 @@ public class AddSampleCommandTests : TestBase
         var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
         await InsertAsync(fakePatientOne);
 
-        var fakeSampleParentOne = FakeSample.Generate();
-        await InsertAsync(fakeSampleParentOne);
-
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         await InsertAsync(fakeContainerOne);
 
         var fakeSampleOne = new FakeSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
+            .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id)
             .Generate();
 
         // Act

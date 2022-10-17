@@ -45,8 +45,8 @@ public static class AddSample
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddSamples);
 
             var containerlessSampleToAdd = _mapper.Map<ContainerlessSampleForCreationDto>(request.SampleToAdd);
-            var sample = Sample.Create(containerlessSampleToAdd);
-            await sample.SetSampleContainer(request.SampleToAdd.ContainerId, _containerRepository, cancellationToken);
+            var container = await _containerRepository.GetById(request.SampleToAdd.ContainerId, cancellationToken: cancellationToken);
+            var sample = Sample.Create(containerlessSampleToAdd, container);
             await _sampleRepository.Add(sample, cancellationToken);
 
             await _unitOfWork.CommitChanges(cancellationToken);
