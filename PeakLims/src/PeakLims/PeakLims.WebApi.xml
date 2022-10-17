@@ -723,6 +723,16 @@
             Cancels a test order
             </summary>
         </member>
+        <member name="M:PeakLims.Controllers.v1.TestOrdersController.SetSampleOnTestOrder(System.Guid,System.Guid)">
+            <summary>
+            Sets a given sample on a test order
+            </summary>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.TestOrdersController.RemoveSampleOnTestOrder(System.Guid)">
+            <summary>
+            Removes the sample a test order when present
+            </summary>
+        </member>
         <member name="M:PeakLims.Controllers.v1.TestsController.GetTests(PeakLims.Domain.Tests.Dtos.TestParametersDto)">
              <summary>
              Gets a list of all Tests.

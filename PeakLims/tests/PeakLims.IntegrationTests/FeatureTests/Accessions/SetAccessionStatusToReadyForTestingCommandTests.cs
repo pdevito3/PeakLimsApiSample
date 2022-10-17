@@ -8,11 +8,14 @@ using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.AccessionStatuses;
 using Domain.Panels.Services;
+using Domain.TestOrders;
 using Domain.TestOrderStatuses;
 using Domain.Tests.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using Services;
+using SharedTestHelpers.Fakes.Sample;
+using SharedTestHelpers.Fakes.Test;
 using static TestFixture;
 
 public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
@@ -32,6 +35,7 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
             .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
             .WithTestRepository(GetService<ITestRepository>())
             .Build();
+        fakeAccessionOne.TestOrders.FirstOrDefault().SetSample(FakeSample.Generate());
         
         await InsertAsync(fakeAccessionOne);
 

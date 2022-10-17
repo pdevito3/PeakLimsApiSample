@@ -8,6 +8,7 @@ using Accessions;
 using Panels;
 using PeakLims.Domain.Tests;
 using PeakLims.Services;
+using Samples;
 using TestOrderStatuses;
 using SharedKernel.Exceptions;
 using TestOrderCancellationReasons;
@@ -37,6 +38,12 @@ public class TestOrder : BaseEntity
     [ForeignKey("Accession")]
     public virtual Guid? AccessionId { get; private set; }
     public virtual Accession Accession { get; private set; }
+
+    [JsonIgnore]
+    [IgnoreDataMember]
+    [ForeignKey("Sample")]
+    public virtual Guid? SampleId { get; private set; }
+    public virtual Sample Sample { get; private set; }
 
     public bool IsPartOfPanel() => AssociatedPanelId.HasValue;
 
@@ -100,6 +107,10 @@ public class TestOrder : BaseEntity
         new ValidationException(nameof(TestOrder),
                 $"A test is required in order to set a test order to {TestOrderStatus.ReadyForTesting().Value}")
             .ThrowWhenNullOrEmpty(TestId);
+        // TODO unit test
+        new ValidationException(nameof(TestOrder),
+                $"A sample is required in order to set a test order to {TestOrderStatus.ReadyForTesting().Value}")
+            .ThrowWhenNullOrEmpty(SampleId);
         
         // TODO unit test
         if (Status != TestOrderStatus.Pending())
@@ -123,7 +134,7 @@ public class TestOrder : BaseEntity
         // TODO unit test
         if (Status.IsFinalState())
             throw new ValidationException(nameof(TestOrder),
-                $"Test orders in a {Status.Value} state can not be set to {TestOrderStatus.Cancelled().Value}");
+                $"This test order is already in a final state and can not be cancelled.");
         
         Status = TestOrderStatus.Cancelled();
         CancellationReason = reason;
@@ -131,6 +142,37 @@ public class TestOrder : BaseEntity
         QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
         return this;
     }
-    
+
+    public TestOrder SetSample(Sample sample)
+    {
+        // TODO unit test
+        GuardIfTestOrderIsProcessing();
+        
+        // TODO must be a sample from the patient on the given accession????
+
+        Sample = sample;
+        SampleId = sample.Id;
+        QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
+        return this;
+    }
+
+    public TestOrder RemoveSample()
+    {
+        // TODO unit test
+        GuardIfTestOrderIsProcessing();
+
+        Sample = null;
+        SampleId = null;
+        QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
+        return this;
+    }
+
+    private void GuardIfTestOrderIsProcessing()
+    {
+        if (Status != TestOrderStatus.Pending())
+            throw new ValidationException(nameof(TestOrder),
+                $"The assigned sample can not be updated once a test order has started processing.");
+    }
+
     protected TestOrder() { } // For EF + Mocking
 }

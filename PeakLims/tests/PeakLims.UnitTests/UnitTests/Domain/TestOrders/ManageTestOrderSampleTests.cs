@@ -14,17 +14,17 @@ using SharedTestHelpers.Fakes.Sample;
 using SharedTestHelpers.Fakes.Test;
 
 [Parallelizable]
-public class SetStatusToReadyForTestingTests
+public class ManageTestOrderSampleTests
 {
     private readonly Faker _faker;
 
-    public SetStatusToReadyForTestingTests()
+    public ManageTestOrderSampleTests()
     {
         _faker = new Faker();
     }
     
     [Test]
-    public void can_set_to_ready_for_testing()
+    public void can_manage_sample()
     {
         // Arrange
         var sample = FakeSample.Generate();
@@ -32,16 +32,20 @@ public class SetStatusToReadyForTestingTests
             .WithMockRepository()
             .Activate()
             .Build();
-        var dtp = Mock.Of<DateTimeProvider>();
         var fakeTestOrder = TestOrder.Create(test);
-        fakeTestOrder.SetSample(sample);
         
-        // Act
-        fakeTestOrder.SetStatusToReadyForTesting(dtp);
+        // Act -- add
+        fakeTestOrder.SetSample(sample);
 
-        // Assert
-        fakeTestOrder.Status.Should().Be(TestOrderStatus.ReadyForTesting());
-        fakeTestOrder.TatSnapshot.Should().Be(test.TurnAroundTime);
-        fakeTestOrder.DueDate.Should().Be(dtp.DateOnlyUtcNow.AddDays(test.TurnAroundTime));
+        // Assert -- add
+        fakeTestOrder.SampleId.Should().Be(sample.Id);
+        fakeTestOrder.Sample.Should().Be(sample);
+        
+        // Act -- remove
+        fakeTestOrder.RemoveSample();
+
+        // Assert -- remove
+        fakeTestOrder.SampleId.Should().BeNull();
+        fakeTestOrder.Sample.Should().BeNull();
     }
 }

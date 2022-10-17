@@ -62,5 +62,43 @@ public sealed class TestOrdersController: ControllerBase
         return NoContent();
     }
 
+
+    /// <summary>
+    /// Sets a given sample on a test order
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{testOrderId:guid}/SetSample/{sampleId:guid}", Name = "SetSampleOnTestOrder")]
+    public async Task<IActionResult> SetSampleOnTestOrder(Guid testOrderId, Guid sampleId)
+    {
+        var command = new SetSampleOnTestOrder.Command(testOrderId, sampleId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Removes the sample a test order when present
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{testOrderId:guid}/RemoveSample", Name = "RemoveSampleOnTestOrder")]
+    public async Task<IActionResult> RemoveSampleOnTestOrder(Guid testOrderId)
+    {
+        var command = new RemoveSampleOnTestOrder.Command(testOrderId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
     // endpoint marker - do not delete this comment
 }

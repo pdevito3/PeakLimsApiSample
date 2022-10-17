@@ -64,6 +64,8 @@ public static class Permissions
     public const string CanAddUserRoles = nameof(CanAddUserRoles);
     public const string CanGetRoles = nameof(CanGetRoles);
     public const string CanGetPermissions = nameof(CanGetPermissions);
+    public const string CanSetSampleOnTestOrder = nameof(CanSetSampleOnTestOrder);
+    public const string CanRemoveSampleOnTestOrder = nameof(CanRemoveSampleOnTestOrder);
 
     public static List<string> List()
     {

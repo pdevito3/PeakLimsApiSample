@@ -14,13 +14,12 @@ using PeakLims.Domain.Patients;
 using PeakLims.Domain.Samples;
 using PeakLims.Domain.Containers;
 using SampleTypes;
+using TestOrders;
 
 public class Sample : BaseEntity
 {
     [Sieve(CanFilter = true, CanSort = true)]
     public virtual string SampleNumber { get; }
-
-    [Sieve(CanFilter = true, CanSort = true)]
     public virtual SampleType Type { get; private set; }
 
     [Sieve(CanFilter = true, CanSort = true)]
@@ -52,6 +51,7 @@ public class Sample : BaseEntity
     [ForeignKey("Container")]
     public virtual Guid? ContainerId { get; private set; }
     public virtual Container Container { get; private set; }
+    public virtual ICollection<TestOrder> TestOrders { get; private set; } = new List<TestOrder>();
 
 
     public static Sample Create(SampleForCreationDto sampleForCreationDto)
