@@ -65,16 +65,24 @@ public class Panel : BaseEntity
         QueueDomainEvent(new PanelUpdated(){ Id = Id });
     }
 
-    public void Activate()
+    public Panel Activate()
     {
+        if (Status == PanelStatus.Active())
+            return this;
+        
         Status = PanelStatus.Active();
         QueueDomainEvent(new PanelUpdated(){ Id = Id });
+        return this;
     }
 
-    public void Deactivate()
+    public Panel Deactivate()
     {
+        if (Status == PanelStatus.Inactive())
+            return this;
+        
         Status = PanelStatus.Inactive();
         QueueDomainEvent(new PanelUpdated(){ Id = Id });
+        return this;
     }
 
     public static void GuardWhenExists(string panelCode, int version, IPanelRepository panelRepository)

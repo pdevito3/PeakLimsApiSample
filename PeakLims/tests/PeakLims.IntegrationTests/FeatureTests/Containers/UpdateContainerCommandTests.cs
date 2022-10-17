@@ -31,8 +31,7 @@ public class UpdateContainerCommandTests : TestBase
         var updatedContainer = await ExecuteDbContextAsync(db => db.Containers.FirstOrDefaultAsync(c => c.Id == id));
 
         // Assert
-        updatedContainer.ContainerNumber.Should().Be(updatedContainerDto.ContainerNumber);
-        updatedContainer.Status.Should().Be(updatedContainerDto.Status);
+        updatedContainer.Status.Should().Be(fakeContainerOne.Status);
         updatedContainer.Type.Should().Be(updatedContainerDto.Type);
     }
 }

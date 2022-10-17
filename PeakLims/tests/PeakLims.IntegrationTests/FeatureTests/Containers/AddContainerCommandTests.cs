@@ -6,6 +6,7 @@ using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.ContainerStatuses;
 using PeakLims.Domain.Containers.Features;
 using static TestFixture;
 using SharedKernel.Exceptions;
@@ -25,12 +26,10 @@ public class AddContainerCommandTests : TestBase
             .FirstOrDefaultAsync(c => c.Id == containerReturned.Id));
 
         // Assert
-        containerReturned.ContainerNumber.Should().Be(fakeContainerOne.ContainerNumber);
-        containerReturned.Status.Should().Be(fakeContainerOne.Status);
+        containerReturned.Status.Should().Be(ContainerStatus.Active().Value);
         containerReturned.Type.Should().Be(fakeContainerOne.Type);
 
-        containerCreated.ContainerNumber.Should().Be(fakeContainerOne.ContainerNumber);
-        containerCreated.Status.Should().Be(fakeContainerOne.Status);
+        containerCreated.Status.Should().Be(ContainerStatus.Active());
         containerCreated.Type.Should().Be(fakeContainerOne.Type);
     }
 }

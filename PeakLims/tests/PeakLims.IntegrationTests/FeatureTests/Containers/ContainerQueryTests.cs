@@ -24,8 +24,7 @@ public class ContainerQueryTests : TestBase
         var container = await SendAsync(query);
 
         // Assert
-        container.ContainerNumber.Should().Be(fakeContainerOne.ContainerNumber);
-        container.Status.Should().Be(fakeContainerOne.Status);
+        container.Status.Should().Be(fakeContainerOne.Status.Value);
         container.Type.Should().Be(fakeContainerOne.Type);
     }
 

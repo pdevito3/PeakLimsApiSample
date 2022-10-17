@@ -82,16 +82,24 @@ public class Test : BaseEntity
         QueueDomainEvent(new TestUpdated(){ Id = Id });
     }
 
-    public void Activate()
+    public Test Activate()
     {
+        if (Status == TestStatus.Active())
+            return this;
+        
         Status = TestStatus.Active();
         QueueDomainEvent(new TestUpdated(){ Id = Id });
+        return this;
     }
 
-    public void Deactivate()
+    public Test Deactivate()
     {
+        if (Status == TestStatus.Inactive())
+            return this;
+        
         Status = TestStatus.Inactive();
         QueueDomainEvent(new TestUpdated(){ Id = Id });
+        return this;
     }
     
     protected Test() { } // For EF + Mocking

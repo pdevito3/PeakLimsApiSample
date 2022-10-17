@@ -29,8 +29,7 @@ public class UpdateContainerTests
         fakeContainer.Update(updatedContainer);
 
         // Assert
-        fakeContainer.ContainerNumber.Should().Be(updatedContainer.ContainerNumber);
-        fakeContainer.Status.Should().Be(updatedContainer.Status);
+        fakeContainer.Status.Should().Be(fakeContainer.Status);
         fakeContainer.Type.Should().Be(updatedContainer.Type);
     }
     

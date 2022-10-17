@@ -1,6 +1,7 @@
 namespace PeakLims.SharedTestHelpers.Fakes.Container;
 
 using AutoBogus;
+using Domain.SampleTypes;
 using PeakLims.Domain.Containers;
 using PeakLims.Domain.Containers.Dtos;
 
@@ -9,8 +10,6 @@ public class FakeContainerForUpdateDto : AutoFaker<ContainerForUpdateDto>
 {
     public FakeContainerForUpdateDto()
     {
-        // if you want default values on any of your properties (e.g. an int between a certain range or a date always in the past), you can add `RuleFor` lines describing those defaults
-        //RuleFor(c => c.ExampleIntProperty, c => c.Random.Number(50, 100000));
-        //RuleFor(c => c.ExampleDateProperty, c => c.Date.Past());
+        RuleFor(x => x.UsedFor, f => f.PickRandom(SampleType.ListNames()));
     }
 }

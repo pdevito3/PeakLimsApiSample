@@ -7,6 +7,7 @@ using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using NUnit.Framework;
+using PeakLims.Domain.ContainerStatuses;
 
 [Parallelizable]
 public class CreateContainerTests
@@ -26,8 +27,7 @@ public class CreateContainerTests
         var fakeContainer = FakeContainer.Generate(containerToCreate);
 
         // Assert
-        fakeContainer.ContainerNumber.Should().Be(containerToCreate.ContainerNumber);
-        fakeContainer.Status.Should().Be(containerToCreate.Status);
+        fakeContainer.Status.Should().Be(ContainerStatus.Active());
         fakeContainer.Type.Should().Be(containerToCreate.Type);
     }
 

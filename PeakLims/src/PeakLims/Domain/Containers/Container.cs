@@ -9,19 +9,16 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
+using ContainerStatuses;
+using SampleTypes;
 using Sieve.Attributes;
 
 
 public class Container : BaseEntity
 {
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string ContainerNumber { get; private set; }
-
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string Status { get; private set; }
-
-    [Sieve(CanFilter = true, CanSort = true)]
     public virtual string Type { get; private set; }
+    public virtual ContainerStatus Status { get; private set; }
+    public virtual SampleType UsedFor { get; private set; }
 
 
     public static Container Create(ContainerForCreationDto containerForCreationDto)
@@ -30,8 +27,8 @@ public class Container : BaseEntity
 
         var newContainer = new Container();
 
-        newContainer.ContainerNumber = containerForCreationDto.ContainerNumber;
-        newContainer.Status = containerForCreationDto.Status;
+        newContainer.Status = ContainerStatus.Active();
+        newContainer.UsedFor = new SampleType(containerForCreationDto.UsedFor);
         newContainer.Type = containerForCreationDto.Type;
 
         newContainer.QueueDomainEvent(new ContainerCreated(){ Container = newContainer });
@@ -43,11 +40,31 @@ public class Container : BaseEntity
     {
         new ContainerForUpdateDtoValidator().ValidateAndThrow(containerForUpdateDto);
 
-        ContainerNumber = containerForUpdateDto.ContainerNumber;
-        Status = containerForUpdateDto.Status;
+        Status = ContainerStatus.Active();
+        UsedFor = new SampleType(containerForUpdateDto.UsedFor);
         Type = containerForUpdateDto.Type;
 
         QueueDomainEvent(new ContainerUpdated(){ Id = Id });
+    }
+
+    public Container Activate()
+    {
+        if (Status == ContainerStatus.Active())
+            return this;
+        
+        Status = ContainerStatus.Active();
+        QueueDomainEvent(new ContainerUpdated(){ Id = Id });
+        return this;
+    }
+
+    public Container Deactivate()
+    {
+        if (Status == ContainerStatus.Inactive())
+            return this;
+        
+        Status = ContainerStatus.Inactive();
+        QueueDomainEvent(new ContainerUpdated(){ Id = Id });
+        return this;
     }
     
     protected Container() { } // For EF + Mocking
