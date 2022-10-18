@@ -1,22 +1,18 @@
-namespace PeakLims.UnitTests.UnitTests.Domain.Tests;
+namespace PeakLims.UnitTests.UnitTests.Domain.HealthcareOrganizations;
 
 using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
-using PeakLims.Domain.AccessionStatuses;
 using PeakLims.Domain.HealthcareOrganizations.DomainEvents;
 using PeakLims.Domain.HealthcareOrganizationStatuses;
-using PeakLims.Domain.Tests.DomainEvents;
-using PeakLims.Domain.TestStatuses;
-using PeakLims.SharedTestHelpers.Fakes.Test;
-using SharedTestHelpers.Fakes.HealthcareOrganization;
+using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 
 [Parallelizable]
-public class TestStateChangeTests
+public class HealthcareOrganizationStateChangeTests
 {
     private readonly Faker _faker;
 
-    public TestStateChangeTests()
+    public HealthcareOrganizationStateChangeTests()
     {
         _faker = new Faker();
     }
