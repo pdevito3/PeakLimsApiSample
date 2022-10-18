@@ -26,9 +26,8 @@ public class AddSampleCommandTests : TestBase
         var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
         await InsertAsync(fakeContainerOne);
 
-        var fakeSampleOne = new FakeSampleForCreationDto()
+        var fakeSampleOne = new FakeSampleForCreationDto(fakeContainerOne)
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id)
             .Generate();
 
         // Act

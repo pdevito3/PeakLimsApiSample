@@ -23,7 +23,7 @@ public class UpdateSampleCommandTests : TestBase
         var sample = Sample.Create(sampleToCreate, container);
         await InsertAsync(sample);
         
-        var updatedSampleData = new FakeSampleForUpdateDto().Generate();
+        var updatedSampleData = new FakeSampleForUpdateDto(container).Generate();
         updatedSampleData.ContainerId = container.Id;
         updatedSampleData.Type = container.UsedFor.Value;
 
