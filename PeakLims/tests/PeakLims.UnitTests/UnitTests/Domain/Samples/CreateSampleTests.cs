@@ -23,10 +23,12 @@ public class CreateSampleTests
     [Test]
     public void can_create_valid_sample()
     {
-        // Arrange + Act
+        // Arrange
         var fakeContainer = FakeContainer.Generate();
         var sampleToCreate = new FakeContainerlessSampleForCreationDto().Generate();
         sampleToCreate.Type = fakeContainer.UsedFor.Value;
+        
+        // Act
         var fakeSample = Sample.Create(sampleToCreate, fakeContainer);
 
         // Assert
@@ -43,11 +45,13 @@ public class CreateSampleTests
     [Test]
     public void given_container_must_be_able_to_contain_the_sample_type()
     {
-        // Arrange + Act
+        // Arrange
         var container = FakeContainer.Generate();
         var containerUsedForString = container.UsedFor.Value;
         var sampleToCreate = new FakeContainerlessSampleForCreationDto().Generate();
         sampleToCreate.Type = _faker.PickRandom(SampleType.ListNames().Where(x => !x.Equals(containerUsedForString)));
+        
+        // Act
         var act = () => Sample.Create(sampleToCreate, container);
 
         // Assert

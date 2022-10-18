@@ -191,5 +191,43 @@ public sealed class HealthcareOrganizationsController: ControllerBase
         return NoContent();
     }
 
+
+    /// <summary>
+    /// Sets a Healthcare Organization status to `Active`
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{id:guid}/activate", Name = "SetHealthcareOrganizationStatusToActive")]
+    public async Task<IActionResult> SetHealthcareOrganizationStatusToActive(Guid id)
+    {
+        var command = new ActivateHealthcareOrganization.Command(id);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Sets a Healthcare Organization status to `Inactive`
+    /// </summary>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{id:guid}/deactivate", Name = "SetHealthcareOrganizationStatusToInactive")]
+    public async Task<IActionResult> SetHealthcareOrganizationStatusToInactive(Guid id)
+    {
+        var command = new DeactivateHealthcareOrganization.Command(id);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
     // endpoint marker - do not delete this comment
 }

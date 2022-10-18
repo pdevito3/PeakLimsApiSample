@@ -389,6 +389,16 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the HealthcareOrganization.</response>
         </member>
+        <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationsController.SetHealthcareOrganizationStatusToActive(System.Guid)">
+            <summary>
+            Sets a Healthcare Organization status to `Active`
+            </summary>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationsController.SetHealthcareOrganizationStatusToInactive(System.Guid)">
+            <summary>
+            Sets a Healthcare Organization status to `Inactive`
+            </summary>
+        </member>
         <member name="M:PeakLims.Controllers.v1.PanelsController.GetPanels(PeakLims.Domain.Panels.Dtos.PanelParametersDto)">
              <summary>
              Gets a list of all Panels.

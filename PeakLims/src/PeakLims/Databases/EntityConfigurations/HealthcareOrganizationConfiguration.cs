@@ -2,6 +2,7 @@ namespace PeakLims.Databases.EntityConfigurations;
 
 using Domain.Addresses;
 using Domain.Emails;
+using Domain.HealthcareOrganizationStatuses;
 using PeakLims.Domain.HealthcareOrganizations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -28,5 +29,7 @@ public sealed class HealthcareOrganizationConfiguration : IEntityTypeConfigurati
             opts.Property(x => x.Country).HasColumnName("primary_address_country");
         }).Navigation(x => x.PrimaryAddress)
             .IsRequired();
+        builder.Property(x => x.Status)
+            .HasConversion(x => x.Value, x => new HealthcareOrganizationStatus(x));
     }
 }
