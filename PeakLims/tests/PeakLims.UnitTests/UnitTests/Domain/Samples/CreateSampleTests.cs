@@ -41,23 +41,6 @@ public class CreateSampleTests
         fakeSample.ParentSampleId.Should().Be(sampleToCreate.ParentSampleId);
         fakeSample.ContainerId.Should().Be(fakeContainer.Id);
     }
-    
-    [Test]
-    public void given_container_must_be_able_to_contain_the_sample_type()
-    {
-        // Arrange
-        var container = FakeContainer.Generate();
-        var containerUsedForString = container.UsedFor.Value;
-        var sampleToCreate = new FakeContainerlessSampleForCreationDto().Generate();
-        sampleToCreate.Type = _faker.PickRandom(SampleType.ListNames().Where(x => !x.Equals(containerUsedForString)));
-        
-        // Act
-        var act = () => Sample.Create(sampleToCreate, container);
-
-        // Assert
-        act.Should().Throw<SharedKernel.Exceptions.ValidationException>()
-            .WithMessage($"A {container.Type} container is used to store {container.UsedFor.Value} samples, not {sampleToCreate.Type}.");
-    }
 
     [Test]
     public void queue_domain_event_on_create()
