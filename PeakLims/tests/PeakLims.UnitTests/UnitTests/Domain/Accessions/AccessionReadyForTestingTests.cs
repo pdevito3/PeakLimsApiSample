@@ -10,6 +10,8 @@ using PeakLims.Domain.AccessionStatuses;
 using PeakLims.Domain.TestOrderStatuses;
 using Services;
 using SharedTestHelpers.Fakes.Container;
+using SharedTestHelpers.Fakes.HealthcareOrganization;
+using SharedTestHelpers.Fakes.Patient;
 using SharedTestHelpers.Fakes.Sample;
 using SharedTestHelpers.Fakes.Test;
 
@@ -27,11 +29,13 @@ public class AccessionReadyForTestingTests
     public void can_change_to_readyForTesting()
     {
         // Arrange
+        var patient = FakePatient.Generate(Mock.Of<IDateTimeProvider>());
+        var org = FakeHealthcareOrganization.Generate();
         var fakeAccession = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(Guid.NewGuid())
-            .WithHealthcareOrganizationId(Guid.NewGuid())
             .WithMockTestRepository()
+            .WithPatient(patient)
+            .WithHealthcareOrganization(org)
             .Build();
         var container = FakeContainer.Generate();
         var sample = FakeSample.Generate(container);
@@ -55,11 +59,13 @@ public class AccessionReadyForTestingTests
             .WithMockRepository()
             .Activate()
             .Build();
+        var patient = FakePatient.Generate(Mock.Of<IDateTimeProvider>());
+        var org = FakeHealthcareOrganization.Generate();
         var fakeAccession = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(Guid.NewGuid())
-            .WithHealthcareOrganizationId(Guid.NewGuid())
             .WithMockTestRepository()
+            .WithPatient(patient)
+            .WithHealthcareOrganization(org)
             .WithTest(test)
             .Build();
         var container = FakeContainer.Generate();
@@ -83,12 +89,11 @@ public class AccessionReadyForTestingTests
     public void can_not_transition_without_patient()
     {
         // Arrange
+        var org = FakeHealthcareOrganization.Generate();
         var fakeAccession = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(Guid.NewGuid())
-            .WithHealthcareOrganizationId(Guid.NewGuid())
             .WithMockTestRepository()
-            .ExcludePatient()
+            .WithHealthcareOrganization(org)
             .Build();
         fakeAccession.DomainEvents.Clear();
         
@@ -103,12 +108,11 @@ public class AccessionReadyForTestingTests
     public void can_not_transition_without_org()
     {
         // Arrange
+        var patient = FakePatient.Generate(Mock.Of<IDateTimeProvider>());
         var fakeAccession = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(Guid.NewGuid())
-            .WithHealthcareOrganizationId(Guid.NewGuid())
             .WithMockTestRepository()
-            .ExcludeOrg()
+            .WithPatient(patient)
             .Build();
         
         // Act
@@ -122,11 +126,13 @@ public class AccessionReadyForTestingTests
     public void can_not_transition_without_panel_or_test()
     {
         // Arrange
+        var patient = FakePatient.Generate(Mock.Of<IDateTimeProvider>());
+        var org = FakeHealthcareOrganization.Generate();
         var fakeAccession = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(Guid.NewGuid())
-            .WithHealthcareOrganizationId(Guid.NewGuid())
             .WithMockTestRepository()
+            .WithPatient(patient)
+            .WithHealthcareOrganization(org)
             .ExcludeTestOrders()
             .Build();
         
@@ -141,11 +147,13 @@ public class AccessionReadyForTestingTests
     public void can_not_transition_without_orgContact()
     {
         // Arrange
+        var patient = FakePatient.Generate(Mock.Of<IDateTimeProvider>());
+        var org = FakeHealthcareOrganization.Generate();
         var fakeAccession = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(Guid.NewGuid())
-            .WithHealthcareOrganizationId(Guid.NewGuid())
             .WithMockTestRepository()
+            .WithPatient(patient)
+            .WithHealthcareOrganization(org)
             .ExcludeContacts()
             .Build();
         

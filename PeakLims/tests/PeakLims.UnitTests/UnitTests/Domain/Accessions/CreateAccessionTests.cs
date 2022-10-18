@@ -23,20 +23,17 @@ public class CreateAccessionTests
     public void can_create_valid_accession()
     {
         // Arrange + Act
-        var accessionToCreate = new FakeAccessionForCreationDto().Generate();
-        var fakeAccession = FakeAccession.Generate(accessionToCreate);
+        var fakeAccession = Accession.Create();
 
         // Assert
         fakeAccession.Status.Should().Be(AccessionStatus.Draft());
-        fakeAccession.PatientId.Should().Be(accessionToCreate.PatientId);
-        fakeAccession.HealthcareOrganizationId.Should().Be(accessionToCreate.HealthcareOrganizationId);
     }
 
     [Test]
     public void queue_domain_event_on_create()
     {
         // Arrange + Act
-        var fakeAccession = FakeAccession.Generate();
+        var fakeAccession = Accession.Create();
 
         // Assert
         fakeAccession.DomainEvents.Count.Should().Be(1);

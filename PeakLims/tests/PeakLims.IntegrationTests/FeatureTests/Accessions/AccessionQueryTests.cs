@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Domain.Accessions;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
@@ -19,15 +20,7 @@ public class AccessionQueryTests : TestBase
     public async Task can_get_existing_accession_with_accurate_props()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate(), GetService<IDateTimeProvider>());
-        await InsertAsync(fakePatientOne);
-
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        await InsertAsync(fakeHealthcareOrganizationOne);
-
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
+        var fakeAccessionOne = Accession.Create();
         await InsertAsync(fakeAccessionOne);
 
         // Act

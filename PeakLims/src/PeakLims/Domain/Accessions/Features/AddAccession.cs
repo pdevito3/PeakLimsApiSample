@@ -14,12 +14,6 @@ public static class AddAccession
 {
     public sealed class Command : IRequest<AccessionDto>
     {
-        public readonly AccessionForCreationDto AccessionToAdd;
-
-        public Command(AccessionForCreationDto accessionToAdd)
-        {
-            AccessionToAdd = accessionToAdd;
-        }
     }
 
     public sealed class Handler : IRequestHandler<Command, AccessionDto>
@@ -41,7 +35,7 @@ public static class AddAccession
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddAccessions);
 
-            var accession = Accession.Create(request.AccessionToAdd);
+            var accession = Accession.Create();
             await _accessionRepository.Add(accession, cancellationToken);
 
             await _unitOfWork.CommitChanges(cancellationToken);

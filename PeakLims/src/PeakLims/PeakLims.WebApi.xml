@@ -118,7 +118,7 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the Accession.</response>
         </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.AddAccession(PeakLims.Domain.Accessions.Dtos.AccessionForCreationDto)">
+        <member name="M:PeakLims.Controllers.v1.AccessionsController.AddAccession">
             <summary>
             Creates a new Accession record.
             </summary>
@@ -128,9 +128,9 @@
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
             <response code="500">There was an error on the server while creating the Accession.</response>
         </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.UpdateAccession(System.Guid,PeakLims.Domain.Accessions.Dtos.AccessionForUpdateDto)">
+        <member name="M:PeakLims.Controllers.v1.AccessionsController.SetOrganizationOnAccession(System.Guid,System.Guid)">
             <summary>
-            Updates an entire existing Accession.
+            Sets the healthcare organization on an accession.
             </summary>
             <response code="204">Accession updated.</response>
             <response code="400">Accession has missing/invalid values.</response>

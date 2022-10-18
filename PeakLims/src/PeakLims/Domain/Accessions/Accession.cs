@@ -29,13 +29,13 @@ public class Accession : BaseEntity
     [IgnoreDataMember]
     [ForeignKey("Patient")]
     public virtual Guid? PatientId { get; private set; }
-    public virtual Patient Patient { get; }
+    public virtual Patient Patient { get; private set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
     [ForeignKey("HealthcareOrganization")]
     public virtual Guid? HealthcareOrganizationId { get; private set; }
-    public virtual HealthcareOrganization HealthcareOrganization { get; }
+    public virtual HealthcareOrganization HealthcareOrganization { get; private set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
@@ -49,27 +49,14 @@ public class Accession : BaseEntity
     [IgnoreDataMember]
     public virtual ICollection<AccessionComment> Comments { get; private set; } = new List<AccessionComment>();
 
-    public static Accession Create(AccessionForCreationDto accessionForCreationDto)
+    public static Accession Create()
     {
         var newAccession = new Accession();
 
         newAccession.Status = AccessionStatus.Draft();
-        newAccession.PatientId = accessionForCreationDto.PatientId;
-        newAccession.HealthcareOrganizationId = accessionForCreationDto.HealthcareOrganizationId;
-
         newAccession.QueueDomainEvent(new AccessionCreated(){ Accession = newAccession });
         
         return newAccession;
-    }
-
-    public Accession Update(AccessionForUpdateDto accessionForUpdateDto)
-    {
-        if (Status != AccessionStatus.Draft()) return this;
-        
-        PatientId = accessionForUpdateDto.PatientId;
-        HealthcareOrganizationId = accessionForUpdateDto.HealthcareOrganizationId;
-        QueueDomainEvent(new AccessionUpdated(){ Id = Id });
-        return this;
     }
 
     public Accession SetStatusToReadyForTesting(IDateTimeProvider dateTimeProvider)
@@ -216,6 +203,42 @@ public class Accession : BaseEntity
         return this;
     }
 
+    public Accession SetPatient(Patient org)
+    {
+        GuardIfInProcessingState("The patient");
+        Patient = org;
+        PatientId = org.Id;
+        return this;
+    }
+
+    public Accession RemovePatient()
+    {
+        GuardIfInProcessingState("The patient");
+        Patient = null;
+        PatientId = null;
+        return this;
+    }
+
+    public Accession SetHealthcareOrganization(HealthcareOrganization org)
+    {
+        GuardIfInProcessingState("The organization");
+        if (!org.Status.IsActive())
+            throw new ValidationException(nameof(Accession),
+                $"Only active organizations can be set on an accession.");
+        
+        HealthcareOrganization = org;
+        HealthcareOrganizationId = org.Id;
+        return this;
+    }
+
+    public Accession RemoveHealthcareOrganization()
+    {
+        GuardIfInProcessingState("The organization");
+        HealthcareOrganization = null;
+        HealthcareOrganizationId = null;
+        return this;
+    }
+
     private bool HealthcareOrganizationContactAlreadyExists(HealthcareOrganizationContact contact) 
         => Contacts.Any(x => contact.Id == x.Id);
 
@@ -224,6 +247,12 @@ public class Accession : BaseEntity
         if (Status.IsFinalState())
             throw new ValidationException(nameof(Accession),
                 $"This accession is in a final state. {subject} can not be modified.");
+    }
+    private void GuardIfInProcessingState(string subject)
+    {
+        if (Status.IsProcessing())
+            throw new ValidationException(nameof(Accession),
+                $"This accession is processing. {subject} can not be modified.");
     }
     
     protected Accession() { } // For EF + Mocking

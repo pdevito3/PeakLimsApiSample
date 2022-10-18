@@ -22,6 +22,7 @@ public class HealthcareOrganizationStateChangeTests
     {
         // Arrange
         var fakeHealthcareOrganization = FakeHealthcareOrganization.Generate();
+        fakeHealthcareOrganization.Deactivate();
         fakeHealthcareOrganization.DomainEvents.Clear();
         
         // Act
@@ -38,6 +39,7 @@ public class HealthcareOrganizationStateChangeTests
     {
         // Arrange
         var fakeHealthcareOrganization = FakeHealthcareOrganization.Generate();
+        fakeHealthcareOrganization.Activate();
         fakeHealthcareOrganization.DomainEvents.Clear();
         
         // Act

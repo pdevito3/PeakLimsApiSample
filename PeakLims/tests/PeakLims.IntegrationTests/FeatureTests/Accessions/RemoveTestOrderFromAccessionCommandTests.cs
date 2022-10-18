@@ -28,9 +28,9 @@ public class RemoveTestOrderFromAccessionCommandTests : TestBase
 
         var fakeAccessionOne = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(fakePatientOne.Id)
-            .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
             .WithTestRepository(GetService<ITestRepository>())
+            // .WithPatient(fakePatientOne)
+            // .WithHealthcareOrganization(fakeHealthcareOrganizationOne)
             .Build();
         await InsertAsync(fakeAccessionOne);
 

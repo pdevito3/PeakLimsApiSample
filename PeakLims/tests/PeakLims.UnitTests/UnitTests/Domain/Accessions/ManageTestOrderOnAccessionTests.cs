@@ -4,6 +4,7 @@ using PeakLims.SharedTestHelpers.Fakes.Accession;
 using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
+using PeakLims.Domain.Accessions;
 using PeakLims.Domain.TestOrders;
 using SharedTestHelpers.Fakes.Panel;
 using SharedTestHelpers.Fakes.Test;
@@ -23,7 +24,7 @@ public class ManageTestOrderOnAccessionTests
     public void can_manage_test_order()
     {
         // Arrange
-        var fakeAccession = FakeAccession.Generate();
+        var fakeAccession = Accession.Create();
 
         var test = new FakeTestBuilder()
             .WithMockRepository()
@@ -55,7 +56,7 @@ public class ManageTestOrderOnAccessionTests
     public void can_not_add_test_order_with_inactive_test()
     {
         // Arrange
-        var fakeAccession = FakeAccession.Generate();
+        var fakeAccession = Accession.Create();
         var test = new FakeTestBuilder()
             .WithMockRepository()
             .Deactivate()
@@ -73,7 +74,7 @@ public class ManageTestOrderOnAccessionTests
     public void can_not_remove_testorder_when_part_of_panel()
     {
         // Arrange
-        var fakeAccession = FakeAccession.Generate();
+        var fakeAccession = Accession.Create();
         var test = new FakeTestBuilder()
             .WithMockRepository()
             .Activate()

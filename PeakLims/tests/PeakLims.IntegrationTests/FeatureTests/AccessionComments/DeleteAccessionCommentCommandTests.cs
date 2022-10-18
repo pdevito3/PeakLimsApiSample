@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Domain.Accessions;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Accession;
 using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
@@ -17,7 +18,7 @@ public class DeleteAccessionCommentCommandTests : TestBase
     public async Task can_delete_accessioncomment_from_db()
     {
         // Arrange
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
+        var fakeAccessionOne = Accession.Create();
         await InsertAsync(fakeAccessionOne);
 
         var fakeAccessionCommentParentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()
@@ -42,24 +43,10 @@ public class DeleteAccessionCommentCommandTests : TestBase
     }
 
     [Test]
-    public async Task delete_accessioncomment_throws_notfoundexception_when_record_does_not_exist()
-    {
-        // Arrange
-        var badId = Guid.NewGuid();
-
-        // Act
-        var command = new DeleteAccessionComment.Command(badId);
-        Func<Task> act = () => SendAsync(command);
-
-        // Assert
-        await act.Should().ThrowAsync<NotFoundException>();
-    }
-
-    [Test]
     public async Task can_softdelete_accessioncomment_from_db()
     {
         // Arrange
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
+        var fakeAccessionOne = Accession.Create();
         await InsertAsync(fakeAccessionOne);
 
         var fakeAccessionCommentParentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()

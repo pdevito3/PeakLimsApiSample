@@ -7,6 +7,7 @@ using PeakLims.Domain.AccessionComments.Features;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Accessions;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Accession;
 using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
@@ -18,8 +19,8 @@ public class AccessionCommentListQueryTests : TestBase
     public async Task can_get_accessioncomment_list()
     {
         // Arrange
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
-        var fakeAccessionTwo = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
+        var fakeAccessionOne = Accession.Create();
+        var fakeAccessionTwo = Accession.Create();
         await InsertAsync(fakeAccessionOne, fakeAccessionTwo);
 
         var fakeAccessionCommentParentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()

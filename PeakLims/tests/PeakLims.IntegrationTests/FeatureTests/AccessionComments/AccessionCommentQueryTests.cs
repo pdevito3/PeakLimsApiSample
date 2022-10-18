@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Domain.Accessions;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Accession;
 using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
@@ -18,7 +19,7 @@ public class AccessionCommentQueryTests : TestBase
     public async Task can_get_existing_accessioncomment_with_accurate_props()
     {
         // Arrange
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
+        var fakeAccessionOne = Accession.Create();
         await InsertAsync(fakeAccessionOne);
         
         var fakeAccessionCommentParentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()

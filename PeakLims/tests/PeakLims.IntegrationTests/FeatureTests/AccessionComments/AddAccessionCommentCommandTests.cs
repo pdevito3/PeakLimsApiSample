@@ -6,6 +6,7 @@ using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Accessions;
 using PeakLims.Domain.AccessionComments.Features;
 using static TestFixture;
 using SharedKernel.Exceptions;
@@ -18,7 +19,7 @@ public class AddAccessionCommentCommandTests : TestBase
     public async Task can_add_new_accessioncomment_to_db()
     {
         // Arrange
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
+        var fakeAccessionOne = Accession.Create();
         await InsertAsync(fakeAccessionOne);
 
         var fakeAccessionCommentParentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()

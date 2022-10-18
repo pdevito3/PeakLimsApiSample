@@ -1,7 +1,9 @@
 namespace PeakLims.SharedTestHelpers.Fakes.Accession;
 
 using Domain.HealthcareOrganizationContacts;
+using Domain.HealthcareOrganizations;
 using Domain.Panels;
+using Domain.Patients;
 using Domain.TestOrders;
 using Domain.Tests;
 using Domain.Tests.Services;
@@ -13,39 +15,30 @@ using Test;
 using TestOrder;
 
 public class FakeAccessionBuilder :
-    IPatientSelectionStage,
-    IOrganizationSelectionStage,
     ITestRepositorySetterStage
 {
-    private AccessionForCreationDto _accessionData = new FakeAccessionForCreationDto().Generate();
     private readonly List<HealthcareOrganizationContact> _contacts = new List<HealthcareOrganizationContact>();
     private readonly List<Panel> _panels = new List<Panel>();
     private readonly List<Test> _tests = new List<Test>();
     private bool _includeATestOrder = true;
     private bool _includeAContact = true;
-    private Guid? _patientId;
-    private Guid? _orgId;
+    private Patient _patient = null;
+    private HealthcareOrganization _org = null;
     private ITestRepository _testRepository = null;
 
     private FakeAccessionBuilder() { }
     
-    public static IPatientSelectionStage Initialize() => new FakeAccessionBuilder();
+    public static ITestRepositorySetterStage Initialize() => new FakeAccessionBuilder();
 
-    public FakeAccessionBuilder WithDto(AccessionForCreationDto data)
+    public FakeAccessionBuilder WithPatient(Patient patient)
     {
-        _accessionData = data;
+        _patient = patient;
         return this;
     }
     
-    public IOrganizationSelectionStage WithPatientId(Guid patientId)
+    public FakeAccessionBuilder WithHealthcareOrganization(HealthcareOrganization org)
     {
-        _patientId = patientId;
-        return this;
-    }
-    
-    public ITestRepositorySetterStage WithHealthcareOrganizationId(Guid orgId)
-    {
-        _orgId = orgId;
+        _org = org;
         return this;
     }
     
@@ -79,19 +72,6 @@ public class FakeAccessionBuilder :
         return this;
     }
     
-    public FakeAccessionBuilder ExcludePatient()
-    {
-        _patientId = null;
-        return this;
-    }
-    
-    public FakeAccessionBuilder ExcludeOrg()
-    {
-        _orgId = null;
-        ExcludeContacts();
-        return this;
-    }
-    
     public FakeAccessionBuilder WithTestRepository(ITestRepository testRepository)
     {
         _testRepository = testRepository;
@@ -111,13 +91,21 @@ public class FakeAccessionBuilder :
     
     public Accession Build()
     {
-        _accessionData.PatientId = _patientId;
-        _accessionData.HealthcareOrganizationId = _orgId;
-        var accession = Accession.Create(_accessionData);
+        var accession = Accession.Create();
+        if (_patient != null)
+            accession.SetPatient(_patient);
+        if (_org != null)
+        {
+            accession.SetHealthcareOrganization(_org);
+        }
+        else
+        {
+            ExcludeContacts();
+        }
         
         if(_contacts.Count <= 0 && _includeAContact)
             _contacts.Add(FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto()
-                .RuleFor(x => x.HealthcareOrganizationId, _accessionData.HealthcareOrganizationId)
+                .RuleFor(x => x.HealthcareOrganizationId, _org?.Id)
                 .Generate()));
 
         if (_tests.Count <= 0 && _panels.Count <= 0 && _includeATestOrder)
@@ -146,18 +134,8 @@ public class FakeAccessionBuilder :
     }
 }
 
-public interface IPatientSelectionStage
-{
-    public IOrganizationSelectionStage WithPatientId(Guid patientId);
-}
-
 public interface ITestRepositorySetterStage
 {
     public FakeAccessionBuilder WithTestRepository(ITestRepository testRepository);
     public FakeAccessionBuilder WithMockTestRepository(bool testExists = false);
-}
-
-public interface IOrganizationSelectionStage
-{
-    public ITestRepositorySetterStage WithHealthcareOrganizationId(Guid orgId);
 }

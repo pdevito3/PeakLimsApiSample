@@ -7,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using Domain.AccessionStatuses;
-using Domain.Panels.Services;
-using Domain.TestOrders;
 using Domain.TestOrderStatuses;
 using Domain.Tests.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
@@ -16,7 +14,6 @@ using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using Services;
 using SharedTestHelpers.Fakes.Container;
 using SharedTestHelpers.Fakes.Sample;
-using SharedTestHelpers.Fakes.Test;
 using static TestFixture;
 
 public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
@@ -26,16 +23,14 @@ public class SetAccessionStatusToReadyForTestingCommandTests : TestBase
     {
         // Arrange
         var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
-        await InsertAsync(fakePatientOne);
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
-        await InsertAsync(fakeHealthcareOrganizationOne);
         var container = FakeContainer.Generate();
 
         var fakeAccessionOne = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(fakePatientOne.Id)
-            .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
             .WithTestRepository(GetService<ITestRepository>())
+            .WithPatient(fakePatientOne)
+            .WithHealthcareOrganization(fakeHealthcareOrganizationOne)
             .Build();
         fakeAccessionOne.TestOrders.FirstOrDefault().SetSample(FakeSample.Generate(container));
         

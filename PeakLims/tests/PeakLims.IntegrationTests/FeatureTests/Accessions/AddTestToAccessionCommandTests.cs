@@ -33,9 +33,9 @@ public class AddTestToAccessionCommandTests : TestBase
 
         var fakeAccessionOne = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(fakePatientOne.Id)
-            .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
             .WithTestRepository(GetService<ITestRepository>())
+            // .WithPatient(fakePatientOne)
+            // .WithHealthcareOrganization(fakeHealthcareOrganizationOne)
             .ExcludeTestOrders()
             .Build();
         await InsertAsync(fakeAccessionOne);
@@ -73,9 +73,9 @@ public class AddTestToAccessionCommandTests : TestBase
 
         var fakeAccessionOne = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(fakePatientOne.Id)
-            .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
             .WithTestRepository(GetService<ITestRepository>())
+            // .WithPatient(fakePatientOne)
+            // .WithHealthcareOrganization(fakeHealthcareOrganizationOne)
             .WithTest(existingTest)
             .Build();
         await InsertAsync(fakeAccessionOne);

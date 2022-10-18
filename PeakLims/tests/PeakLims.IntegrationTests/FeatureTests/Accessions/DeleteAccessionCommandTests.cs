@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
+using Domain.Accessions;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
@@ -24,9 +25,7 @@ public class DeleteAccessionCommandTests : TestBase
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
         await InsertAsync(fakeHealthcareOrganizationOne);
 
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
+        var fakeAccessionOne = Accession.Create();
         await InsertAsync(fakeAccessionOne);
         var accession = await ExecuteDbContextAsync(db => db.Accessions
             .FirstOrDefaultAsync(a => a.Id == fakeAccessionOne.Id));
@@ -64,9 +63,7 @@ public class DeleteAccessionCommandTests : TestBase
         var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
         await InsertAsync(fakeHealthcareOrganizationOne);
 
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
+        var fakeAccessionOne = Accession.Create();
         await InsertAsync(fakeAccessionOne);
         var accession = await ExecuteDbContextAsync(db => db.Accessions
             .FirstOrDefaultAsync(a => a.Id == fakeAccessionOne.Id));

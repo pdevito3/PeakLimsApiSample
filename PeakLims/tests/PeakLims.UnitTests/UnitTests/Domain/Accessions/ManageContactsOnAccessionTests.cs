@@ -4,6 +4,7 @@ using PeakLims.SharedTestHelpers.Fakes.Accession;
 using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
+using PeakLims.Domain.Accessions;
 using SharedTestHelpers.Fakes.HealthcareOrganizationContact;
 
 [Parallelizable]
@@ -20,7 +21,7 @@ public class ManageContactsOnAccessionTests
     public void can_manage_contact()
     {
         // Arrange
-        var fakeAccession = FakeAccession.Generate();
+        var fakeAccession = Accession.Create();
         var contact = FakeHealthcareOrganizationContact.Generate();
         
         // Act - Can add idempotently

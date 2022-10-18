@@ -41,6 +41,7 @@ public class TestOrderStatus : ValueObject
     public static TestOrderStatus Completed() => new TestOrderStatus(TestOrderStatusEnum.Completed.Name);
     public static TestOrderStatus Cancelled() => new TestOrderStatus(TestOrderStatusEnum.Cancelled.Name);
     public bool IsFinalState() => _status.IsFinalState();
+    public bool IsProcessing() => Pending().Value != Value;
 
     protected TestOrderStatus() { } // EF Core
 }

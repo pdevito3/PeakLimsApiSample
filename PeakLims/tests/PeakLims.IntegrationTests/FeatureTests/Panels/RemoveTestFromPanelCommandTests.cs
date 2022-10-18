@@ -74,9 +74,9 @@ public class RemoveTestFromPanelCommandTests : TestBase
         await InsertAsync(fakeHealthcareOrganizationOne);
         var accession = FakeAccessionBuilder
             .Initialize()
-            .WithPatientId(fakePatientOne.Id)
-            .WithHealthcareOrganizationId(fakeHealthcareOrganizationOne.Id)
             .WithTestRepository(GetService<ITestRepository>())
+            // .WithPatient(fakePatientOne)
+            // .WithHealthcareOrganization(fakeHealthcareOrganizationOne)
             .WithPanel(panel)
             .Build();
         await InsertAsync(accession);

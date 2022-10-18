@@ -37,9 +37,9 @@ public class GetAccessionListTests
     public async Task can_get_paged_list_of_accession()
     {
         //Arrange
-        var fakeAccessionOne = FakeAccession.Generate();
-        var fakeAccessionTwo = FakeAccession.Generate();
-        var fakeAccessionThree = FakeAccession.Generate();
+        var fakeAccessionOne = Accession.Create();
+        var fakeAccessionTwo = Accession.Create();
+        var fakeAccessionThree = Accession.Create();
         var accession = new List<Accession>();
         accession.Add(fakeAccessionOne);
         accession.Add(fakeAccessionTwo);

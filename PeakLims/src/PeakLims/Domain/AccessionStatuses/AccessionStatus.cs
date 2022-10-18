@@ -43,6 +43,7 @@ public class AccessionStatus : ValueObject
     public static AccessionStatus Cancelled() => new AccessionStatus(AccessionStatusEnum.Cancelled.Name);
     public static AccessionStatus Qns() => new AccessionStatus(AccessionStatusEnum.Qns.Name);
     public bool IsFinalState() => _status.IsFinalState();
+    public bool IsProcessing() => Draft().Value != Value;
 
     protected AccessionStatus() { } // EF Core
 }

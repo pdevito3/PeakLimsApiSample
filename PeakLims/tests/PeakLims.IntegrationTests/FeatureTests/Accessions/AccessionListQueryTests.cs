@@ -7,6 +7,8 @@ using PeakLims.Domain.Accessions.Features;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Domain.Accessions;
+using Domain.Accessions.DomainEvents;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
@@ -19,20 +21,8 @@ public class AccessionListQueryTests : TestBase
     public async Task can_get_accession_list()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate(), GetService<IDateTimeProvider>());
-        var fakePatientTwo = FakePatient.Generate(new FakePatientForCreationDto().Generate(), GetService<IDateTimeProvider>());
-        await InsertAsync(fakePatientOne, fakePatientTwo);
-
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        var fakeHealthcareOrganizationTwo = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        await InsertAsync(fakeHealthcareOrganizationOne, fakeHealthcareOrganizationTwo);
-
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
-        var fakeAccessionTwo = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.PatientId, _ => fakePatientTwo.Id)
-            .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationTwo.Id).Generate());
+        var fakeAccessionOne = Accession.Create();
+        var fakeAccessionTwo = Accession.Create();
         var queryParameters = new AccessionParametersDto();
 
         await InsertAsync(fakeAccessionOne, fakeAccessionTwo);

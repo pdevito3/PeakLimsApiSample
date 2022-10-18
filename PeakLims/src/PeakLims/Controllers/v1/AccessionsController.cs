@@ -131,9 +131,9 @@ public sealed class AccessionsController: ControllerBase
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost(Name = "AddAccession")]
-    public async Task<ActionResult<AccessionDto>> AddAccession([FromBody]AccessionForCreationDto accessionForCreation)
+    public async Task<ActionResult<AccessionDto>> AddAccession()
     {
-        var command = new AddAccession.Command(accessionForCreation);
+        var command = new AddAccession.Command();
         var commandResponse = await _mediator.Send(command);
 
         return CreatedAtRoute("GetAccession",
@@ -143,13 +143,13 @@ public sealed class AccessionsController: ControllerBase
 
 
     /// <summary>
-    /// Updates an entire existing Accession.
+    /// Sets the healthcare organization on an accession.
     /// </summary>
     /// <response code="204">Accession updated.</response>
     /// <response code="400">Accession has missing/invalid values.</response>
     /// <response code="401">This request was not able to be authenticated.</response>
     /// <response code="403">The required permissions to access this resource were not present in the given request.</response>
-    /// <response code="500">There was an error on the server while creating the Accession.</response>
+    /// <response code="500">There was an error on the server while updating the Accession.</response>
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
     [ProducesResponseType(401)]
@@ -157,12 +157,83 @@ public sealed class AccessionsController: ControllerBase
     [ProducesResponseType(500)]
     [Authorize]
     [Produces("application/json")]
-    [HttpPut("{id:guid}", Name = "UpdateAccession")]
-    public async Task<IActionResult> UpdateAccession(Guid id, AccessionForUpdateDto accession)
+    [HttpPut("{accessionId:guid}/SetHealthcareOrganization/{orgId:guid}", Name = "SetOrganizationOnAccession")]
+    public async Task<IActionResult> SetOrganizationOnAccession(Guid accessionId, Guid orgId)
     {
-        var command = new UpdateAccession.Command(id, accession);
+        var command = new SetAccessionHealthcareOrganization.Command(accessionId, orgId);
         await _mediator.Send(command);
+        return NoContent();
+    }
 
+
+    /// <summary>
+    /// Removes the healthcare organization on an accession.
+    /// </summary>
+    /// <response code="204">Accession updated.</response>
+    /// <response code="400">Accession has missing/invalid values.</response>
+    /// <response code="401">This request was not able to be authenticated.</response>
+    /// <response code="403">The required permissions to access this resource were not present in the given request.</response>
+    /// <response code="500">There was an error on the server while updating the Accession.</response>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{accessionId:guid}/RemoveHealthcareOrganization", Name = "RemoveOrganizationOnAccession")]
+    public async Task<IActionResult> RemoveOrganizationOnAccession(Guid accessionId)
+    {
+        var command = new RemoveAccessionHealthcareOrganization.Command(accessionId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Sets the patient on an accession.
+    /// </summary>
+    /// <response code="204">Accession updated.</response>
+    /// <response code="400">Accession has missing/invalid values.</response>
+    /// <response code="401">This request was not able to be authenticated.</response>
+    /// <response code="403">The required permissions to access this resource were not present in the given request.</response>
+    /// <response code="500">There was an error on the server while updating the Accession.</response>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{accessionId:guid}/SetPatient/{orgId:guid}", Name = "SetPatientOnAccession")]
+    public async Task<IActionResult> SetPatientOnAccession(Guid accessionId, Guid orgId)
+    {
+        var command = new SetAccessionPatient.Command(accessionId, orgId);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Removes the patient on an accession.
+    /// </summary>
+    /// <response code="204">Accession updated.</response>
+    /// <response code="400">Accession has missing/invalid values.</response>
+    /// <response code="401">This request was not able to be authenticated.</response>
+    /// <response code="403">The required permissions to access this resource were not present in the given request.</response>
+    /// <response code="500">There was an error on the server while updating the Accession.</response>
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(500)]
+    [Authorize]
+    [Produces("application/json")]
+    [HttpPut("{accessionId:guid}/RemovePatient", Name = "RemovePatientOnAccession")]
+    public async Task<IActionResult> RemovePatientOnAccession(Guid accessionId)
+    {
+        var command = new RemoveAccessionPatient.Command(accessionId);
+        await _mediator.Send(command);
         return NoContent();
     }
 

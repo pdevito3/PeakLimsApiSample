@@ -169,7 +169,7 @@ public class TestOrder : BaseEntity
 
     private void GuardIfTestOrderIsProcessing()
     {
-        if (Status != TestOrderStatus.Pending())
+        if (Status.IsProcessing())
             throw new ValidationException(nameof(TestOrder),
                 $"The assigned sample can not be updated once a test order has started processing.");
     }
