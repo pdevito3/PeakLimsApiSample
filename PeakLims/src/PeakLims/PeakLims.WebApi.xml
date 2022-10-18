@@ -136,7 +136,37 @@
             <response code="400">Accession has missing/invalid values.</response>
             <response code="401">This request was not able to be authenticated.</response>
             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Accession.</response>
+            <response code="500">There was an error on the server while updating the Accession.</response>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.AccessionsController.RemoveOrganizationOnAccession(System.Guid)">
+            <summary>
+            Removes the healthcare organization on an accession.
+            </summary>
+            <response code="204">Accession updated.</response>
+            <response code="400">Accession has missing/invalid values.</response>
+            <response code="401">This request was not able to be authenticated.</response>
+            <response code="403">The required permissions to access this resource were not present in the given request.</response>
+            <response code="500">There was an error on the server while updating the Accession.</response>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.AccessionsController.SetPatientOnAccession(System.Guid,System.Guid)">
+            <summary>
+            Sets the patient on an accession.
+            </summary>
+            <response code="204">Accession updated.</response>
+            <response code="400">Accession has missing/invalid values.</response>
+            <response code="401">This request was not able to be authenticated.</response>
+            <response code="403">The required permissions to access this resource were not present in the given request.</response>
+            <response code="500">There was an error on the server while updating the Accession.</response>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.AccessionsController.RemovePatientOnAccession(System.Guid)">
+            <summary>
+            Removes the patient on an accession.
+            </summary>
+            <response code="204">Accession updated.</response>
+            <response code="400">Accession has missing/invalid values.</response>
+            <response code="401">This request was not able to be authenticated.</response>
+            <response code="403">The required permissions to access this resource were not present in the given request.</response>
+            <response code="500">There was an error on the server while updating the Accession.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.AccessionsController.DeleteAccession(System.Guid)">
             <summary>
