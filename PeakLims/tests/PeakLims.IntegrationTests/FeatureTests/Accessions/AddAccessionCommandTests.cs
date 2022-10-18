@@ -20,15 +20,25 @@ public class AddAccessionCommandTests : TestBase
     public async Task can_add_new_accession_to_db()
     {
         // Arrange
+        var patient = FakePatient.Generate(new FakePatientForCreationDto().Generate(), GetService<IDateTimeProvider>());
+        await InsertAsync(patient);
+
+        var org = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
+        await InsertAsync(org);
 
         // Act
-        var command = new AddAccession.Command();
+        var command = new AddAccession.Command(patient.Id, org.Id);
         var accessionReturned = await SendAsync(command);
         var accessionCreated = await ExecuteDbContextAsync(db => db.Accessions
             .FirstOrDefaultAsync(a => a.Id == accessionReturned.Id));
 
         // Assert
         accessionReturned.Status.Should().Be(AccessionStatus.Draft().Value);
+        accessionReturned.PatientId.Should().Be(patient.Id);
+        accessionReturned.HealthcareOrganizationId.Should().Be(org.Id);
+        
         accessionCreated.Status.Should().Be(AccessionStatus.Draft());
+        accessionCreated.PatientId.Should().Be(patient.Id);
+        accessionCreated.HealthcareOrganizationId.Should().Be(org.Id);
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Threading.Tasks;
 using System.Threading;
+using Domain.Accessions;
 using MediatR;
 
 [ApiController]
@@ -131,9 +132,9 @@ public sealed class AccessionsController: ControllerBase
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost(Name = "AddAccession")]
-    public async Task<ActionResult<AccessionDto>> AddAccession()
+    public async Task<ActionResult<AccessionDto>> AddAccession([FromBody] AccessionForCreationDto accessionForCreationDto)
     {
-        var command = new AddAccession.Command();
+        var command = new AddAccession.Command(accessionForCreationDto.PatientId, accessionForCreationDto.HealthcareOrganizationId);
         var commandResponse = await _mediator.Send(command);
 
         return CreatedAtRoute("GetAccession",

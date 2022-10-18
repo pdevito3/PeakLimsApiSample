@@ -42,7 +42,6 @@ public class ManageSampleContainerTests
     {
         // Arrange
         var container = FakeContainer.Generate();
-        var containerUsedForString = container.UsedFor.Value;
         container.Deactivate();
         var sampleToCreate = new FakeContainerlessSampleForCreationDto().Generate();
         sampleToCreate.Type = container.UsedFor.Value;
