@@ -203,11 +203,11 @@ public class Accession : BaseEntity
         return this;
     }
 
-    public Accession SetPatient(Patient org)
+    public Accession SetPatient(Patient patient)
     {
         GuardIfInProcessingState("The patient");
-        Patient = org;
-        PatientId = org.Id;
+        Patient = patient;
+        PatientId = patient.Id;
         return this;
     }
 
@@ -248,6 +248,7 @@ public class Accession : BaseEntity
             throw new ValidationException(nameof(Accession),
                 $"This accession is in a final state. {subject} can not be modified.");
     }
+    
     private void GuardIfInProcessingState(string subject)
     {
         if (Status.IsProcessing())
