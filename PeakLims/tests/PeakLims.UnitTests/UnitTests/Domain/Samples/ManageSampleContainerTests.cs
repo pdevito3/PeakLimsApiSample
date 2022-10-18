@@ -54,4 +54,18 @@ public class ManageSampleContainerTests
         act.Should().Throw<SharedKernel.Exceptions.ValidationException>()
             .WithMessage($"Only active containers can be added to a sample.");
     }
+
+    [Test]
+    public void must_use_valid_container()
+    {
+        // Arrange
+        var sampleToCreate = new FakeContainerlessSampleForCreationDto().Generate();
+        
+        // Act
+        var actAdd = () => Sample.Create(sampleToCreate, null);
+
+        // Assert
+        actAdd.Should().Throw<SharedKernel.Exceptions.ValidationException>()
+            .WithMessage($"Invalid Container.");
+    }
 }

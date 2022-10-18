@@ -75,4 +75,21 @@ public class ManagePatientOnAccessionTests
         actRemove.Should().Throw<SharedKernel.Exceptions.ValidationException>()
             .WithMessage($"This accession is processing. The patient can not be modified.");
     }
+
+    [Test]
+    public void must_use_valid_patient()
+    {
+        // Arrange
+        var accession = FakeAccessionBuilder
+            .Initialize()
+            .WithMockTestRepository()
+            .Build();
+        
+        // Act
+        var actAdd = () => accession.SetPatient(null);
+
+        // Assert
+        actAdd.Should().Throw<SharedKernel.Exceptions.ValidationException>()
+            .WithMessage($"Invalid Patient.");
+    }
 }

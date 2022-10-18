@@ -77,4 +77,22 @@ public class ManageTestOrderSampleTests
         actRemove.Should().Throw<SharedKernel.Exceptions.ValidationException>()
             .WithMessage($"The assigned sample can not be updated once a test order has started processing.");
     }
+
+    [Test]
+    public void must_use_valid_sample()
+    {
+        // Arrange
+        var test = new FakeTestBuilder()
+            .WithMockRepository()
+            .Activate()
+            .Build();
+        var testOrder = TestOrder.Create(test);
+        
+        // Act
+        var actAdd = () => testOrder.SetSample(null);
+
+        // Assert
+        actAdd.Should().Throw<SharedKernel.Exceptions.ValidationException>()
+            .WithMessage($"Invalid Sample.");
+    }
 }

@@ -75,7 +75,6 @@ public class ManageHealthcareOrganizationOnAccessionTests
         var container = FakeContainer.Generate();
         var sample = FakeSample.Generate(container);
         accession.TestOrders.FirstOrDefault().SetSample(sample);
-        accession.DomainEvents.Clear();
         accession.SetStatusToReadyForTesting(Mock.Of<IDateTimeProvider>());
 
         var anotherOrg = FakeHealthcareOrganization.Generate();
@@ -89,5 +88,22 @@ public class ManageHealthcareOrganizationOnAccessionTests
             .WithMessage($"This accession is processing. The organization can not be modified.");
         actRemove.Should().Throw<SharedKernel.Exceptions.ValidationException>()
             .WithMessage($"This accession is processing. The organization can not be modified.");
+    }
+
+    [Test]
+    public void must_use_valid_org()
+    {
+        // Arrange
+        var accession = FakeAccessionBuilder
+            .Initialize()
+            .WithMockTestRepository()
+            .Build();
+        
+        // Act
+        var actAdd = () => accession.SetHealthcareOrganization(null);
+
+        // Assert
+        actAdd.Should().Throw<SharedKernel.Exceptions.ValidationException>()
+            .WithMessage($"Invalid Healthcare Organization.");
     }
 }

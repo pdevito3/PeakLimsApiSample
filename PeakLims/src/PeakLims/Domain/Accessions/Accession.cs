@@ -206,6 +206,7 @@ public class Accession : BaseEntity
     public Accession SetPatient(Patient patient)
     {
         GuardIfInProcessingState("The patient");
+        new ValidationException(nameof(Accession), $"Invalid Patient.").ThrowWhenNull(patient);
         Patient = patient;
         PatientId = patient.Id;
         return this;
@@ -221,6 +222,7 @@ public class Accession : BaseEntity
 
     public Accession SetHealthcareOrganization(HealthcareOrganization org)
     {
+        new ValidationException(nameof(Accession), $"Invalid Healthcare Organization.").ThrowWhenNull(org);
         GuardIfInProcessingState("The organization");
         if (!org.Status.IsActive())
             throw new ValidationException(nameof(Accession),

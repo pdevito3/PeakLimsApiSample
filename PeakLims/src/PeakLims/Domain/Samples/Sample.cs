@@ -95,6 +95,7 @@ public class Sample : BaseEntity
 
     private Sample SetContainer(Container container)
     {
+        new ValidationException(nameof(Sample), $"Invalid Container.").ThrowWhenNull(container);
         if (!container.CanStore(Type))
             throw new ValidationException(nameof(Sample),
                 $"A {container.Type} container is used to store {container.UsedFor.Value} samples, not {Type.Value}.");

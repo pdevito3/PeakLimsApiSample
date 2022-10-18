@@ -148,6 +148,7 @@ public class TestOrder : BaseEntity
 
     public TestOrder SetSample(Sample sample)
     {
+        new ValidationException(nameof(Sample), $"Invalid Sample.").ThrowWhenNull(sample);
         GuardSampleIfTestOrderIsProcessing();
 
         Sample = sample;
