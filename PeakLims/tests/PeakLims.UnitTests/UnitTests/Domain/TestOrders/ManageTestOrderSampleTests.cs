@@ -50,4 +50,31 @@ public class ManageTestOrderSampleTests
         fakeTestOrder.SampleId.Should().BeNull();
         fakeTestOrder.Sample.Should().BeNull();
     }
+
+    [Test]
+    public void can_not_update_sample_when_processing_accession()
+    {
+        // Arrange
+        var container = FakeContainer.Generate();
+        var sample = FakeSample.Generate(container);
+        var test = new FakeTestBuilder()
+            .WithMockRepository()
+            .Activate()
+            .Build();
+        var testOrder = TestOrder.Create(test);
+        testOrder.SetSample(sample);
+        testOrder.SetStatusToReadyForTesting(Mock.Of<IDateTimeProvider>());
+
+        var anotherSample = FakeSample.Generate(container);
+        
+        // Act
+        var actAdd = () => testOrder.SetSample(anotherSample);
+        var actRemove = () => testOrder.RemoveSample();
+
+        // Assert
+        actAdd.Should().Throw<SharedKernel.Exceptions.ValidationException>()
+            .WithMessage($"The assigned sample can not be updated once a test order has started processing.");
+        actRemove.Should().Throw<SharedKernel.Exceptions.ValidationException>()
+            .WithMessage($"The assigned sample can not be updated once a test order has started processing.");
+    }
 }

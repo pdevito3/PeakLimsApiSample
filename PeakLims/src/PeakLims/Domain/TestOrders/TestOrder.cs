@@ -50,11 +50,12 @@ public class TestOrder : BaseEntity
 
     public static TestOrder Create(Test test)
     {
+        new ValidationException(nameof(TestOrder), $"Invalid Test.").ThrowWhenNull(test);
         var newTestOrder = new TestOrder();
 
         newTestOrder.Status = TestOrderStatus.Pending();
         newTestOrder.Test = test;
-        newTestOrder.TestId = test.Id;
+        newTestOrder.TestId = test?.Id;
 
         newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
         
@@ -63,6 +64,7 @@ public class TestOrder : BaseEntity
     
     public static TestOrder Create(Guid testId)
     {
+        new ValidationException(nameof(TestOrder), $"Invalid Test Id.").ThrowWhenNullOrEmpty(testId);
         var newTestOrder = new TestOrder();
 
         newTestOrder.Status = TestOrderStatus.Pending();
@@ -75,6 +77,9 @@ public class TestOrder : BaseEntity
     
     public static TestOrder Create(Guid testId, Guid associatedPanelId)
     {
+        new ValidationException(nameof(TestOrder), $"Invalid Test Id.").ThrowWhenNullOrEmpty(testId);
+        new ValidationException(nameof(TestOrder), $"Invalid Panel Id.").ThrowWhenNullOrEmpty(associatedPanelId);
+        
         var newTestOrder = new TestOrder();
 
         newTestOrder.Status = TestOrderStatus.Pending();
@@ -88,13 +93,16 @@ public class TestOrder : BaseEntity
     
     public static TestOrder Create(Test test, Panel associatedPanel)
     {
+        new ValidationException(nameof(TestOrder), $"Invalid Test.").ThrowWhenNull(test);
+        new ValidationException(nameof(TestOrder), $"Invalid Panel.").ThrowWhenNull(associatedPanel);
+        
         var newTestOrder = new TestOrder();
 
         newTestOrder.Status = TestOrderStatus.Pending();
         newTestOrder.Test = test;
-        newTestOrder.TestId = test.Id;
+        newTestOrder.TestId = test?.Id;
         newTestOrder.AssociatedPanel = associatedPanel;
-        newTestOrder.AssociatedPanelId = associatedPanel.Id;
+        newTestOrder.AssociatedPanelId = associatedPanel?.Id;
 
         newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
         
@@ -103,20 +111,16 @@ public class TestOrder : BaseEntity
 
     public TestOrder SetStatusToReadyForTesting(IDateTimeProvider dateTimeProvider)
     {
-        // TODO unit test
-        new ValidationException(nameof(TestOrder),
-                $"A test is required in order to set a test order to {TestOrderStatus.ReadyForTesting().Value}")
-            .ThrowWhenNullOrEmpty(TestId);
-        // TODO unit test
-        new ValidationException(nameof(TestOrder),
-                $"A sample is required in order to set a test order to {TestOrderStatus.ReadyForTesting().Value}")
-            .ThrowWhenNullOrEmpty(SampleId);
-        
-        // TODO unit test
-        if (Status != TestOrderStatus.Pending())
+        if (Status.IsProcessing())
             throw new ValidationException(nameof(TestOrder),
-                $"Test orders in a {Status.Value} state can not be set to {TestOrderStatus.ReadyForTesting().Value}");
-        
+                $"Test orders in a {Status.Value} state can not be set to {TestOrderStatus.ReadyForTesting().Value}.");
+        new ValidationException(nameof(TestOrder),
+                $"A test is required in order to set a test order to {TestOrderStatus.ReadyForTesting().Value}.")
+            .ThrowWhenNullOrEmpty(TestId);
+        new ValidationException(nameof(TestOrder),
+                $"A sample is required in order to set a test order to {TestOrderStatus.ReadyForTesting().Value}.")
+            .ThrowWhenNullOrEmpty(SampleId);
+
         Status = TestOrderStatus.ReadyForTesting();
         TatSnapshot = Test.TurnAroundTime;
         DueDate = dateTimeProvider.DateOnlyUtcNow.AddDays(Test.TurnAroundTime);
@@ -126,7 +130,6 @@ public class TestOrder : BaseEntity
 
     public TestOrder Cancel(TestOrderCancellationReason reason, string comments)
     {
-        // TODO unit test
         new ValidationException(nameof(TestOrder),
             $"A comment must be provided detailing why the test order was cancelled.")
             .ThrowWhenNullOrEmpty(comments);
@@ -145,10 +148,7 @@ public class TestOrder : BaseEntity
 
     public TestOrder SetSample(Sample sample)
     {
-        // TODO unit test
-        GuardIfTestOrderIsProcessing();
-        
-        // TODO must be a sample from the patient on the given accession????
+        GuardSampleIfTestOrderIsProcessing();
 
         Sample = sample;
         SampleId = sample.Id;
@@ -158,8 +158,7 @@ public class TestOrder : BaseEntity
 
     public TestOrder RemoveSample()
     {
-        // TODO unit test
-        GuardIfTestOrderIsProcessing();
+        GuardSampleIfTestOrderIsProcessing();
 
         Sample = null;
         SampleId = null;
@@ -167,7 +166,7 @@ public class TestOrder : BaseEntity
         return this;
     }
 
-    private void GuardIfTestOrderIsProcessing()
+    private void GuardSampleIfTestOrderIsProcessing()
     {
         if (Status.IsProcessing())
             throw new ValidationException(nameof(TestOrder),
