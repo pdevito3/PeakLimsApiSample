@@ -11,6 +11,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.Net;
 using System.Threading.Tasks;
+using Services;
 
 public class GetSampleTests : TestBase
 {
@@ -18,19 +19,13 @@ public class GetSampleTests : TestBase
     public async Task get_sample_returns_success_when_entity_exists_using_valid_auth_credentials()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var container = FakeContainer.Generate();
+        var fakePatientOne = FakePatient.Generate(new DateTimeProvider());
         await InsertAsync(fakePatientOne);
-
-        var fakeSampleParentOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
-        await InsertAsync(fakeSampleParentOne);
-
-        var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
-        await InsertAsync(fakeContainerOne);
 
         var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
             .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(s => s.ParentSampleId, _ => fakeSampleParentOne.Id)
-            .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id).Generate());
+            .Generate(), container);
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);
@@ -48,7 +43,13 @@ public class GetSampleTests : TestBase
     public async Task get_sample_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
+        var container = FakeContainer.Generate();
+        var fakePatientOne = FakePatient.Generate(new DateTimeProvider());
+        await InsertAsync(fakePatientOne);
+
+        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
+            .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
+            .Generate(), container);
 
         await InsertAsync(fakeSample);
 
@@ -64,7 +65,13 @@ public class GetSampleTests : TestBase
     public async Task get_sample_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
+        var container = FakeContainer.Generate();
+        var fakePatientOne = FakePatient.Generate(new DateTimeProvider());
+        await InsertAsync(fakePatientOne);
+
+        var fakeSample = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
+            .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
+            .Generate(), container);
         FactoryClient.AddAuth();
 
         await InsertAsync(fakeSample);

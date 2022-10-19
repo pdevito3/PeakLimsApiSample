@@ -11,6 +11,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.Net;
 using System.Threading.Tasks;
+using Services;
 
 public class CreateSampleTests : TestBase
 {
@@ -18,22 +19,9 @@ public class CreateSampleTests : TestBase
     public async Task create_sample_returns_created_using_valid_dto_and_valid_auth_credentials()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
-        await InsertAsync(fakePatientOne);
-
-        var fakeSampleOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto().Generate());
-        await InsertAsync(fakeSampleOne);
-
-        var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
-        await InsertAsync(fakeContainerOne);
-
-        var fakeSample = new FakeContainerlessSampleForCreationDto()
-            .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            
-            .RuleFor(s => s.ParentSampleId, _ => fakeSampleOne.Id)
-            
-            .RuleFor(s => s.ContainerId, _ => fakeContainerOne.Id)
-            .Generate();
+        var container = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
+        await InsertAsync(container);
+        var fakeSample = new FakeSampleForCreationDto(container).Generate();
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);

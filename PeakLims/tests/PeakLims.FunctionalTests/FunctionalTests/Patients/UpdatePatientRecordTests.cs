@@ -8,6 +8,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.Net;
 using System.Threading.Tasks;
+using Services;
 
 public class UpdatePatientRecordTests : TestBase
 {
@@ -15,7 +16,7 @@ public class UpdatePatientRecordTests : TestBase
     public async Task put_patient_returns_nocontent_when_entity_exists_and_auth_credentials_are_valid()
     {
         // Arrange
-        var fakePatient = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatient = FakePatient.Generate(new DateTimeProvider());
         var updatedPatientDto = new FakePatientForUpdateDto().Generate();
 
         var user = await AddNewSuperAdmin();
@@ -34,7 +35,7 @@ public class UpdatePatientRecordTests : TestBase
     public async Task put_patient_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakePatient = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatient = FakePatient.Generate(new DateTimeProvider());
         var updatedPatientDto = new FakePatientForUpdateDto { }.Generate();
 
         await InsertAsync(fakePatient);
@@ -51,7 +52,7 @@ public class UpdatePatientRecordTests : TestBase
     public async Task put_patient_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakePatient = FakePatient.Generate(new FakePatientForCreationDto().Generate());
+        var fakePatient = FakePatient.Generate(new DateTimeProvider());
         var updatedPatientDto = new FakePatientForUpdateDto { }.Generate();
         FactoryClient.AddAuth();
 

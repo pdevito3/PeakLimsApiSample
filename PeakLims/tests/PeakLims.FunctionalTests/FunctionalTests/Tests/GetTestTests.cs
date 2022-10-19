@@ -8,6 +8,8 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.Net;
 using System.Threading.Tasks;
+using Domain.Tests.Services;
+using Moq;
 
 public class GetTestTests : TestBase
 {
@@ -15,7 +17,7 @@ public class GetTestTests : TestBase
     public async Task get_test_returns_success_when_entity_exists_using_valid_auth_credentials()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate(), Mock.Of<ITestRepository>());
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);
@@ -33,7 +35,7 @@ public class GetTestTests : TestBase
     public async Task get_test_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate(), Mock.Of<ITestRepository>());
 
         await InsertAsync(fakeTest);
 
@@ -49,7 +51,7 @@ public class GetTestTests : TestBase
     public async Task get_test_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate(), Mock.Of<ITestRepository>());
         FactoryClient.AddAuth();
 
         await InsertAsync(fakeTest);

@@ -17,15 +17,15 @@ public class DeleteAccessionCommentTests : TestBase
     public async Task delete_accessioncomment_returns_nocontent_when_entity_exists_and_auth_credentials_are_valid()
     {
         // Arrange
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
-        await InsertAsync(fakeAccessionOne);
-
-        var fakeAccessionCommentParentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto().Generate());
-        await InsertAsync(fakeAccessionCommentParentOne);
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithMockTestRepository()
+            .ExcludeTestOrders()
+            .Build();
+        await InsertAsync(fakeAccession);
 
         var fakeAccessionComment = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()
-            .RuleFor(a => a.AccessionId, _ => fakeAccessionOne.Id)
-            .RuleFor(a => a.OriginalCommentId, _ => fakeAccessionCommentParentOne.Id).Generate());
+            .RuleFor(a => a.AccessionId, _ => fakeAccession.Id).Generate());
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);
@@ -45,8 +45,6 @@ public class DeleteAccessionCommentTests : TestBase
         // Arrange
         var fakeAccessionComment = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto().Generate());
 
-        await InsertAsync(fakeAccessionComment);
-
         // Act
         var route = ApiRoutes.AccessionComments.Delete.Replace(ApiRoutes.AccessionComments.Id, fakeAccessionComment.Id.ToString());
         var result = await FactoryClient.DeleteRequestAsync(route);
@@ -61,8 +59,6 @@ public class DeleteAccessionCommentTests : TestBase
         // Arrange
         var fakeAccessionComment = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto().Generate());
         FactoryClient.AddAuth();
-
-        await InsertAsync(fakeAccessionComment);
 
         // Act
         var route = ApiRoutes.AccessionComments.Delete.Replace(ApiRoutes.AccessionComments.Id, fakeAccessionComment.Id.ToString());

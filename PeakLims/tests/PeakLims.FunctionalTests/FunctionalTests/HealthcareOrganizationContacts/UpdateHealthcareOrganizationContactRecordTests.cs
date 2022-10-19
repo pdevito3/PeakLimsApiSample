@@ -43,8 +43,6 @@ public class UpdateHealthcareOrganizationContactRecordTests : TestBase
         var fakeHealthcareOrganizationContact = FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto().Generate());
         var updatedHealthcareOrganizationContactDto = new FakeHealthcareOrganizationContactForUpdateDto { }.Generate();
 
-        await InsertAsync(fakeHealthcareOrganizationContact);
-
         // Act
         var route = ApiRoutes.HealthcareOrganizationContacts.Put.Replace(ApiRoutes.HealthcareOrganizationContacts.Id, fakeHealthcareOrganizationContact.Id.ToString());
         var result = await FactoryClient.PutJsonRequestAsync(route, updatedHealthcareOrganizationContactDto);
@@ -60,8 +58,6 @@ public class UpdateHealthcareOrganizationContactRecordTests : TestBase
         var fakeHealthcareOrganizationContact = FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto().Generate());
         var updatedHealthcareOrganizationContactDto = new FakeHealthcareOrganizationContactForUpdateDto { }.Generate();
         FactoryClient.AddAuth();
-
-        await InsertAsync(fakeHealthcareOrganizationContact);
 
         // Act
         var route = ApiRoutes.HealthcareOrganizationContacts.Put.Replace(ApiRoutes.HealthcareOrganizationContacts.Id, fakeHealthcareOrganizationContact.Id.ToString());

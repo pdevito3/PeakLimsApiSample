@@ -43,8 +43,6 @@ public class AddPanelToAccessionCommandPanels : TestBase
         var fakeAccessionOne = FakeAccessionBuilder
             .Initialize()
             .WithTestRepository(GetService<ITestRepository>())
-            // .WithPatient(fakePatientOne)
-            // .WithHealthcareOrganization(fakeHealthcareOrganizationOne)
             .ExcludeTestOrders()
             .Build();
         await InsertAsync(fakeAccessionOne);

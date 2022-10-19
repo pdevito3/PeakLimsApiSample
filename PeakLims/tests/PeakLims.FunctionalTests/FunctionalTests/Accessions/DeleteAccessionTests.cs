@@ -17,15 +17,11 @@ public class DeleteAccessionTests : TestBase
     public async Task delete_accession_returns_nocontent_when_entity_exists_and_auth_credentials_are_valid()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(new FakePatientForCreationDto().Generate());
-        await InsertAsync(fakePatientOne);
-
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        await InsertAsync(fakeHealthcareOrganizationOne);
-
-        var fakeAccession = FakeAccession.Generate(new FakeAccessionForCreationDto()
-            .RuleFor(a => a.PatientId, _ => fakePatientOne.Id)
-            .RuleFor(a => a.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithMockTestRepository()
+            .ExcludeTestOrders()
+            .Build();
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);
@@ -43,7 +39,11 @@ public class DeleteAccessionTests : TestBase
     public async Task delete_accession_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeAccession = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithMockTestRepository()
+            .ExcludeTestOrders()
+            .Build();
 
         await InsertAsync(fakeAccession);
 
@@ -59,7 +59,11 @@ public class DeleteAccessionTests : TestBase
     public async Task delete_accession_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeAccession = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithMockTestRepository()
+            .ExcludeTestOrders()
+            .Build();
         FactoryClient.AddAuth();
 
         await InsertAsync(fakeAccession);

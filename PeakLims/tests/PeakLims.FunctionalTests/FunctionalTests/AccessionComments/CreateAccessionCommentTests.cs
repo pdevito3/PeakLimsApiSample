@@ -10,6 +10,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.Net;
 using System.Threading.Tasks;
+using Domain.Accessions.Dtos;
 
 public class CreateAccessionCommentTests : TestBase
 {
@@ -17,16 +18,15 @@ public class CreateAccessionCommentTests : TestBase
     public async Task create_accessioncomment_returns_created_using_valid_dto_and_valid_auth_credentials()
     {
         // Arrange
-        var fakeAccessionOne = FakeAccession.Generate(new FakeAccessionForCreationDto().Generate());
-        await InsertAsync(fakeAccessionOne);
-
-        var fakeAccessionCommentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto().Generate());
-        await InsertAsync(fakeAccessionCommentOne);
+        var fakeAccession = FakeAccessionBuilder
+            .Initialize()
+            .WithMockTestRepository()
+            .ExcludeTestOrders()
+            .Build();
+        await InsertAsync(fakeAccession);
 
         var fakeAccessionComment = new FakeAccessionCommentForCreationDto()
-            .RuleFor(a => a.AccessionId, _ => fakeAccessionOne.Id)
-            
-            .RuleFor(a => a.OriginalCommentId, _ => fakeAccessionCommentOne.Id)
+            .RuleFor(a => a.AccessionId, _ => fakeAccession.Id)
             .Generate();
 
         var user = await AddNewSuperAdmin();

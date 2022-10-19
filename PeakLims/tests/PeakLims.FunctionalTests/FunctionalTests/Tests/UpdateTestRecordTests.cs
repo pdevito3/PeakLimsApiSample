@@ -8,6 +8,8 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.Net;
 using System.Threading.Tasks;
+using Domain.Tests.Services;
+using Moq;
 
 public class UpdateTestRecordTests : TestBase
 {
@@ -15,7 +17,7 @@ public class UpdateTestRecordTests : TestBase
     public async Task put_test_returns_nocontent_when_entity_exists_and_auth_credentials_are_valid()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate(), Mock.Of<ITestRepository>());
         var updatedTestDto = new FakeTestForUpdateDto().Generate();
 
         var user = await AddNewSuperAdmin();
@@ -34,7 +36,7 @@ public class UpdateTestRecordTests : TestBase
     public async Task put_test_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate(), Mock.Of<ITestRepository>());
         var updatedTestDto = new FakeTestForUpdateDto { }.Generate();
 
         await InsertAsync(fakeTest);
@@ -51,7 +53,7 @@ public class UpdateTestRecordTests : TestBase
     public async Task put_test_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate());
+        var fakeTest = FakeTest.Generate(new FakeTestForCreationDto().Generate(), Mock.Of<ITestRepository>());
         var updatedTestDto = new FakeTestForUpdateDto { }.Generate();
         FactoryClient.AddAuth();
 
