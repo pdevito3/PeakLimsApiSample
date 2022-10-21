@@ -1,6 +1,5 @@
 namespace PeakLims.IntegrationTests.FeatureTests.AccessionComments;
 
-using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
 using PeakLims.Domain.AccessionComments.Features;
 using FluentAssertions;
 using FluentAssertions.Extensions;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 using Domain.Accessions;
 using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Accession;
-using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
+using SharedTestHelpers.Fakes.AccessionComments;
 
 public class AccessionCommentQueryTests : TestBase
 {
@@ -19,17 +18,9 @@ public class AccessionCommentQueryTests : TestBase
     public async Task can_get_existing_accessioncomment_with_accurate_props()
     {
         // Arrange
-        var fakeAccessionOne = Accession.Create();
-        await InsertAsync(fakeAccessionOne);
-        
-        var fakeAccessionCommentParentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()
-            .RuleFor(a => a.AccessionId, _ => fakeAccessionOne.Id)
-            .Generate());
-        await InsertAsync(fakeAccessionCommentParentOne);
-
-        var fakeAccessionCommentOne = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()
-            .RuleFor(a => a.AccessionId, _ => fakeAccessionOne.Id)
-            .RuleFor(a => a.OriginalCommentId, _ => fakeAccessionCommentParentOne.Id).Generate());
+        var fakeAccessionCommentOne = FakeAccessionCommentBuilder.Initialize()
+            .WithMockAccession()
+            .Build();
         await InsertAsync(fakeAccessionCommentOne);
 
         // Act
@@ -38,10 +29,6 @@ public class AccessionCommentQueryTests : TestBase
 
         // Assert
         accessionComment.Comment.Should().Be(fakeAccessionCommentOne.Comment);
-        accessionComment.InitialAccessionState.Should().Be(fakeAccessionCommentOne.InitialAccessionState);
-        accessionComment.EndingAccessionState.Should().Be(fakeAccessionCommentOne.EndingAccessionState);
-        accessionComment.AccessionId.Should().Be(fakeAccessionCommentOne.AccessionId);
-        accessionComment.OriginalCommentId.Should().Be(fakeAccessionCommentOne.OriginalCommentId);
     }
 
     [Test]

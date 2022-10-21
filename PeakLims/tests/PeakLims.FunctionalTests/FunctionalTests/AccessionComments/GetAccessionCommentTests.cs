@@ -1,15 +1,14 @@
 namespace PeakLims.FunctionalTests.FunctionalTests.AccessionComments;
 
-using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
 using PeakLims.FunctionalTests.TestUtilities;
 using PeakLims.Domain;
 using SharedKernel.Domain;
 using PeakLims.SharedTestHelpers.Fakes.Accession;
-using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Net;
 using System.Threading.Tasks;
+using SharedTestHelpers.Fakes.AccessionComments;
 
 public class GetAccessionCommentTests : TestBase
 {
@@ -17,22 +16,16 @@ public class GetAccessionCommentTests : TestBase
     public async Task get_accessioncomment_returns_success_when_entity_exists_using_valid_auth_credentials()
     {
         // Arrange
-        var fakeAccession = FakeAccessionBuilder
-            .Initialize()
-            .WithMockTestRepository()
-            .ExcludeTestOrders()
+        var accessionComment = FakeAccessionCommentBuilder.Initialize()
+            .WithMockAccession()
             .Build();
-        await InsertAsync(fakeAccession);
-
-        var fakeAccessionComment = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto()
-            .RuleFor(a => a.AccessionId, _ => fakeAccession.Id).Generate());
+        await InsertAsync(accessionComment);
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);
-        await InsertAsync(fakeAccessionComment);
 
         // Act
-        var route = ApiRoutes.AccessionComments.GetRecord.Replace(ApiRoutes.AccessionComments.Id, fakeAccessionComment.Id.ToString());
+        var route = ApiRoutes.AccessionComments.GetRecord.Replace(ApiRoutes.AccessionComments.Id, accessionComment.Id.ToString());
         var result = await FactoryClient.GetRequestAsync(route);
 
         // Assert
@@ -43,10 +36,12 @@ public class GetAccessionCommentTests : TestBase
     public async Task get_accessioncomment_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeAccessionComment = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto().Generate());
+        var accessionComment = FakeAccessionCommentBuilder.Initialize()
+            .WithMockAccession()
+            .Build();
 
         // Act
-        var route = ApiRoutes.AccessionComments.GetRecord.Replace(ApiRoutes.AccessionComments.Id, fakeAccessionComment.Id.ToString());
+        var route = ApiRoutes.AccessionComments.GetRecord.Replace(ApiRoutes.AccessionComments.Id, accessionComment.Id.ToString());
         var result = await FactoryClient.GetRequestAsync(route);
 
         // Assert
@@ -57,11 +52,13 @@ public class GetAccessionCommentTests : TestBase
     public async Task get_accessioncomment_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeAccessionComment = FakeAccessionComment.Generate(new FakeAccessionCommentForCreationDto().Generate());
+        var accessionComment = FakeAccessionCommentBuilder.Initialize()
+            .WithMockAccession()
+            .Build();
         FactoryClient.AddAuth();
 
         // Act
-        var route = ApiRoutes.AccessionComments.GetRecord.Replace(ApiRoutes.AccessionComments.Id, fakeAccessionComment.Id.ToString());
+        var route = ApiRoutes.AccessionComments.GetRecord.Replace(ApiRoutes.AccessionComments.Id, accessionComment.Id.ToString());
         var result = await FactoryClient.GetRequestAsync(route);
 
         // Assert

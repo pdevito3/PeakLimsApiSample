@@ -1,15 +1,15 @@
 namespace PeakLims.FunctionalTests.FunctionalTests.AccessionComments;
 
-using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
 using PeakLims.FunctionalTests.TestUtilities;
 using PeakLims.Domain;
 using SharedKernel.Domain;
 using PeakLims.SharedTestHelpers.Fakes.Accession;
-using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Net;
 using System.Threading.Tasks;
+using Bogus;
+using Domain.AccessionComments.Dtos;
 using Domain.Accessions.Dtos;
 
 public class CreateAccessionCommentTests : TestBase
@@ -18,23 +18,23 @@ public class CreateAccessionCommentTests : TestBase
     public async Task create_accessioncomment_returns_created_using_valid_dto_and_valid_auth_credentials()
     {
         // Arrange
+        var faker = new Faker();
         var fakeAccession = FakeAccessionBuilder
             .Initialize()
             .WithMockTestRepository()
-            .ExcludeTestOrders()
             .Build();
         await InsertAsync(fakeAccession);
-
-        var fakeAccessionComment = new FakeAccessionCommentForCreationDto()
-            .RuleFor(a => a.AccessionId, _ => fakeAccession.Id)
-            .Generate();
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);
 
         // Act
         var route = ApiRoutes.AccessionComments.Create;
-        var result = await FactoryClient.PostJsonRequestAsync(route, fakeAccessionComment);
+        var result = await FactoryClient.PostJsonRequestAsync(route, new AccessionCommentForCreationDto()
+        {
+            AccessionId = fakeAccession.Id,
+            Comment = faker.Lorem.Sentence()
+        });
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -44,7 +44,7 @@ public class CreateAccessionCommentTests : TestBase
     public async Task create_accessioncomment_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeAccessionComment = new FakeAccessionCommentForCreationDto { }.Generate();
+        var fakeAccessionComment = new AccessionCommentForCreationDto();
 
         // Act
         var route = ApiRoutes.AccessionComments.Create;
@@ -58,7 +58,7 @@ public class CreateAccessionCommentTests : TestBase
     public async Task create_accessioncomment_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeAccessionComment = new FakeAccessionCommentForCreationDto { }.Generate();
+        var fakeAccessionComment = new AccessionCommentForCreationDto();
         FactoryClient.AddAuth();
 
         // Act

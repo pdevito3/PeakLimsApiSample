@@ -39,6 +39,15 @@ namespace SharedKernel.Exceptions
             };
         }
 
+        public ValidationException(string errorMessage)
+            : base(errorMessage)
+        {
+            Errors = new Dictionary<string, string[]>
+            {
+                ["Validation Exception"] = new[] { errorMessage }
+            };
+        }
+
         public IDictionary<string, string[]> Errors { get; }
     }
 

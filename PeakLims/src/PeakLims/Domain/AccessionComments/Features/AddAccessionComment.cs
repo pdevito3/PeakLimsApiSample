@@ -1,5 +1,6 @@
 namespace PeakLims.Domain.AccessionComments.Features;
 
+using Accessions.Services;
 using PeakLims.Domain.AccessionComments.Services;
 using PeakLims.Domain.AccessionComments;
 using PeakLims.Domain.AccessionComments.Dtos;
@@ -14,34 +15,39 @@ public static class AddAccessionComment
 {
     public sealed class Command : IRequest<AccessionCommentDto>
     {
-        public readonly AccessionCommentForCreationDto AccessionCommentToAdd;
+        public readonly string Comment;
+        public readonly Guid AccessionId;
 
-        public Command(AccessionCommentForCreationDto accessionCommentToAdd)
+        public Command( Guid accessionId, string comment)
         {
-            AccessionCommentToAdd = accessionCommentToAdd;
+            Comment = comment;
+            AccessionId = accessionId;
         }
     }
 
     public sealed class Handler : IRequestHandler<Command, AccessionCommentDto>
     {
         private readonly IAccessionCommentRepository _accessionCommentRepository;
+        private readonly IAccessionRepository _accessionRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IAccessionCommentRepository accessionCommentRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IAccessionCommentRepository accessionCommentRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard, IAccessionRepository accessionRepository)
         {
             _mapper = mapper;
             _accessionCommentRepository = accessionCommentRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
+            _accessionRepository = accessionRepository;
         }
 
         public async Task<AccessionCommentDto> Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddAccessionComments);
 
-            var accessionComment = AccessionComment.Create(request.AccessionCommentToAdd);
+            var accession = await _accessionRepository.GetById(request.AccessionId, cancellationToken: cancellationToken);
+            var accessionComment = AccessionComment.Create(accession, request.Comment);
             await _accessionCommentRepository.Add(accessionComment, cancellationToken);
 
             await _unitOfWork.CommitChanges(cancellationToken);

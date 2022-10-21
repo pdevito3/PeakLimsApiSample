@@ -2,7 +2,6 @@ namespace PeakLims.Domain.AccessionComments.Features;
 
 using PeakLims.Domain.AccessionComments;
 using PeakLims.Domain.AccessionComments.Dtos;
-using PeakLims.Domain.AccessionComments.Validators;
 using PeakLims.Domain.AccessionComments.Services;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
@@ -15,13 +14,13 @@ public static class UpdateAccessionComment
 {
     public sealed class Command : IRequest<bool>
     {
-        public readonly Guid Id;
-        public readonly AccessionCommentForUpdateDto AccessionCommentToUpdate;
+        public readonly Guid AccessionCommentId;
+        public readonly string Comment;
 
-        public Command(Guid accessionComment, AccessionCommentForUpdateDto newAccessionCommentData)
+        public Command(Guid accessionCommentId, string comment)
         {
-            Id = accessionComment;
-            AccessionCommentToUpdate = newAccessionCommentData;
+            AccessionCommentId = accessionCommentId;
+            Comment = comment;
         }
     }
 
@@ -42,10 +41,12 @@ public static class UpdateAccessionComment
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdateAccessionComments);
 
-            var accessionCommentToUpdate = await _accessionCommentRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            var accessionCommentToUpdate = await _accessionCommentRepository.GetById(request.AccessionCommentId, cancellationToken: cancellationToken);
 
-            accessionCommentToUpdate.Update(request.AccessionCommentToUpdate);
-            _accessionCommentRepository.Update(accessionCommentToUpdate);
+            accessionCommentToUpdate.Update(request.Comment, out var newComment, out var archivedComment);
+            await _accessionCommentRepository.Add(newComment, cancellationToken);
+            _accessionCommentRepository.Update(archivedComment);
+            
             return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
         }
     }
