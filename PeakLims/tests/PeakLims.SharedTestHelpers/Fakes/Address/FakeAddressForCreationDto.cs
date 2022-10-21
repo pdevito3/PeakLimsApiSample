@@ -6,7 +6,7 @@ using Domain.Addresses.Dtos;
 using PeakLims.Domain.HealthcareOrganizations.Dtos;
 
 // or replace 'AutoFaker' with 'Faker' along with your own rules if you don't want all fields to be auto faked
-public class FakeAddressForCreationDto : AutoFaker<AddressForCreationDto>
+public sealed class FakeAddressForCreationDto : AutoFaker<AddressForCreationDto>
 {
     public FakeAddressForCreationDto()
     {
