@@ -1,0 +1,436 @@
+DomainName: PeakLimsApi
+BoundedContexts:
+  - ProjectName: PeakLims
+    Port: 6247
+    DbContext:
+      ContextName: PeakLimsDbContext
+      DatabaseName: PeakLims
+      Provider: Postgres
+    Entities:
+      - Name: Patient
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: FirstName
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: LastName
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: DateOfBirth
+            Type: DateOnly?
+            CanFilter: true
+            CanSort: true
+          - Name: Age
+            Type: int?
+            CanFilter: true
+            CanSort: true
+          - Name: Sex
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Race
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Ethnicity
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: InternalId
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Accessions
+            Type: ICollection<Accession>
+            ForeignEntityPlural: Accessions
+          - Name: Samples
+            Type: ICollection<Sample>
+            ForeignEntityPlural: Samples
+      - Name: Accession
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: AccessionNumber
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: State
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: PatientId
+            Type: Guid?
+            ForeignEntityName: Patient
+            ForeignEntityPlural: Patients
+          - Name: HealthcareOrganizationId
+            Type: Guid?
+            ForeignEntityName: HealthcareOrganization
+            ForeignEntityPlural: HealthcareOrganizations
+          - Name: Contacts
+            Type: ICollection<HealthcareOrganizationContact>
+            ForeignEntityPlural: HealthcareOrganizationContacts
+          - Name: PanelOrders
+            Type: ICollection<PanelOrder>
+            ForeignEntityPlural: PanelOrders
+          - Name: TestOrders
+            Type: ICollection<TestOrder>
+            ForeignEntityPlural: TestOrders
+          - Name: Comments
+            Type: ICollection<AccessionComment>
+            ForeignEntityPlural: AccessionComments
+      - Name: AccessionComment
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: Comment
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: InitialAccessionState
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: EndingAccessionState
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: AccessionId
+            Type: Guid
+            ForeignEntityName: Accession
+            ForeignEntityPlural: Accessions
+          - Name: OriginalCommentId
+            Type: Guid?
+            ForeignEntityName: AccessionComment
+            ForeignEntityPlural: AccessionComments
+      - Name: Sample
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: SampleNumber
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: State
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Type
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Quantity
+            Type: decimal?
+            CanFilter: true
+            CanSort: true
+          - Name: CollectionDate
+            Type: DateOnly?
+            CanFilter: true
+            CanSort: true
+          - Name: ReceivedDate
+            Type: DateOnly?
+            CanFilter: true
+            CanSort: true
+          - Name: CollectionSite
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: PatientId
+            Type: Guid?
+            ForeignEntityName: Patient
+            ForeignEntityPlural: Patients
+          - Name: ParentSampleId
+            Type: Guid?
+            ForeignEntityName: Sample
+            ForeignEntityPlural: Samples
+          - Name: ContainerId
+            Type: Guid?
+            ForeignEntityName: Container
+            ForeignEntityPlural: Containers
+      - Name: Container
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: ContainerNumber
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: State
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Type
+            Type: string
+            CanFilter: true
+            CanSort: true
+      - Name: PanelOrder
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: State
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: PanelId
+            Type: Guid?
+            ForeignEntityName: Panel
+            ForeignEntityPlural: Panels
+      - Name: TestOrder
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: State
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: TestId
+            Type: Guid?
+            ForeignEntityName: Test
+            ForeignEntityPlural: Tests
+      - Name: Panel
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: PanelNumber
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: PanelCode
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: PanelName
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: TurnAroundTime
+            Type: int
+            CanFilter: true
+            CanSort: true
+          - Name: Type
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Version
+            Type: int
+            CanFilter: true
+            CanSort: true
+          - Name: Tests
+            Type: ICollection<Test>
+            ForeignEntityPlural: Tests
+      - Name: Test
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: TestNumber
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: TestCode
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: TestName
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Methodology
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Platform
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Version
+            Type: int
+            CanFilter: true
+            CanSort: true
+          - Name: Panels
+            Type: ICollection<Panel>
+            ForeignEntityPlural: Panels
+      - Name: HealthcareOrganization
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: Name
+            Type: string
+            CanFilter: true
+            CanSort: true
+          # TODO IN APP Address
+          - Name: Email
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Contacts
+            Type: ICollection<HealthcareOrganizationContact>
+            ForeignEntityPlural: HealthcareOrganizationContacts
+      - Name: HealthcareOrganizationContact
+        Features:
+          - Type: GetList
+            IsProtected: true
+          - Type: GetRecord
+            IsProtected: true
+          - Type: AddRecord
+            IsProtected: true
+          - Type: UpdateRecord
+            IsProtected: true
+          - Type: DeleteRecord
+            IsProtected: true
+        Properties:
+          - Name: Name
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Email
+            Type: string
+            CanFilter: true
+            CanSort: true
+          - Name: Npi
+            Type: string
+            CanFilter: true
+            CanSort: true
+          # TODO IN APP Address
+          - Name: HealthcareOrganizationId
+            Type: Guid
+            IsRequired: true
+            ForeignEntityName: HealthcareOrganization
+            ForeignEntityPlural: HealthcareOrganizations
+    Environment:
+      AuthSettings:
+        Authority: http://localhost:7821/auth/realms/DevRealm
+        Audience: peak_lims
+        AuthorizationUrl: http://localhost:7821/auth/realms/DevRealm/protocol/openid-connect/auth
+        TokenUrl: http://localhost:7821/auth/realms/DevRealm/protocol/openid-connect/token
+        ClientId: peak_lims.swagger
+        ClientSecret: 9bbea418-bed9-4f32-8e5f-12a11d389559
+AuthServer:
+  Name: KeycloakInPulumi
+  RealmName: DevRealm
+  Port: 7821
+  Clients:
+    - Id: peak_lims.postman.machine
+      Name: PeakLims Postman Machine
+      Secret: dd283422-f6ef-4e28-b373-1d3b9d909f8e
+      GrantType: ClientCredentials
+      BaseUrl: "https://oauth.pstmn.io/"
+      Scopes:
+        - peak_lims #this should match the audience scope in your boundary auth settings and swagger specs
+    - Id: peak_lims.postman.code
+      Name: PeakLims Postman Code
+      Secret: 946407b0-ce34-40ee-a0d6-205b813588f3 #optional
+      GrantType: Code
+      BaseUrl: "https://oauth.pstmn.io/"
+      Scopes:
+        - peak_lims #this should match the audience scope in your boundary auth settings and swagger specs
+    - Id: peak_lims.swagger
+      Name: PeakLims Swagger
+      Secret: 9bbea418-bed9-4f32-8e5f-12a11d389559
+      GrantType: Code
+      BaseUrl: "https://localhost:6247/"
+      Scopes:
+        - peak_lims #this should match the audience scope in your boundary auth settings and swagger specs
+    - Id: peak_lims.next
+      Name: PeakLims Next
+      Secret: 063c2754-b258-47a4-92bc-22a609e7ca13
+      BaseUrl: "http://localhost:8811/"
+      GrantType: Code
+      RedirectUris:
+        - "http://localhost:8811/*"
+      AllowedCorsOrigins:
+        - "https://localhost:6247" # api 1 - peak_lims
+        - "http://localhost:8811"
+      Scopes:
+        - peak_lims #this should match the audience scope in your boundary auth settings and swagger specs
