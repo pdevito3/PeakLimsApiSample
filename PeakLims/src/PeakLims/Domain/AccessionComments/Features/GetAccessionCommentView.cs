@@ -54,15 +54,22 @@ public static class GetAccessionCommentView
                 .Distinct()
                 .ToList();
 
-            var distinctUserList = await _userRepository.Query()
-                .Where(x => distinctAccessionCommentUserIdList.Contains(x.CreatedBy))
-                .ToListAsync(cancellationToken);
+            var distinctUserListSpecification = new DistinctUserListSpecification(distinctAccessionCommentUserIdList);
+            var distinctUserList = await _userRepository.ListAsync(distinctUserListSpecification, cancellationToken);
             foreach (var accessionComment in activeAccessionComments)
             {
                 treatmentPlanDto.AccessionComments.Add(GetAccessionCommentItemDto(accessionComment, allAccessionComments, distinctUserList));
             }
 
             return treatmentPlanDto;
+        }
+    }
+    
+    private sealed class DistinctUserListSpecification : Specification<User>
+    {
+        public DistinctUserListSpecification(List<string> distinctAccessionCommentUserIdList)
+        {
+            Query.Where(x => distinctAccessionCommentUserIdList.Contains(x.CreatedBy));
         }
     }
     
