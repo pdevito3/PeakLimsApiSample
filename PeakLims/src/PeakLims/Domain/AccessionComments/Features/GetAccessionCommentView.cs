@@ -35,17 +35,17 @@ public static class GetAccessionCommentView
 
         public async Task<AccessionCommentViewDto> Handle(Query request, CancellationToken cancellationToken)
         {
-            var conference = await _accessionRepository.Query()
+            var accession = await _accessionRepository.Query()
                 .Include(x => x.Comments)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == request.AccessionId, cancellationToken: cancellationToken);
             
-            if (conference == null)
+            if (accession == null)
                 throw new KeyNotFoundException($"Accession with id {request.AccessionId} not found");
 
             var treatmentPlanDto = new AccessionCommentViewDto();
 
-            var allAccessionComments = conference.Comments.ToList();
+            var allAccessionComments = accession.Comments.ToList();
             var activeAccessionComments = allAccessionComments
                 .Where(tsi => tsi.Status == AccessionCommentStatus.Active())
                 .OrderBy(x => x.CreatedOn)
