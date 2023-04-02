@@ -56,12 +56,14 @@ public class AccessionComment : BaseEntity
             Comment = commentText,
             AccessionId = AccessionId,
             Accession = Accession,
-            ParentAccessionCommentId = Id,
-            ParentAccessionComment = this,
+            ParentAccessionCommentId = null,
+            ParentAccessionComment = null,
             Status = AccessionCommentStatus.Active()
         };
 
         Status = AccessionCommentStatus.Archived();
+        ParentAccessionCommentId = newComment.Id;
+        ParentAccessionComment = newComment;
         archivedComment = this;
         
         QueueDomainEvent(new AccessionCommentUpdated(){ Id = Id });
@@ -72,6 +74,5 @@ public class AccessionComment : BaseEntity
     {
         new ValidationException("Please provide a valid comment.").ThrowWhenNullOrEmpty(commentText);
     }
-    
     protected AccessionComment() { } // For EF + Mocking
 }

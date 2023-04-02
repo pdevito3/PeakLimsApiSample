@@ -44,12 +44,12 @@ public class UpdateAccessionCommentCommandTests : TestBase
         
         newComment.AccessionId.Should().Be(originalAccessionComment.AccessionId);
         newComment.Comment.Should().Be(comment);
-        newComment.ParentAccessionCommentId.Should().Be(originalAccessionComment.Id);
+        newComment.ParentAccessionCommentId.Should().BeNull();
         newComment.Status.Should().Be(AccessionCommentStatus.Active());
         
         archivedComment.Id.Should().Be(originalAccessionComment.Id);
         archivedComment.AccessionId.Should().Be(originalAccessionComment.AccessionId);
-        archivedComment.ParentAccessionCommentId.Should().BeNull();
+        archivedComment.ParentAccessionCommentId.Should().Be(newComment.Id);
         archivedComment.Comment.Should().Be(originalAccessionComment.Comment);
         archivedComment.Status.Should().Be(AccessionCommentStatus.Archived());
     }
