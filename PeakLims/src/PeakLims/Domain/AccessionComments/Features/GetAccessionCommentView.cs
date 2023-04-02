@@ -1,7 +1,9 @@
 namespace PeakLims.Domain.AccessionComments.Features;
 
 using AccessionCommentStatuses;
+using Accessions;
 using Accessions.Services;
+using Ardalis.Specification;
 using Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -35,10 +37,8 @@ public static class GetAccessionCommentView
 
         public async Task<AccessionCommentViewDto> Handle(Query request, CancellationToken cancellationToken)
         {
-            var accession = await _accessionRepository.Query()
-                .Include(x => x.Comments)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == request.AccessionId, cancellationToken: cancellationToken);
+            var accessionWithCommentsSpecification = new UntrackedAccessionWithCommentsSpecification(request.AccessionId);
+            var accession = await _accessionRepository.GetByIdOrDefault(accessionWithCommentsSpecification, cancellationToken);
             
             if (accession == null)
                 throw new KeyNotFoundException($"Accession with id {request.AccessionId} not found");
@@ -63,6 +63,16 @@ public static class GetAccessionCommentView
             }
 
             return treatmentPlanDto;
+        }
+    }
+    
+    private sealed class UntrackedAccessionWithCommentsSpecification : Specification<Accession>
+    {
+        public UntrackedAccessionWithCommentsSpecification(Guid accessionId)
+        {
+            Query.Include(x => x.Comments)
+                .AsNoTracking()
+                .Where(x => x.Id == accessionId);
         }
     }
     
