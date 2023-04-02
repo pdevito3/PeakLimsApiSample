@@ -46,7 +46,7 @@ public class CreateUserTests
         var newUser = () => User.Create(toCreate);
 
         // Act + Assert
-        newUser.Should().Throw<FluentValidation.ValidationException>();
+        newUser.Should().Throw<SharedKernel.Exceptions.ValidationException>();
     }
 
     [Test]

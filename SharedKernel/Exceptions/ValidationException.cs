@@ -49,6 +49,32 @@ namespace SharedKernel.Exceptions
         }
 
         public IDictionary<string, string[]> Errors { get; }
+        
+        public static void ThrowWhenNullOrEmpty(string value, string message)
+        {
+            if (string.IsNullOrEmpty(value))
+                throw new ValidationException(message);
+        }
+        public static void ThrowWhenNullOrEmpty(Guid? value, string message)
+        {
+            if (value == null || value == Guid.Empty)
+                throw new ValidationException(message);
+        }
+        public static void ThrowWhenNull(object value, string message)
+        {
+            if (value == null)
+                throw new ValidationException(message);
+        }
+        public static void ThrowWhenNull(int? value, string message)
+        {
+            if (value == null)
+                throw new ValidationException(message);
+        }
+        public static void Must(bool condition, string message)
+        {
+            if(!condition)
+                throw new ValidationException(message);
+        }
     }
 
     public static class Extensions

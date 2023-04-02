@@ -78,6 +78,6 @@ public class UpdateRolePermissionTests
         });
 
         // Act + Assert
-        updateRolePermission.Should().Throw<FluentValidation.ValidationException>();
+        updateRolePermission.Should().Throw<SharedKernel.Exceptions.ValidationException>();
     }
 }

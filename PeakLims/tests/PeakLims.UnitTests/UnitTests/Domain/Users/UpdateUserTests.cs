@@ -48,7 +48,7 @@ public class UpdateUserTests
         var newUser = () => fakeUser.Update(updatedUser);
 
         // Act + Assert
-        newUser.Should().Throw<FluentValidation.ValidationException>();
+        newUser.Should().Throw<SharedKernel.Exceptions.ValidationException>();
     }
     
     [Test]

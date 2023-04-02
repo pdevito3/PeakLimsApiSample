@@ -3,8 +3,8 @@ namespace PeakLims.Domain.RolePermissions;
 using Dtos;
 using Validators;
 using DomainEvents;
-using FluentValidation;
 using Roles;
+using SharedKernel.Exceptions;
 
 public class RolePermission : BaseEntity
 {
@@ -14,7 +14,8 @@ public class RolePermission : BaseEntity
 
     public static RolePermission Create(RolePermissionForCreationDto rolePermissionForCreationDto)
     {
-        new RolePermissionForCreationDtoValidator().ValidateAndThrow(rolePermissionForCreationDto);
+        ValidationException.Must(BeAnExistingPermission(rolePermissionForCreationDto.Permission), 
+            "Please use a valid permission.");
 
         var newRolePermission = new RolePermission();
 
@@ -28,12 +29,17 @@ public class RolePermission : BaseEntity
 
     public void Update(RolePermissionForUpdateDto rolePermissionForUpdateDto)
     {
-        new RolePermissionForUpdateDtoValidator().ValidateAndThrow(rolePermissionForUpdateDto);
-
+        ValidationException.Must(BeAnExistingPermission(rolePermissionForUpdateDto.Permission), 
+            "Please use a valid permission.");
+        
         Role = new Role(rolePermissionForUpdateDto.Role);
         Permission = rolePermissionForUpdateDto.Permission;
 
         QueueDomainEvent(new RolePermissionUpdated(){ Id = Id });
+    }
+    private static bool BeAnExistingPermission(string permission)
+    {
+        return Permissions.List().Contains(permission, StringComparer.InvariantCultureIgnoreCase);
     }
     
     protected RolePermission() { } // For EF + Mocking

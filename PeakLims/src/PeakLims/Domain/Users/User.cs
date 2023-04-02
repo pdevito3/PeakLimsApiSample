@@ -5,9 +5,9 @@ using PeakLims.Domain.Users.Validators;
 using PeakLims.Domain.Users.DomainEvents;
 using PeakLims.Domain.Emails;
 using Roles;
-using FluentValidation;
 using System.Text.Json.Serialization;
 using System.Runtime.Serialization;
+using SharedKernel.Exceptions;
 using Sieve.Attributes;
 
 public class User : BaseEntity
@@ -34,7 +34,8 @@ public class User : BaseEntity
 
     public static User Create(UserForCreationDto userForCreationDto)
     {
-        new UserForCreationDtoValidator().ValidateAndThrow(userForCreationDto);
+        ValidationException.ThrowWhenNullOrEmpty(userForCreationDto.Identifier, 
+        "Please provide an identifier.");
 
         var newUser = new User();
 
@@ -51,7 +52,8 @@ public class User : BaseEntity
 
     public void Update(UserForUpdateDto userForUpdateDto)
     {
-        new UserForUpdateDtoValidator().ValidateAndThrow(userForUpdateDto);
+        ValidationException.ThrowWhenNullOrEmpty(userForUpdateDto.Identifier, 
+        "Please provide an identifier.");
 
         Identifier = userForUpdateDto.Identifier;
         FirstName = userForUpdateDto.FirstName;

@@ -64,6 +64,6 @@ public class CreateRolePermissionTests
         });
 
         // Act + Assert
-        rolePermission.Should().Throw<FluentValidation.ValidationException>();
+        rolePermission.Should().Throw<SharedKernel.Exceptions.ValidationException>();
     }
 }

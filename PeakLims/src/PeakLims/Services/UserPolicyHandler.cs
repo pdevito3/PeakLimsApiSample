@@ -26,14 +26,28 @@ public sealed class UserPolicyHandler : IUserPolicyHandler
         _mediator = mediator;
     }
     
-    public async Task<IEnumerable<string>> GetUserPermissions()
+    public async Task<bool> HasPermission(string permission)
+    {
+        var roles = await GetRoles();
+    
+        // super admins can do everything
+        if (roles.Contains(Role.SuperAdmin().Value))
+            return true;
+        
+        return await _rolePermissionRepository.Query()
+            .Where(rp => roles.Contains(rp.Role))
+            .Select(rp => rp.Permission)
+            .AnyAsync(x => x == permission);
+    }
+
+    private async Task<string[]> GetRoles()
     {
         var claimsPrincipal = _currentUserService.User;
         if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
-        
+
         var nameIdentifier = _currentUserService.UserId;
         var usersExist = _userRepository.Query().Any();
-        
+
         if (!usersExist)
             await SeedRootUser(nameIdentifier);
 
@@ -41,9 +55,15 @@ public sealed class UserPolicyHandler : IUserPolicyHandler
 
         if (roles.Length == 0)
             throw new NoRolesAssignedException();
+        return roles;
+    }
+
+    public async Task<IEnumerable<string>> GetUserPermissions()
+    {
+        var roles = await GetRoles();
 
         // super admins can do everything
-        if(roles.Contains(Role.SuperAdmin().Value))
+        if (roles.Contains(Role.SuperAdmin().Value))
             return Permissions.List();
 
         var permissions = await _rolePermissionRepository.Query()

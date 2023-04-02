@@ -25,7 +25,8 @@ public static class ServiceRegistration
             options.UseNpgsql(connectionString,
                 builder => builder.MigrationsAssembly(typeof(PeakLimsDbContext).Assembly.FullName))
                             .UseSnakeCaseNamingConvention());
-
+        
+        
         // Auth -- Do Not Delete
         if (!env.IsEnvironment(Consts.Testing.FunctionalTestingEnvName))
         {
