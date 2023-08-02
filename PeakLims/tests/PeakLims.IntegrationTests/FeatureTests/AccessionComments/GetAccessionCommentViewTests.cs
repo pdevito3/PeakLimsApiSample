@@ -24,26 +24,26 @@ public class GetAccessionCommentViewTests
             .Build();
 
         // input
-        var tumorboardDiscussionCommentItem = FakeAccessionCommentBuilder.Initialize()
+        var accessionCommentItem = FakeAccessionCommentBuilder.Initialize()
             .WithAccession(accession)
             .Build();
-        await InsertAsync(tumorboardDiscussionCommentItem);
+        await InsertAsync(accessionCommentItem);
         var newComment = new Faker().Lorem.Sentence();
-        var command = new UpdateAccessionComment.Command(tumorboardDiscussionCommentItem.Id, newComment);
+        var command = new UpdateAccessionComment.Command(accessionCommentItem.Id, newComment);
         await SendAsync(command);
 
         // Act
         var query = new GetAccessionCommentView.Query(accession.Id);
-        var discussionView = await SendAsync(query);
+        var accessionView = await SendAsync(query);
 
         // Assert
-        discussionView.AccessionComments.Count.Should().Be(1);
-        var viewCommentItem = discussionView.AccessionComments[0];
+        accessionView.AccessionComments.Count.Should().Be(1);
+        var viewCommentItem = accessionView.AccessionComments[0];
         viewCommentItem.Comment.Should().Be(newComment);
         viewCommentItem.History.Count.Should().Be(1);
         
         var viewCommentItemHistory = viewCommentItem.History[0];
-        viewCommentItemHistory.Comment.Should().Be(tumorboardDiscussionCommentItem.Comment);
+        viewCommentItemHistory.Comment.Should().Be(accessionCommentItem.Comment);
     }
     
     [Test]
@@ -80,14 +80,14 @@ public class GetAccessionCommentViewTests
 
         // Act
         var query = new GetAccessionCommentView.Query(accession.Id);
-        var discussionView = await SendAsync(query);
+        var accessionView = await SendAsync(query);
 
         // Assert
-        discussionView.AccessionComments.Count.Should().Be(2);
-        var standaloneCommentItemView = discussionView.AccessionComments.FirstOrDefault(x => x.Id == standaloneCommentItem.Id);
+        accessionView.AccessionComments.Count.Should().Be(2);
+        var standaloneCommentItemView = accessionView.AccessionComments.FirstOrDefault(x => x.Id == standaloneCommentItem.Id);
         standaloneCommentItemView.Comment.Should().Be(standaloneCommentItem.Comment);
         
-        var editedCommentItemView = discussionView.AccessionComments.FirstOrDefault(x => x.Id != standaloneCommentItem.Id);
+        var editedCommentItemView = accessionView.AccessionComments.FirstOrDefault(x => x.Id != standaloneCommentItem.Id);
         editedCommentItemView.Comment.Should().Be(finalCommentText);
  
         editedCommentItemView.History.Count.Should().Be(2);
