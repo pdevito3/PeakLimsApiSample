@@ -1,143 +1,77 @@
 namespace PeakLims.Domain.TestOrders;
 
-using PeakLims.Domain.TestOrders.DomainEvents;
-using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.Serialization;
-using Accessions;
-using Panels;
-using PeakLims.Domain.Tests;
-using PeakLims.Services;
-using Samples;
-using TestOrderStatuses;
 using SharedKernel.Exceptions;
+using PeakLims.Domain.Accessions;
+using PeakLims.Domain.TestOrders.DomainEvents;
+using Panels;
+using PeakLims.Domain.Samples;
+using PeakLims.Domain.Samples.Models;
 using TestOrderCancellationReasons;
+using TestOrderStatuses;
+using Tests;
+using ValidationException = SharedKernel.Exceptions.ValidationException;
 
 public class TestOrder : BaseEntity
 {
-    public virtual TestOrderStatus Status { get; private set; }
-    public virtual DateOnly? DueDate { get; private set; }
-    public virtual int? TatSnapshot { get; private set; }
-    public virtual TestOrderCancellationReason CancellationReason { get; private set; }
-    public virtual string CancellationComments { get; private set; }
-    
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("Panel")]
-    public virtual Guid? AssociatedPanelId { get; private set; }
-    public virtual Panel AssociatedPanel { get; private set; }
+    public TestOrderStatus Status { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("Test")]
-    public virtual Guid? TestId { get; private set; }
-    public virtual Test Test { get; private set; }
+    public DateOnly? DueDate { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("Accession")]
-    public virtual Guid? AccessionId { get; private set; }
-    public virtual Accession Accession { get; private set; }
+    public int? TatSnapshot { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("Sample")]
-    public virtual Guid? SampleId { get; private set; }
-    public virtual Sample Sample { get; private set; }
+    public TestOrderCancellationReason CancellationReason { get; private set; }
 
-    public bool IsPartOfPanel() => AssociatedPanelId.HasValue;
+    public string CancellationComments { get; private set; }
 
+    public Panel AssociatedPanel { get; private set; }
+
+    public Test Test { get; private set; }
+
+    public Sample Sample { get; private set; }
+
+    public Accession Accession { get; }
+
+    // Add Props Marker -- Deleting this comment will cause the add props utility to be incomplete
+
+    public bool IsPartOfPanel() => AssociatedPanel != null;
 
     public static TestOrder Create(Test test)
     {
-        new ValidationException(nameof(TestOrder), $"Invalid Test.").ThrowWhenNull(test);
+        ValidationException.ThrowWhenNull(test, $"A test must be provided.");
         var newTestOrder = new TestOrder();
 
         newTestOrder.Status = TestOrderStatus.Pending();
         newTestOrder.Test = test;
-        newTestOrder.TestId = test?.Id;
 
         newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
         
         return newTestOrder;
     }
     
-    public static TestOrder Create(Guid testId)
+    public static TestOrder Create(Test test, Panel panel)
     {
-        new ValidationException(nameof(TestOrder), $"Invalid Test Id.").ThrowWhenNullOrEmpty(testId);
-        var newTestOrder = new TestOrder();
-
-        newTestOrder.Status = TestOrderStatus.Pending();
-        newTestOrder.TestId = testId;
-
-        newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
-        
-        return newTestOrder;
-    }
-    
-    public static TestOrder Create(Guid testId, Guid associatedPanelId)
-    {
-        new ValidationException(nameof(TestOrder), $"Invalid Test Id.").ThrowWhenNullOrEmpty(testId);
-        new ValidationException(nameof(TestOrder), $"Invalid Panel Id.").ThrowWhenNullOrEmpty(associatedPanelId);
-        
-        var newTestOrder = new TestOrder();
-
-        newTestOrder.Status = TestOrderStatus.Pending();
-        newTestOrder.TestId = testId;
-        newTestOrder.AssociatedPanelId = associatedPanelId;
-
-        newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
-        
-        return newTestOrder;
-    }
-    
-    public static TestOrder Create(Test test, Panel associatedPanel)
-    {
-        new ValidationException(nameof(TestOrder), $"Invalid Test.").ThrowWhenNull(test);
-        new ValidationException(nameof(TestOrder), $"Invalid Panel.").ThrowWhenNull(associatedPanel);
-        
+        ValidationException.ThrowWhenNull(test, $"A test must be provided.");
+        ValidationException.ThrowWhenNull(panel, $"A panel must be provided.");
         var newTestOrder = new TestOrder();
 
         newTestOrder.Status = TestOrderStatus.Pending();
         newTestOrder.Test = test;
-        newTestOrder.TestId = test?.Id;
-        newTestOrder.AssociatedPanel = associatedPanel;
-        newTestOrder.AssociatedPanelId = associatedPanel?.Id;
+        newTestOrder.AssociatedPanel = panel;
+        // TODO derive TAT and due date from test
 
         newTestOrder.QueueDomainEvent(new TestOrderCreated(){ TestOrder = newTestOrder });
         
         return newTestOrder;
-    }
-
-    public TestOrder SetStatusToReadyForTesting(IDateTimeProvider dateTimeProvider)
-    {
-        if (Status.IsProcessing())
-            throw new ValidationException(nameof(TestOrder),
-                $"Test orders in a {Status.Value} state can not be set to {TestOrderStatus.ReadyForTesting().Value}.");
-        new ValidationException(nameof(TestOrder),
-                $"A test is required in order to set a test order to {TestOrderStatus.ReadyForTesting().Value}.")
-            .ThrowWhenNullOrEmpty(TestId);
-        new ValidationException(nameof(TestOrder),
-                $"A sample is required in order to set a test order to {TestOrderStatus.ReadyForTesting().Value}.")
-            .ThrowWhenNullOrEmpty(SampleId);
-
-        Status = TestOrderStatus.ReadyForTesting();
-        TatSnapshot = Test.TurnAroundTime;
-        DueDate = dateTimeProvider.DateOnlyUtcNow.AddDays(Test.TurnAroundTime);
-        QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
-        return this;
     }
 
     public TestOrder Cancel(TestOrderCancellationReason reason, string comments)
     {
-        new ValidationException(nameof(TestOrder),
-            $"A comment must be provided detailing why the test order was cancelled.")
-            .ThrowWhenNullOrEmpty(comments);
+        ValidationException.ThrowWhenNullOrWhitespace(comments, 
+            $"A comment must be provided detailing why the test order was cancelled.");
         
         // TODO unit test
-        if (Status.IsFinalState())
-            throw new ValidationException(nameof(TestOrder),
-                $"This test order is already in a final state and can not be cancelled.");
+        ValidationException.MustNot(Status.IsFinalState(), 
+            $"This test order is already in a final state and can not be cancelled.");
         
         Status = TestOrderStatus.Cancelled();
         CancellationReason = reason;
@@ -146,13 +80,28 @@ public class TestOrder : BaseEntity
         return this;
     }
 
+    public TestOrder SetStatusToReadyForTesting()
+    {
+        ValidationException.MustNot(Status.IsProcessing(), 
+            $"Test orders in a {Status.Value} state can not be set to {TestOrderStatus.ReadyForTesting().Value}.");
+
+        ValidationException.MustNot(Sample == null, 
+            $"A sample is required in order to set a test order to {TestOrderStatus.ReadyForTesting().Value}.");
+
+        Status = TestOrderStatus.ReadyForTesting();
+        TatSnapshot = Test.TurnAroundTime;
+        DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(Test.TurnAroundTime));
+        
+        QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
+        return this;
+    }
+
     public TestOrder SetSample(Sample sample)
     {
-        new ValidationException(nameof(Sample), $"Invalid Sample.").ThrowWhenNull(sample);
+        ValidationException.ThrowWhenNull(sample, $"A valid sample must be provided.");
         GuardSampleIfTestOrderIsProcessing();
 
         Sample = sample;
-        SampleId = sample.Id;
         QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
         return this;
     }
@@ -162,7 +111,6 @@ public class TestOrder : BaseEntity
         GuardSampleIfTestOrderIsProcessing();
 
         Sample = null;
-        SampleId = null;
         QueueDomainEvent(new TestOrderUpdated(){ Id = Id });
         return this;
     }
@@ -174,5 +122,7 @@ public class TestOrder : BaseEntity
                 $"The assigned sample can not be updated once a test order has started processing.");
     }
 
+    // Add Prop Methods Marker -- Deleting this comment will cause the add props utility to be incomplete
+    
     protected TestOrder() { } // For EF + Mocking
 }

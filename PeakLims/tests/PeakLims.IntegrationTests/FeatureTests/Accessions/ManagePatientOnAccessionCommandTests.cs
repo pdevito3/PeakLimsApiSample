@@ -5,7 +5,7 @@ using Bogus;
 using Domain.Accessions;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using PeakLims.Domain.Accessions.Features;
 using PeakLims.Domain.Tests.Services;
 using PeakLims.SharedTestHelpers.Fakes.Patient;
@@ -24,31 +24,32 @@ public class ManagePatientOnAccessionCommandTests : TestBase
         _faker = new Faker();
     }
     
-    [Test]
+    [Fact]
     public async Task can_manage_patient()
     {
         // Arrange
-        var patient = FakePatient.Generate(GetService<IDateTimeProvider>());
-        await InsertAsync(patient);
+        var testingServiceScope = new TestingServiceScope();
+        var patient = new FakePatientBuilder().Build();
+        await testingServiceScope.InsertAsync(patient);
         var accession = Accession.Create();
-        await InsertAsync(accession);
+        await testingServiceScope.InsertAsync(accession);
 
         // Act - set
         var command = new SetAccessionPatient.Command(accession.Id, patient.Id);
-        await SendAsync(command);
-        var accessionFromDb = await ExecuteDbContextAsync(db => db.Accessions
+        await testingServiceScope.SendAsync(command);
+        var accessionFromDb = await testingServiceScope.ExecuteDbContextAsync(db => db.Accessions
             .FirstOrDefaultAsync(x => x.Id == accession.Id));
 
         // Assert - set
-        accessionFromDb.PatientId.Should().Be(patient.Id);
+        accessionFromDb.Patient.Id.Should().Be(patient.Id);
 
         // Act - remove
         var removeCommand = new RemoveAccessionPatient.Command(accession.Id);
-        await SendAsync(removeCommand);
-        accessionFromDb = await ExecuteDbContextAsync(db => db.Accessions
+        await testingServiceScope.SendAsync(removeCommand);
+        accessionFromDb = await testingServiceScope.ExecuteDbContextAsync(db => db.Accessions
             .FirstOrDefaultAsync(x => x.Id == accession.Id));
 
         // Assert - remove
-        accessionFromDb.PatientId.Should().BeNull();
+        accessionFromDb.Patient.Should().BeNull();
     }
 }

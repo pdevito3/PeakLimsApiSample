@@ -3,24 +3,24 @@ namespace PeakLims.IntegrationTests.FeatureTests.RolePermissions;
 using PeakLims.SharedTestHelpers.Fakes.RolePermission;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
 using PeakLims.Domain.RolePermissions.Features;
-using static TestFixture;
 using SharedKernel.Exceptions;
 
 public class AddRolePermissionCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_add_new_rolepermission_to_db()
     {
         // Arrange
+        var testingServiceScope = new TestingServiceScope();
         var fakeRolePermissionOne = new FakeRolePermissionForCreationDto().Generate();
 
         // Act
         var command = new AddRolePermission.Command(fakeRolePermissionOne);
-        var rolePermissionReturned = await SendAsync(command);
-        var rolePermissionCreated = await ExecuteDbContextAsync(db => db.RolePermissions
+        var rolePermissionReturned = await testingServiceScope.SendAsync(command);
+        var rolePermissionCreated = await testingServiceScope.ExecuteDbContextAsync(db => db.RolePermissions
             .FirstOrDefaultAsync(r => r.Id == rolePermissionReturned.Id));
 
         // Assert

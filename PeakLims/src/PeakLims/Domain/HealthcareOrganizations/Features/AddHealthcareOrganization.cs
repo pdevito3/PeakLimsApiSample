@@ -3,11 +3,12 @@ namespace PeakLims.Domain.HealthcareOrganizations.Features;
 using PeakLims.Domain.HealthcareOrganizations.Services;
 using PeakLims.Domain.HealthcareOrganizations;
 using PeakLims.Domain.HealthcareOrganizations.Dtos;
+using PeakLims.Domain.HealthcareOrganizations.Models;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class AddHealthcareOrganization
@@ -26,12 +27,10 @@ public static class AddHealthcareOrganization
     {
         private readonly IHealthcareOrganizationRepository _healthcareOrganizationRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IHealthcareOrganizationRepository healthcareOrganizationRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IHealthcareOrganizationRepository healthcareOrganizationRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _healthcareOrganizationRepository = healthcareOrganizationRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
@@ -41,13 +40,13 @@ public static class AddHealthcareOrganization
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddHealthcareOrganizations);
 
-            var healthcareOrganization = HealthcareOrganization.Create(request.HealthcareOrganizationToAdd);
-            await _healthcareOrganizationRepository.Add(healthcareOrganization, cancellationToken);
+            var healthcareOrganizationToAdd = request.HealthcareOrganizationToAdd.ToHealthcareOrganizationForCreation();
+            var healthcareOrganization = HealthcareOrganization.Create(healthcareOrganizationToAdd);
 
+            await _healthcareOrganizationRepository.Add(healthcareOrganization, cancellationToken);
             await _unitOfWork.CommitChanges(cancellationToken);
 
-            var healthcareOrganizationAdded = await _healthcareOrganizationRepository.GetById(healthcareOrganization.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<HealthcareOrganizationDto>(healthcareOrganizationAdded);
+            return healthcareOrganization.ToHealthcareOrganizationDto();
         }
     }
 }

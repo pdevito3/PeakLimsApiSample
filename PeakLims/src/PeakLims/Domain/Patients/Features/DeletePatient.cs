@@ -9,17 +9,17 @@ using MediatR;
 
 public static class DeletePatient
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
 
-        public Command(Guid patient)
+        public Command(Guid id)
         {
-            Id = patient;
+            Id = id;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IPatientRepository _patientRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -32,14 +32,13 @@ public static class DeletePatient
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanDeletePatients);
 
             var recordToDelete = await _patientRepository.GetById(request.Id, cancellationToken: cancellationToken);
-
             _patientRepository.Remove(recordToDelete);
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

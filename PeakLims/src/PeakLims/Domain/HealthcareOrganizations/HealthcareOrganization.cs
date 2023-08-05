@@ -1,69 +1,51 @@
 namespace PeakLims.Domain.HealthcareOrganizations;
 
 using SharedKernel.Exceptions;
-using PeakLims.Domain.HealthcareOrganizations.Dtos;
-using PeakLims.Domain.HealthcareOrganizations.Validators;
+using PeakLims.Domain.HealthcareOrganizationContacts;
+using PeakLims.Domain.Accessions;
+using PeakLims.Domain.HealthcareOrganizations.Models;
 using PeakLims.Domain.HealthcareOrganizations.DomainEvents;
 using FluentValidation;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
-using Addresses;
-using Emails;
 using HealthcareOrganizationStatuses;
-using Sieve.Attributes;
-using PeakLims.Domain.HealthcareOrganizationContacts;
-
 
 public class HealthcareOrganization : BaseEntity
 {
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string Name { get; private set; }
-    public virtual Email Email { get; private set; }
-    public virtual HealthcareOrganizationStatus Status { get; private set; }
-    public virtual Address PrimaryAddress { get; private set; }
+    public string Name { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<HealthcareOrganizationContact> Contacts { get; private set; }
+    public string Email { get; private set; }
+    public HealthcareOrganizationStatus Status { get; private set; }
+
+    public IReadOnlyCollection<Accession> Accessions { get; }
+
+    public IReadOnlyCollection<HealthcareOrganizationContact> HealthcareOrganizationContacts { get; }
+
+    // Add Props Marker -- Deleting this comment will cause the add props utility to be incomplete
 
 
-    public static HealthcareOrganization Create(HealthcareOrganizationForCreationDto healthcareOrganizationForCreationDto)
+    public static HealthcareOrganization Create(HealthcareOrganizationForCreation healthcareOrganizationForCreation)
     {
-        new HealthcareOrganizationForCreationDtoValidator().ValidateAndThrow(healthcareOrganizationForCreationDto);
-
         var newHealthcareOrganization = new HealthcareOrganization();
 
-        newHealthcareOrganization.Name = healthcareOrganizationForCreationDto.Name;
-        newHealthcareOrganization.Email = new Email(healthcareOrganizationForCreationDto.Email);
+        newHealthcareOrganization.Name = healthcareOrganizationForCreation.Name;
+        newHealthcareOrganization.Email = healthcareOrganizationForCreation.Email;
         newHealthcareOrganization.Status = HealthcareOrganizationStatus.Active();
-        newHealthcareOrganization.PrimaryAddress = new Address(healthcareOrganizationForCreationDto.PrimaryAddress.Line1,
-            healthcareOrganizationForCreationDto.PrimaryAddress.Line2,
-            healthcareOrganizationForCreationDto.PrimaryAddress.City,
-            healthcareOrganizationForCreationDto.PrimaryAddress.State,
-            healthcareOrganizationForCreationDto.PrimaryAddress.PostalCode,
-            healthcareOrganizationForCreationDto.PrimaryAddress.Country);
 
         newHealthcareOrganization.QueueDomainEvent(new HealthcareOrganizationCreated(){ HealthcareOrganization = newHealthcareOrganization });
         
         return newHealthcareOrganization;
     }
 
-    public void Update(HealthcareOrganizationForUpdateDto healthcareOrganizationForUpdateDto)
+    public HealthcareOrganization Update(HealthcareOrganizationForUpdate healthcareOrganizationForUpdate)
     {
-        new HealthcareOrganizationForUpdateDtoValidator().ValidateAndThrow(healthcareOrganizationForUpdateDto);
-
-        Name = healthcareOrganizationForUpdateDto.Name;
-        Email = new Email(healthcareOrganizationForUpdateDto.Email);
-        PrimaryAddress = new Address(healthcareOrganizationForUpdateDto.PrimaryAddress.Line1,
-            healthcareOrganizationForUpdateDto.PrimaryAddress.Line2,
-            healthcareOrganizationForUpdateDto.PrimaryAddress.City,
-            healthcareOrganizationForUpdateDto.PrimaryAddress.State,
-            healthcareOrganizationForUpdateDto.PrimaryAddress.PostalCode,
-            healthcareOrganizationForUpdateDto.PrimaryAddress.Country);
+        Name = healthcareOrganizationForUpdate.Name;
+        Email = healthcareOrganizationForUpdate.Email;
 
         QueueDomainEvent(new HealthcareOrganizationUpdated(){ Id = Id });
+        return this;
     }
 
     public HealthcareOrganization Activate()
@@ -85,6 +67,8 @@ public class HealthcareOrganization : BaseEntity
         QueueDomainEvent(new HealthcareOrganizationUpdated(){ Id = Id });
         return this;
     }
+
+    // Add Prop Methods Marker -- Deleting this comment will cause the add props utility to be incomplete
     
     protected HealthcareOrganization() { } // For EF + Mocking
 }

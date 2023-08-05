@@ -1,11 +1,8 @@
 namespace PeakLims.SharedTestHelpers.Fakes.Address;
 
 using AutoBogus;
-using Bogus;
-using Domain.Addresses.Dtos;
-using PeakLims.Domain.HealthcareOrganizations.Dtos;
+using PeakLims.Domain.Addresses.Dtos;
 
-// or replace 'AutoFaker' with 'Faker' along with your own rules if you don't want all fields to be auto faked
 public sealed class FakeAddressForCreationDto : AutoFaker<AddressForCreationDto>
 {
     public FakeAddressForCreationDto()

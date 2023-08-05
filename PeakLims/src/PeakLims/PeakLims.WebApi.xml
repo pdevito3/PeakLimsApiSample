@@ -8,892 +8,306 @@
             <summary>
             Gets a single AccessionComment by ID.
             </summary>
-            <response code="200">AccessionComment record returned successfully.</response>
-            <response code="400">AccessionComment has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the AccessionComment.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.AccessionCommentsController.AddAccessionComment(PeakLims.Domain.AccessionComments.Dtos.AccessionCommentForCreationDto)">
             <summary>
             Creates a new AccessionComment record.
             </summary>
-            <response code="201">AccessionComment created.</response>
-            <response code="400">AccessionComment has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the AccessionComment.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.AccessionCommentsController.UpdateAccessionComment(System.Guid,PeakLims.Domain.AccessionComments.Dtos.AccessionCommentForUpdateDto)">
             <summary>
             Updates an entire existing AccessionComment.
             </summary>
-            <response code="204">AccessionComment updated.</response>
-            <response code="400">AccessionComment has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the AccessionComment.</response>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.AccessionCommentsController.DeleteAccessionComment(System.Guid)">
+            <summary>
+            Deletes an existing AccessionComment record.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.AccessionsController.GetAccessions(PeakLims.Domain.Accessions.Dtos.AccessionParametersDto)">
-             <summary>
-             Gets a list of all Accessions.
-             </summary>
-             <response code="200">Accession list returned successfully.</response>
-             <response code="400">Accession has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the Accession.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all Accessions.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.AccessionsController.GetAccession(System.Guid)">
             <summary>
             Gets a single Accession by ID.
             </summary>
-            <response code="200">Accession record returned successfully.</response>
-            <response code="400">Accession has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Accession.</response>
         </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.AddAccession(PeakLims.Domain.Accessions.Dtos.AccessionForCreationDto)">
+        <member name="M:PeakLims.Controllers.v1.AccessionsController.AddAccession">
             <summary>
             Creates a new Accession record.
             </summary>
-            <response code="201">Accession created.</response>
-            <response code="400">Accession has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Accession.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.SetOrganizationOnAccession(System.Guid,System.Guid)">
-            <summary>
-            Sets the healthcare organization on an accession.
-            </summary>
-            <response code="204">Accession updated.</response>
-            <response code="400">Accession has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while updating the Accession.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.RemoveOrganizationOnAccession(System.Guid)">
-            <summary>
-            Removes the healthcare organization on an accession.
-            </summary>
-            <response code="204">Accession updated.</response>
-            <response code="400">Accession has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while updating the Accession.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.SetPatientOnAccession(System.Guid,System.Guid)">
-            <summary>
-            Sets the patient on an accession.
-            </summary>
-            <response code="204">Accession updated.</response>
-            <response code="400">Accession has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while updating the Accession.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.RemovePatientOnAccession(System.Guid)">
-            <summary>
-            Removes the patient on an accession.
-            </summary>
-            <response code="204">Accession updated.</response>
-            <response code="400">Accession has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while updating the Accession.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.AccessionsController.DeleteAccession(System.Guid)">
             <summary>
             Deletes an existing Accession record.
             </summary>
-            <response code="204">Accession deleted.</response>
-            <response code="400">Accession has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Accession.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.SetAccessionStatusToReadyForTesting(System.Guid)">
-            <summary>
-            Sets an accession status to `Ready for Testing`
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.AddTestToAccession(System.Guid,System.Guid)">
-            <summary>
-            Adds a test to an accession
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.AddPanelToAccession(System.Guid,System.Guid)">
-            <summary>
-            Adds a panel to an accession
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.RemoveTestOrderFromAccession(System.Guid,System.Guid)">
-            <summary>
-            Removes a test order from an accession
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.AccessionsController.RemovePanelFromAccession(System.Guid,System.Guid)">
-            <summary>
-            Removes a panel and all it's associated tests from an accession
-            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.ContainersController.GetContainers(PeakLims.Domain.Containers.Dtos.ContainerParametersDto)">
-             <summary>
-             Gets a list of all Containers.
-             </summary>
-             <response code="200">Container list returned successfully.</response>
-             <response code="400">Container has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the Container.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all Containers.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.ContainersController.GetContainer(System.Guid)">
             <summary>
             Gets a single Container by ID.
             </summary>
-            <response code="200">Container record returned successfully.</response>
-            <response code="400">Container has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Container.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.ContainersController.AddContainer(PeakLims.Domain.Containers.Dtos.ContainerForCreationDto)">
             <summary>
             Creates a new Container record.
             </summary>
-            <response code="201">Container created.</response>
-            <response code="400">Container has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Container.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.ContainersController.UpdateContainer(System.Guid,PeakLims.Domain.Containers.Dtos.ContainerForUpdateDto)">
             <summary>
             Updates an entire existing Container.
             </summary>
-            <response code="204">Container updated.</response>
-            <response code="400">Container has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Container.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.ContainersController.DeleteContainer(System.Guid)">
             <summary>
             Deletes an existing Container record.
             </summary>
-            <response code="204">Container deleted.</response>
-            <response code="400">Container has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Container.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationContactsController.GetHealthcareOrganizationContacts(PeakLims.Domain.HealthcareOrganizationContacts.Dtos.HealthcareOrganizationContactParametersDto)">
-             <summary>
-             Gets a list of all HealthcareOrganizationContacts.
-             </summary>
-             <response code="200">HealthcareOrganizationContact list returned successfully.</response>
-             <response code="400">HealthcareOrganizationContact has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the HealthcareOrganizationContact.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all HealthcareOrganizationContacts.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationContactsController.GetHealthcareOrganizationContact(System.Guid)">
             <summary>
             Gets a single HealthcareOrganizationContact by ID.
             </summary>
-            <response code="200">HealthcareOrganizationContact record returned successfully.</response>
-            <response code="400">HealthcareOrganizationContact has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the HealthcareOrganizationContact.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationContactsController.AddHealthcareOrganizationContact(PeakLims.Domain.HealthcareOrganizationContacts.Dtos.HealthcareOrganizationContactForCreationDto)">
             <summary>
             Creates a new HealthcareOrganizationContact record.
             </summary>
-            <response code="201">HealthcareOrganizationContact created.</response>
-            <response code="400">HealthcareOrganizationContact has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the HealthcareOrganizationContact.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationContactsController.UpdateHealthcareOrganizationContact(System.Guid,PeakLims.Domain.HealthcareOrganizationContacts.Dtos.HealthcareOrganizationContactForUpdateDto)">
             <summary>
             Updates an entire existing HealthcareOrganizationContact.
             </summary>
-            <response code="204">HealthcareOrganizationContact updated.</response>
-            <response code="400">HealthcareOrganizationContact has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the HealthcareOrganizationContact.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationContactsController.DeleteHealthcareOrganizationContact(System.Guid)">
             <summary>
             Deletes an existing HealthcareOrganizationContact record.
             </summary>
-            <response code="204">HealthcareOrganizationContact deleted.</response>
-            <response code="400">HealthcareOrganizationContact has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the HealthcareOrganizationContact.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationsController.GetHealthcareOrganizations(PeakLims.Domain.HealthcareOrganizations.Dtos.HealthcareOrganizationParametersDto)">
-             <summary>
-             Gets a list of all HealthcareOrganizations.
-             </summary>
-             <response code="200">HealthcareOrganization list returned successfully.</response>
-             <response code="400">HealthcareOrganization has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the HealthcareOrganization.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all HealthcareOrganizations.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationsController.GetHealthcareOrganization(System.Guid)">
             <summary>
             Gets a single HealthcareOrganization by ID.
             </summary>
-            <response code="200">HealthcareOrganization record returned successfully.</response>
-            <response code="400">HealthcareOrganization has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the HealthcareOrganization.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationsController.AddHealthcareOrganization(PeakLims.Domain.HealthcareOrganizations.Dtos.HealthcareOrganizationForCreationDto)">
             <summary>
             Creates a new HealthcareOrganization record.
             </summary>
-            <response code="201">HealthcareOrganization created.</response>
-            <response code="400">HealthcareOrganization has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the HealthcareOrganization.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationsController.UpdateHealthcareOrganization(System.Guid,PeakLims.Domain.HealthcareOrganizations.Dtos.HealthcareOrganizationForUpdateDto)">
             <summary>
             Updates an entire existing HealthcareOrganization.
             </summary>
-            <response code="204">HealthcareOrganization updated.</response>
-            <response code="400">HealthcareOrganization has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the HealthcareOrganization.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationsController.DeleteHealthcareOrganization(System.Guid)">
             <summary>
             Deletes an existing HealthcareOrganization record.
             </summary>
-            <response code="204">HealthcareOrganization deleted.</response>
-            <response code="400">HealthcareOrganization has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the HealthcareOrganization.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationsController.SetHealthcareOrganizationStatusToActive(System.Guid)">
-            <summary>
-            Sets a Healthcare Organization status to `Active`
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.HealthcareOrganizationsController.SetHealthcareOrganizationStatusToInactive(System.Guid)">
-            <summary>
-            Sets a Healthcare Organization status to `Inactive`
-            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.PanelsController.GetPanels(PeakLims.Domain.Panels.Dtos.PanelParametersDto)">
-             <summary>
-             Gets a list of all Panels.
-             </summary>
-             <response code="200">Panel list returned successfully.</response>
-             <response code="400">Panel has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the Panel.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all Panels.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.PanelsController.GetPanel(System.Guid)">
             <summary>
             Gets a single Panel by ID.
             </summary>
-            <response code="200">Panel record returned successfully.</response>
-            <response code="400">Panel has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Panel.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.PanelsController.AddPanel(PeakLims.Domain.Panels.Dtos.PanelForCreationDto)">
             <summary>
             Creates a new Panel record.
             </summary>
-            <response code="201">Panel created.</response>
-            <response code="400">Panel has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Panel.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.PanelsController.UpdatePanel(System.Guid,PeakLims.Domain.Panels.Dtos.PanelForUpdateDto)">
             <summary>
             Updates an entire existing Panel.
             </summary>
-            <response code="204">Panel updated.</response>
-            <response code="400">Panel has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Panel.</response>
         </member>
-        <member name="M:PeakLims.Controllers.v1.PanelsController.AddTestToPanel(System.Guid,System.Guid)">
+        <member name="M:PeakLims.Controllers.v1.PanelsController.DeletePanel(System.Guid)">
             <summary>
-            Adds a test to a panel
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.PanelsController.RemoveTestFromPanel(System.Guid,System.Guid)">
-            <summary>
-            Removes a test from a panel
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.PanelsController.SetPanelStatusToActive(System.Guid)">
-            <summary>
-            Sets panel status to `Active`
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.PanelsController.SetPanelStatusToInactive(System.Guid)">
-            <summary>
-            Sets panel status to `Inactive`
+            Deletes an existing Panel record.
             </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.PatientsController.GetPatients(PeakLims.Domain.Patients.Dtos.PatientParametersDto)">
-             <summary>
-             Gets a list of all Patients.
-             </summary>
-             <response code="200">Patient list returned successfully.</response>
-             <response code="400">Patient has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the Patient.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all Patients.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.PatientsController.GetPatient(System.Guid)">
             <summary>
             Gets a single Patient by ID.
             </summary>
-            <response code="200">Patient record returned successfully.</response>
-            <response code="400">Patient has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Patient.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.PatientsController.AddPatient(PeakLims.Domain.Patients.Dtos.PatientForCreationDto)">
             <summary>
             Creates a new Patient record.
             </summary>
-            <response code="201">Patient created.</response>
-            <response code="400">Patient has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Patient.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.PatientsController.UpdatePatient(System.Guid,PeakLims.Domain.Patients.Dtos.PatientForUpdateDto)">
             <summary>
             Updates an entire existing Patient.
             </summary>
-            <response code="204">Patient updated.</response>
-            <response code="400">Patient has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Patient.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.PatientsController.DeletePatient(System.Guid)">
             <summary>
             Deletes an existing Patient record.
             </summary>
-            <response code="204">Patient deleted.</response>
-            <response code="400">Patient has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Patient.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.PermissionsController.GetPermissions">
             <summary>
             Gets a list of all available permissions.
             </summary>
-            <response code="200">List retrieved.</response>
-            <response code="500">There was an error getting the list of permissions.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.PermissionsController.GetAssignedPermissions">
             <summary>
             Gets a list of the current user's assigned permissions.
             </summary>
-            <response code="200">List retrieved.</response>
-            <response code="500">There was an error getting the list of permissions.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.RolePermissionsController.GetRolePermissions(PeakLims.Domain.RolePermissions.Dtos.RolePermissionParametersDto)">
-             <summary>
-             Gets a list of all RolePermissions.
-             </summary>
-             <response code="200">RolePermission list returned successfully.</response>
-             <response code="400">RolePermission has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the RolePermission.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all RolePermissions.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.RolePermissionsController.GetRolePermission(System.Guid)">
             <summary>
             Gets a single RolePermission by ID.
             </summary>
-            <response code="200">RolePermission record returned successfully.</response>
-            <response code="400">RolePermission has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the RolePermission.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.RolePermissionsController.AddRolePermission(PeakLims.Domain.RolePermissions.Dtos.RolePermissionForCreationDto)">
             <summary>
             Creates a new RolePermission record.
             </summary>
-            <response code="201">RolePermission created.</response>
-            <response code="400">RolePermission has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the RolePermission.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.RolePermissionsController.UpdateRolePermission(System.Guid,PeakLims.Domain.RolePermissions.Dtos.RolePermissionForUpdateDto)">
             <summary>
             Updates an entire existing RolePermission.
             </summary>
-            <response code="204">RolePermission updated.</response>
-            <response code="400">RolePermission has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the RolePermission.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.RolePermissionsController.DeleteRolePermission(System.Guid)">
             <summary>
             Deletes an existing RolePermission record.
             </summary>
-            <response code="204">RolePermission deleted.</response>
-            <response code="400">RolePermission has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the RolePermission.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.RolesController.GetRoles">
             <summary>
             Gets a list of all available roles.
             </summary>
-            <response code="200">List retrieved.</response>
-            <response code="500">There was an error getting the list of roles.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.SamplesController.GetSamples(PeakLims.Domain.Samples.Dtos.SampleParametersDto)">
-             <summary>
-             Gets a list of all Samples.
-             </summary>
-             <response code="200">Sample list returned successfully.</response>
-             <response code="400">Sample has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the Sample.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all Samples.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.SamplesController.GetSample(System.Guid)">
             <summary>
             Gets a single Sample by ID.
             </summary>
-            <response code="200">Sample record returned successfully.</response>
-            <response code="400">Sample has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Sample.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.SamplesController.AddSample(PeakLims.Domain.Samples.Dtos.SampleForCreationDto)">
             <summary>
             Creates a new Sample record.
             </summary>
-            <response code="201">Sample created.</response>
-            <response code="400">Sample has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Sample.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.SamplesController.UpdateSample(System.Guid,PeakLims.Domain.Samples.Dtos.SampleForUpdateDto)">
             <summary>
             Updates an entire existing Sample.
             </summary>
-            <response code="204">Sample updated.</response>
-            <response code="400">Sample has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Sample.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.SamplesController.DeleteSample(System.Guid)">
             <summary>
             Deletes an existing Sample record.
             </summary>
-            <response code="204">Sample deleted.</response>
-            <response code="400">Sample has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Sample.</response>
+        </member>
+        <member name="M:PeakLims.Controllers.v1.TestOrdersController.GetTestOrders(PeakLims.Domain.TestOrders.Dtos.TestOrderParametersDto)">
+            <summary>
+            Gets a list of all TestOrders.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.TestOrdersController.GetTestOrder(System.Guid)">
             <summary>
-            Gets a single Test Order by ID.
-            </summary>
-            <response code="200">Test Order record returned successfully.</response>
-            <response code="400">Test Order has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while getting the Test Order.</response>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.TestOrdersController.CancelTestOrder(System.Guid,PeakLims.Domain.TestOrders.Dtos.CancelTestOrderDto)">
-            <summary>
-            Cancels a test order
+            Gets a single TestOrder by ID.
             </summary>
         </member>
-        <member name="M:PeakLims.Controllers.v1.TestOrdersController.SetSampleOnTestOrder(System.Guid,System.Guid)">
+        <member name="M:PeakLims.Controllers.v1.TestOrdersController.AddTestOrder(PeakLims.Domain.TestOrders.Dtos.TestOrderForCreationDto)">
             <summary>
-            Sets a given sample on a test order
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.TestOrdersController.RemoveSampleOnTestOrder(System.Guid)">
-            <summary>
-            Removes the sample a test order when present
+            Creates a new TestOrder record.
             </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.TestsController.GetTests(PeakLims.Domain.Tests.Dtos.TestParametersDto)">
-             <summary>
-             Gets a list of all Tests.
-             </summary>
-             <response code="200">Test list returned successfully.</response>
-             <response code="400">Test has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the Test.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all Tests.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.TestsController.GetTest(System.Guid)">
             <summary>
             Gets a single Test by ID.
             </summary>
-            <response code="200">Test record returned successfully.</response>
-            <response code="400">Test has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Test.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.TestsController.AddTest(PeakLims.Domain.Tests.Dtos.TestForCreationDto)">
             <summary>
             Creates a new Test record.
             </summary>
-            <response code="201">Test created.</response>
-            <response code="400">Test has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Test.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.TestsController.UpdateTest(System.Guid,PeakLims.Domain.Tests.Dtos.TestForUpdateDto)">
             <summary>
             Updates an entire existing Test.
             </summary>
-            <response code="204">Test updated.</response>
-            <response code="400">Test has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the Test.</response>
         </member>
-        <member name="M:PeakLims.Controllers.v1.TestsController.SetTestStatusToActive(System.Guid)">
+        <member name="M:PeakLims.Controllers.v1.TestsController.DeleteTest(System.Guid)">
             <summary>
-            Sets test status to `Active`
-            </summary>
-        </member>
-        <member name="M:PeakLims.Controllers.v1.TestsController.SetTestStatusToInactive(System.Guid)">
-            <summary>
-            Sets test status to `Inactive`
+            Deletes an existing Test record.
             </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.UsersController.AddRole(System.Guid,System.String)">
             <summary>
             Adds a new role to a user.
             </summary>
-            <response code="204">Role added.</response>
-            <response code="400">Request has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while adding the role.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.UsersController.RemoveRole(System.Guid,System.String)">
             <summary>
             Removes a role from a User
             </summary>
-            <response code="204">Role removed.</response>
-            <response code="400">Request has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while removing the UserRole.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.UsersController.GetUsers(PeakLims.Domain.Users.Dtos.UserParametersDto)">
-             <summary>
-             Gets a list of all Users.
-             </summary>
-             <response code="200">User list returned successfully.</response>
-             <response code="400">User has missing/invalid values.</response>
-             <response code="401">This request was not able to be authenticated.</response>
-             <response code="403">The required permissions to access this resource were not present in the given request.</response>
-             <response code="500">There was an error on the server while creating the User.</response>
-             <remarks>
-             Requests can be narrowed down with a variety of query string values:
-             ## Query String Parameters
-             - **PageNumber**: An integer value that designates the page of records that should be returned.
-             - **PageSize**: An integer value that designates the number of records returned on the given page that you would like to return. This value is capped by the internal MaxPageSize.
-             - **SortOrder**: A comma delimited ordered list of property names to sort by. Adding a `-` before the name switches to sorting descendingly.
-             - **Filters**: A comma delimited list of fields to filter by formatted as `{Name}{Operator}{Value}` where
-                 - {Name} is the name of a filterable property. You can also have multiple names (for OR logic) by enclosing them in brackets and using a pipe delimiter, eg. `(LikeCount|CommentCount)>10` asks if LikeCount or CommentCount is >10
-                 - {Operator} is one of the Operators below
-                 - {Value} is the value to use for filtering. You can also have multiple values (for OR logic) by using a pipe delimiter, eg.`Title@= new|hot` will return posts with titles that contain the text "new" or "hot"
-            
-                | Operator | Meaning                       | Operator  | Meaning                                      |
-                | -------- | ----------------------------- | --------- | -------------------------------------------- |
-                | `==`     | Equals                        |  `!@=`    | Does not Contains                            |
-                | `!=`     | Not equals                    |  `!_=`    | Does not Starts with                         |
-                | `>`      | Greater than                  |  `@=*`    | Case-insensitive string Contains             |
-                | `&lt;`   | Less than                     |  `_=*`    | Case-insensitive string Starts with          |
-                | `>=`     | Greater than or equal to      |  `==*`    | Case-insensitive string Equals               |
-                | `&lt;=`  | Less than or equal to         |  `!=*`    | Case-insensitive string Not equals           |
-                | `@=`     | Contains                      |  `!@=*`   | Case-insensitive string does not Contains    |
-                | `_=`     | Starts with                   |  `!_=*`   | Case-insensitive string does not Starts with |
-             </remarks>
+            <summary>
+            Gets a list of all Users.
+            </summary>
         </member>
         <member name="M:PeakLims.Controllers.v1.UsersController.GetUser(System.Guid)">
             <summary>
             Gets a single User by ID.
             </summary>
-            <response code="200">User record returned successfully.</response>
-            <response code="400">User has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the User.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.UsersController.AddUser(PeakLims.Domain.Users.Dtos.UserForCreationDto)">
             <summary>
             Creates a new User record.
             </summary>
-            <response code="201">User created.</response>
-            <response code="400">User has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the User.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.UsersController.UpdateUser(System.Guid,PeakLims.Domain.Users.Dtos.UserForUpdateDto)">
             <summary>
             Updates an entire existing User.
             </summary>
-            <response code="204">User updated.</response>
-            <response code="400">User has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the User.</response>
         </member>
         <member name="M:PeakLims.Controllers.v1.UsersController.DeleteUser(System.Guid)">
             <summary>
             Deletes an existing User record.
             </summary>
-            <response code="204">User deleted.</response>
-            <response code="400">User has missing/invalid values.</response>
-            <response code="401">This request was not able to be authenticated.</response>
-            <response code="403">The required permissions to access this resource were not present in the given request.</response>
-            <response code="500">There was an error on the server while creating the User.</response>
         </member>
         <member name="M:PeakLims.Databases.EntityConfigurations.AccessionCommentConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{PeakLims.Domain.AccessionComments.AccessionComment})">
             <summary>
@@ -994,6 +408,66 @@
             <summary>
             Registers all services in the assembly of the given interface.
             </summary>
+        </member>
+        <member name="T:PeakLims.Migrations.InitialMigration">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.InitialMigration.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.InitialMigration.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.InitialMigration.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:PeakLims.Migrations.UpdateLifespanAge">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.UpdateLifespanAge.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.UpdateLifespanAge.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.UpdateLifespanAge.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:PeakLims.Migrations.AddDbSequencesForSamplePatientAndAccession">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.AddDbSequencesForSamplePatientAndAccession.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.AddDbSequencesForSamplePatientAndAccession.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.AddDbSequencesForSamplePatientAndAccession.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:PeakLims.Migrations.TestOrderCleanup">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.TestOrderCleanup.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.TestOrderCleanup.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.TestOrderCleanup.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:PeakLims.Migrations.AddOrgStatus">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.AddOrgStatus.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.AddOrgStatus.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PeakLims.Migrations.AddOrgStatus.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
         </member>
     </members>
 </doc>

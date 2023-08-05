@@ -15,24 +15,22 @@ public static class Permissions
     public const string CanReadHealthcareOrganizations = nameof(CanReadHealthcareOrganizations);
     public const string CanActivateHealthcareOrganizations = nameof(CanActivateHealthcareOrganizations);
     public const string CanDeactivateHealthcareOrganizations = nameof(CanDeactivateHealthcareOrganizations);
-    public const string CanActivateTests = nameof(CanActivateTests);
-    public const string CanDeactivateTests = nameof(CanDeactivateTests);
+    public const string CanDeleteTests = nameof(CanDeleteTests);
     public const string CanUpdateTests = nameof(CanUpdateTests);
     public const string CanAddTests = nameof(CanAddTests);
     public const string CanReadTests = nameof(CanReadTests);
+    public const string CanDeletePanels = nameof(CanDeletePanels);
     public const string CanUpdatePanels = nameof(CanUpdatePanels);
     public const string CanAddPanels = nameof(CanAddPanels);
     public const string CanReadPanels = nameof(CanReadPanels);
     public const string CanActivatePanels = nameof(CanActivatePanels);
     public const string CanDeactivatePanels = nameof(CanDeactivatePanels);
-    public const string CanDeleteTestOrders = nameof(CanDeleteTestOrders);
-    public const string CanAddTestToPanel = nameof(CanAddTestToPanel);
-    public const string CanRemoveTestFromPanel = nameof(CanRemoveTestFromPanel);
-    public const string CanAddTestToAccessions = nameof(CanAddTestToAccessions);
-    public const string CanReadTestOrders = nameof(CanReadTestOrders);
     public const string CanCancelTestOrders = nameof(CanCancelTestOrders);
-    public const string CanRemovePanelOrders = nameof(CanRemovePanelOrders);
-    public const string CanAddPanelToAccession = nameof(CanAddPanelToAccession);
+    public const string CanRemoveTestFromPanel = nameof(CanRemoveTestFromPanel);
+    public const string CanAddTestToPanel = nameof(CanAddTestToPanel);
+    public const string CanAddTestToAccessions = nameof(CanAddTestToAccessions);
+    public const string CanAddTestOrders = nameof(CanAddTestOrders);
+    public const string CanReadTestOrders = nameof(CanReadTestOrders);
     public const string CanDeleteContainers = nameof(CanDeleteContainers);
     public const string CanUpdateContainers = nameof(CanUpdateContainers);
     public const string CanAddContainers = nameof(CanAddContainers);
@@ -49,7 +47,6 @@ public static class Permissions
     public const string CanUpdateAccessions = nameof(CanUpdateAccessions);
     public const string CanAddAccessions = nameof(CanAddAccessions);
     public const string CanReadAccessions = nameof(CanReadAccessions);
-    public const string CanSetAccessionStatusToReadyForTesting = nameof(CanSetAccessionStatusToReadyForTesting);
     public const string CanDeletePatients = nameof(CanDeletePatients);
     public const string CanUpdatePatients = nameof(CanUpdatePatients);
     public const string CanAddPatients = nameof(CanAddPatients);
@@ -68,7 +65,13 @@ public static class Permissions
     public const string CanGetPermissions = nameof(CanGetPermissions);
     public const string CanSetSampleOnTestOrder = nameof(CanSetSampleOnTestOrder);
     public const string CanRemoveSampleOnTestOrder = nameof(CanRemoveSampleOnTestOrder);
-
+    public const string CanActivateTests = nameof(CanActivateTests);
+    public const string CanDeactivateTests = nameof(CanDeactivateTests);
+    public const string CanAddPanelToAccession = nameof(CanAddPanelToAccession);
+    public const string CanSetAccessionStatusToReadyForTesting = nameof(CanSetAccessionStatusToReadyForTesting);
+    public const string CanDeleteTestOrders = nameof(CanDeleteTestOrders);
+    public const string CanRemovePanelOrders = nameof(CanRemovePanelOrders);
+    
     public static List<string> List()
     {
         return typeof(Permissions)

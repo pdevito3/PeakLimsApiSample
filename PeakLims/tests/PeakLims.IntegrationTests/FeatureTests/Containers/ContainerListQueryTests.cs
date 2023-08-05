@@ -5,28 +5,45 @@ using PeakLims.SharedTestHelpers.Fakes.Container;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.Containers.Features;
 using FluentAssertions;
-using NUnit.Framework;
+using Domain;
+using Xunit;
 using System.Threading.Tasks;
-using static TestFixture;
 
 public class ContainerListQueryTests : TestBase
 {
     
-    [Test]
+    [Fact]
     public async Task can_get_container_list()
     {
         // Arrange
-        var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
-        var fakeContainerTwo = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
+        var testingServiceScope = new TestingServiceScope();
+        var fakeContainerOne = new FakeContainerBuilder().Build();
+        var fakeContainerTwo = new FakeContainerBuilder().Build();
         var queryParameters = new ContainerParametersDto();
 
-        await InsertAsync(fakeContainerOne, fakeContainerTwo);
+        await testingServiceScope.InsertAsync(fakeContainerOne, fakeContainerTwo);
 
         // Act
         var query = new GetContainerList.Query(queryParameters);
-        var containers = await SendAsync(query);
+        var containers = await testingServiceScope.SendAsync(query);
 
         // Assert
         containers.Count.Should().BeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanReadContainers);
+        var queryParameters = new ContainerParametersDto();
+
+        // Act
+        var command = new GetContainerList.Query(queryParameters);
+        Func<Task> act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

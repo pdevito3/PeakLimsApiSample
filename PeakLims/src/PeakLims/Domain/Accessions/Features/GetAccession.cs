@@ -5,7 +5,7 @@ using PeakLims.Domain.Accessions.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetAccession
@@ -23,12 +23,10 @@ public static class GetAccession
     public sealed class Handler : IRequestHandler<Query, AccessionDto>
     {
         private readonly IAccessionRepository _accessionRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IAccessionRepository accessionRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IAccessionRepository accessionRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _accessionRepository = accessionRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetAccession
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadAccessions);
 
             var result = await _accessionRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<AccessionDto>(result);
+            return result.ToAccessionDto();
         }
     }
 }

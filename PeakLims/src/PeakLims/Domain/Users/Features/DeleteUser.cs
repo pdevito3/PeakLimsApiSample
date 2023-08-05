@@ -9,17 +9,17 @@ using MediatR;
 
 public static class DeleteUser
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
 
-        public Command(Guid user)
+        public Command(Guid id)
         {
-            Id = user;
+            Id = id;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -32,14 +32,13 @@ public static class DeleteUser
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanDeleteUsers);
 
             var recordToDelete = await _userRepository.GetById(request.Id, cancellationToken: cancellationToken);
-
             _userRepository.Remove(recordToDelete);
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

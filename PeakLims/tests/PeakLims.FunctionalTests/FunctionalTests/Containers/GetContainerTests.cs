@@ -5,57 +5,53 @@ using PeakLims.FunctionalTests.TestUtilities;
 using PeakLims.Domain;
 using SharedKernel.Domain;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 using System.Net;
 using System.Threading.Tasks;
 
 public class GetContainerTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task get_container_returns_success_when_entity_exists_using_valid_auth_credentials()
     {
         // Arrange
-        var fakeContainer = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
+        var fakeContainer = new FakeContainerBuilder().Build();
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);
         await InsertAsync(fakeContainer);
 
         // Act
-        var route = ApiRoutes.Containers.GetRecord.Replace(ApiRoutes.Containers.Id, fakeContainer.Id.ToString());
+        var route = ApiRoutes.Containers.GetRecord(fakeContainer.Id);
         var result = await FactoryClient.GetRequestAsync(route);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.OK);
     }
             
-    [Test]
+    [Fact]
     public async Task get_container_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeContainer = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
-
-        await InsertAsync(fakeContainer);
+        var fakeContainer = new FakeContainerBuilder().Build();
 
         // Act
-        var route = ApiRoutes.Containers.GetRecord.Replace(ApiRoutes.Containers.Id, fakeContainer.Id.ToString());
+        var route = ApiRoutes.Containers.GetRecord(fakeContainer.Id);
         var result = await FactoryClient.GetRequestAsync(route);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
             
-    [Test]
+    [Fact]
     public async Task get_container_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeContainer = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
+        var fakeContainer = new FakeContainerBuilder().Build();
         FactoryClient.AddAuth();
 
-        await InsertAsync(fakeContainer);
-
         // Act
-        var route = ApiRoutes.Containers.GetRecord.Replace(ApiRoutes.Containers.Id, fakeContainer.Id.ToString());
+        var route = ApiRoutes.Containers.GetRecord(fakeContainer.Id);
         var result = await FactoryClient.GetRequestAsync(route);
 
         // Assert

@@ -4,14 +4,15 @@ using PeakLims.Domain.Patients.Dtos;
 using PeakLims.Domain.Patients.Services;
 using PeakLims.Wrappers;
 using SharedKernel.Exceptions;
+using PeakLims.Resources;
+using PeakLims.Services;
 using PeakLims.Domain;
 using HeimGuard;
-using Microsoft.EntityFrameworkCore;
-using MapsterMapper;
-using Mapster;
+using Mappings;
 using MediatR;
-using Sieve.Models;
-using Sieve.Services;
+using Microsoft.EntityFrameworkCore;
+using QueryKit;
+using QueryKit.Configuration;
 
 public static class GetPatientList
 {
@@ -28,33 +29,29 @@ public static class GetPatientList
     public sealed class Handler : IRequestHandler<Query, PagedList<PatientDto>>
     {
         private readonly IPatientRepository _patientRepository;
-        private readonly SieveProcessor _sieveProcessor;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IPatientRepository patientRepository, IMapper mapper, SieveProcessor sieveProcessor, IHeimGuardClient heimGuard)
+        public Handler(IPatientRepository patientRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _patientRepository = patientRepository;
-            _sieveProcessor = sieveProcessor;
             _heimGuard = heimGuard;
         }
 
         public async Task<PagedList<PatientDto>> Handle(Query request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadPatients);
-
-            var collection = _patientRepository.Query().AsNoTracking();
-
-            var sieveModel = new SieveModel
+            
+            var queryKitConfig = new CustomQueryKitConfiguration();
+            var queryKitData = new QueryKitData()
             {
-                Sorts = request.QueryParameters.SortOrder ?? "-CreatedOn",
-                Filters = request.QueryParameters.Filters
+                Filters = request.QueryParameters.Filters,
+                SortOrder = request.QueryParameters.SortOrder ?? "-CreatedOn",
+                Configuration = queryKitConfig
             };
 
-            var appliedCollection = _sieveProcessor.Apply(sieveModel, collection);
-            var dtoCollection = appliedCollection
-                .ProjectToType<PatientDto>();
+            var collection = _patientRepository.Query().AsNoTracking();
+            var appliedCollection = collection.ApplyQueryKit(queryKitData);
+            var dtoCollection = appliedCollection.ToPatientDtoQueryable();
 
             return await PagedList<PatientDto>.CreateAsync(dtoCollection,
                 request.QueryParameters.PageNumber,

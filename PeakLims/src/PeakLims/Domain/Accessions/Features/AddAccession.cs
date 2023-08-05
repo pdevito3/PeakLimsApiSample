@@ -8,7 +8,7 @@ using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 using Patients.Services;
 
@@ -32,12 +32,10 @@ public static class AddAccession
         private readonly IPatientRepository _patientRepository;
         private readonly IHealthcareOrganizationRepository _healthcareOrganizationRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IAccessionRepository accessionRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard, IPatientRepository patientRepository, IHealthcareOrganizationRepository healthcareOrganizationRepository)
+        public Handler(IAccessionRepository accessionRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard, IPatientRepository patientRepository, IHealthcareOrganizationRepository healthcareOrganizationRepository)
         {
-            _mapper = mapper;
             _accessionRepository = accessionRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
@@ -67,8 +65,7 @@ public static class AddAccession
 
             await _unitOfWork.CommitChanges(cancellationToken);
 
-            var accessionAdded = await _accessionRepository.GetById(accession.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<AccessionDto>(accessionAdded);
+            return accession.ToAccessionDto();
         }
     }
 }

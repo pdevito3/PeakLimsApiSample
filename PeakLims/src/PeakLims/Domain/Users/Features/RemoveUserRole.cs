@@ -11,7 +11,7 @@ using Roles;
 
 public static class RemoveUserRole
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid UserId;
         public readonly string Role;
@@ -23,7 +23,7 @@ public static class RemoveUserRole
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -36,7 +36,7 @@ public static class RemoveUserRole
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanRemoveUserRoles);
             var user = await _userRepository.GetById(request.UserId, true, cancellationToken);
@@ -45,8 +45,6 @@ public static class RemoveUserRole
             _userRepository.RemoveRole(roleToRemove);
             _userRepository.Update(user);
             await _unitOfWork.CommitChanges(cancellationToken);
-
-            return true;
         }
     }
 }

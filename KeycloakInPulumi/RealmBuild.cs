@@ -43,7 +43,7 @@ class RealmBuild : Stack
             "peak_lims.swagger", 
             "9bbea418-bed9-4f32-8e5f-12a11d389559", 
             "PeakLims Swagger",
-            "https://localhost:6247",
+            "https://localhost:5227",
             redirectUris: null,
             webOrigins: null
             );
@@ -54,15 +54,15 @@ class RealmBuild : Stack
             "peak_lims.next", 
             "063c2754-b258-47a4-92bc-22a609e7ca13", 
             "PeakLims Next",
-            "http://localhost:8811",
+            "http://localhost:6488",
             redirectUris: new InputList<string>() 
                 {
-                "http://localhost:8811/*",
+                "http://localhost:6488/*",
                 },
             webOrigins: new InputList<string>() 
                 {
-                "https://localhost:6247",
-                "http://localhost:8811",
+                "https://localhost:5227",
+                "http://localhost:6488",
                 }
             );
         peakLimsNextClient.ExtendDefaultScopes(peaklimsScope.Name);

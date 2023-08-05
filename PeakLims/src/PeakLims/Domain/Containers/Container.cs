@@ -1,8 +1,8 @@
 namespace PeakLims.Domain.Containers;
 
 using SharedKernel.Exceptions;
-using PeakLims.Domain.Containers.Dtos;
-using PeakLims.Domain.Containers.Validators;
+using PeakLims.Domain.Samples;
+using PeakLims.Domain.Containers.Models;
 using PeakLims.Domain.Containers.DomainEvents;
 using FluentValidation;
 using System.Text.Json.Serialization;
@@ -11,41 +11,41 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using ContainerStatuses;
 using SampleTypes;
-using Sieve.Attributes;
-
 
 public class Container : BaseEntity
 {
-    public virtual string Type { get; private set; }
-    public virtual ContainerStatus Status { get; private set; }
-    public virtual SampleType UsedFor { get; private set; }
+    public SampleType UsedFor { get; private set; }
+
+    public ContainerStatus Status { get; private set; }
+
+    public string Type { get; private set; }
     public bool CanStore(SampleType sampleType) => UsedFor == sampleType;
 
+    public IReadOnlyCollection<Sample> Samples { get; }
 
-    public static Container Create(ContainerForCreationDto containerForCreationDto)
+    // Add Props Marker -- Deleting this comment will cause the add props utility to be incomplete
+
+
+    public static Container Create(ContainerForCreation containerForCreation)
     {
-        new ContainerForCreationDtoValidator().ValidateAndThrow(containerForCreationDto);
-
         var newContainer = new Container();
 
+        newContainer.UsedFor = SampleType.Of(containerForCreation.UsedFor);
         newContainer.Status = ContainerStatus.Active();
-        newContainer.UsedFor = new SampleType(containerForCreationDto.UsedFor);
-        newContainer.Type = containerForCreationDto.Type;
+        newContainer.Type = containerForCreation.Type;
 
         newContainer.QueueDomainEvent(new ContainerCreated(){ Container = newContainer });
         
         return newContainer;
     }
 
-    public void Update(ContainerForUpdateDto containerForUpdateDto)
+    public Container Update(ContainerForUpdate containerForUpdate)
     {
-        new ContainerForUpdateDtoValidator().ValidateAndThrow(containerForUpdateDto);
-
-        Status = ContainerStatus.Active();
-        UsedFor = new SampleType(containerForUpdateDto.UsedFor);
-        Type = containerForUpdateDto.Type;
+        UsedFor = SampleType.Of(containerForUpdate.UsedFor);
+        Type = containerForUpdate.Type;
 
         QueueDomainEvent(new ContainerUpdated(){ Id = Id });
+        return this;
     }
 
     public Container Activate()
@@ -67,6 +67,8 @@ public class Container : BaseEntity
         QueueDomainEvent(new ContainerUpdated(){ Id = Id });
         return this;
     }
+
+    // Add Prop Methods Marker -- Deleting this comment will cause the add props utility to be incomplete
     
     protected Container() { } // For EF + Mocking
 }

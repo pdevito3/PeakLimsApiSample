@@ -5,7 +5,7 @@ using PeakLims.Domain.Tests.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetTest
@@ -23,12 +23,10 @@ public static class GetTest
     public sealed class Handler : IRequestHandler<Query, TestDto>
     {
         private readonly ITestRepository _testRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(ITestRepository testRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(ITestRepository testRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _testRepository = testRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetTest
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadTests);
 
             var result = await _testRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<TestDto>(result);
+            return result.ToTestDto();
         }
     }
 }

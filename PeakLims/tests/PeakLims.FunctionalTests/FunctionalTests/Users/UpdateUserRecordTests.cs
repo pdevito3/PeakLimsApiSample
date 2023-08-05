@@ -5,17 +5,17 @@ using PeakLims.FunctionalTests.TestUtilities;
 using PeakLims.Domain;
 using SharedKernel.Domain;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 using System.Net;
 using System.Threading.Tasks;
 
 public class UpdateUserRecordTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task put_user_returns_nocontent_when_entity_exists_and_auth_credentials_are_valid()
     {
         // Arrange
-        var fakeUser = FakeUser.Generate(new FakeUserForCreationDto().Generate());
+        var fakeUser = new FakeUserBuilder().Build();
         var updatedUserDto = new FakeUserForUpdateDto().Generate();
 
         var user = await AddNewSuperAdmin();
@@ -23,42 +23,38 @@ public class UpdateUserRecordTests : TestBase
         await InsertAsync(fakeUser);
 
         // Act
-        var route = ApiRoutes.Users.Put.Replace(ApiRoutes.Users.Id, fakeUser.Id.ToString());
+        var route = ApiRoutes.Users.Put(fakeUser.Id);
         var result = await FactoryClient.PutJsonRequestAsync(route, updatedUserDto);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
             
-    [Test]
+    [Fact]
     public async Task put_user_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeUser = FakeUser.Generate(new FakeUserForCreationDto().Generate());
+        var fakeUser = new FakeUserBuilder().Build();
         var updatedUserDto = new FakeUserForUpdateDto { }.Generate();
 
-        await InsertAsync(fakeUser);
-
         // Act
-        var route = ApiRoutes.Users.Put.Replace(ApiRoutes.Users.Id, fakeUser.Id.ToString());
+        var route = ApiRoutes.Users.Put(fakeUser.Id);
         var result = await FactoryClient.PutJsonRequestAsync(route, updatedUserDto);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
             
-    [Test]
+    [Fact]
     public async Task put_user_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeUser = FakeUser.Generate(new FakeUserForCreationDto().Generate());
+        var fakeUser = new FakeUserBuilder().Build();
         var updatedUserDto = new FakeUserForUpdateDto { }.Generate();
         FactoryClient.AddAuth();
 
-        await InsertAsync(fakeUser);
-
         // Act
-        var route = ApiRoutes.Users.Put.Replace(ApiRoutes.Users.Id, fakeUser.Id.ToString());
+        var route = ApiRoutes.Users.Put(fakeUser.Id);
         var result = await FactoryClient.PutJsonRequestAsync(route, updatedUserDto);
 
         // Assert

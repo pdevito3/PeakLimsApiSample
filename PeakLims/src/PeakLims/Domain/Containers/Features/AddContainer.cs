@@ -3,11 +3,12 @@ namespace PeakLims.Domain.Containers.Features;
 using PeakLims.Domain.Containers.Services;
 using PeakLims.Domain.Containers;
 using PeakLims.Domain.Containers.Dtos;
+using PeakLims.Domain.Containers.Models;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class AddContainer
@@ -26,12 +27,10 @@ public static class AddContainer
     {
         private readonly IContainerRepository _containerRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IContainerRepository containerRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IContainerRepository containerRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _containerRepository = containerRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
@@ -41,13 +40,13 @@ public static class AddContainer
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddContainers);
 
-            var container = Container.Create(request.ContainerToAdd);
-            await _containerRepository.Add(container, cancellationToken);
+            var containerToAdd = request.ContainerToAdd.ToContainerForCreation();
+            var container = Container.Create(containerToAdd);
 
+            await _containerRepository.Add(container, cancellationToken);
             await _unitOfWork.CommitChanges(cancellationToken);
 
-            var containerAdded = await _containerRepository.GetById(container.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<ContainerDto>(containerAdded);
+            return container.ToContainerDto();
         }
     }
 }

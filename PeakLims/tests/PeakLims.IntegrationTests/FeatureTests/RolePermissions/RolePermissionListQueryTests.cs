@@ -5,28 +5,45 @@ using PeakLims.SharedTestHelpers.Fakes.RolePermission;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.RolePermissions.Features;
 using FluentAssertions;
-using NUnit.Framework;
+using Domain;
+using Xunit;
 using System.Threading.Tasks;
-using static TestFixture;
 
 public class RolePermissionListQueryTests : TestBase
 {
     
-    [Test]
+    [Fact]
     public async Task can_get_rolepermission_list()
     {
         // Arrange
-        var fakeRolePermissionOne = FakeRolePermission.Generate(new FakeRolePermissionForCreationDto().Generate());
-        var fakeRolePermissionTwo = FakeRolePermission.Generate(new FakeRolePermissionForCreationDto().Generate());
+        var testingServiceScope = new TestingServiceScope();
+        var fakeRolePermissionOne = new FakeRolePermissionBuilder().Build();
+        var fakeRolePermissionTwo = new FakeRolePermissionBuilder().Build();
         var queryParameters = new RolePermissionParametersDto();
 
-        await InsertAsync(fakeRolePermissionOne, fakeRolePermissionTwo);
+        await testingServiceScope.InsertAsync(fakeRolePermissionOne, fakeRolePermissionTwo);
 
         // Act
         var query = new GetRolePermissionList.Query(queryParameters);
-        var rolePermissions = await SendAsync(query);
+        var rolePermissions = await testingServiceScope.SendAsync(query);
 
         // Assert
         rolePermissions.Count.Should().BeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanReadRolePermissions);
+        var queryParameters = new RolePermissionParametersDto();
+
+        // Act
+        var command = new GetRolePermissionList.Query(queryParameters);
+        Func<Task> act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

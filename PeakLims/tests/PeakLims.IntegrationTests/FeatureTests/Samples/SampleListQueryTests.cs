@@ -5,46 +5,45 @@ using PeakLims.SharedTestHelpers.Fakes.Sample;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.Samples.Features;
 using FluentAssertions;
-using NUnit.Framework;
+using Domain;
+using Xunit;
 using System.Threading.Tasks;
-using static TestFixture;
-using PeakLims.SharedTestHelpers.Fakes.Patient;
-using PeakLims.SharedTestHelpers.Fakes.Sample;
-using PeakLims.SharedTestHelpers.Fakes.Container;
-using Services;
 
 public class SampleListQueryTests : TestBase
 {
     
-    [Test]
+    [Fact]
     public async Task can_get_sample_list()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
-        var fakePatientTwo = FakePatient.Generate(GetService<IDateTimeProvider>());
-        await InsertAsync(fakePatientOne, fakePatientTwo);
-
-        var container = FakeContainer.Generate();
-
-        var fakeContainerOne = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
-        var fakeContainerTwo = FakeContainer.Generate(new FakeContainerForCreationDto().Generate());
-        await InsertAsync(fakeContainerOne, fakeContainerTwo);
-
-        var fakeSampleOne = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
-            .RuleFor(s => s.PatientId, _ => fakePatientOne.Id)
-            .Generate(), container);
-        var fakeSampleTwo = FakeSample.Generate(new FakeContainerlessSampleForCreationDto()
-            .RuleFor(s => s.PatientId, _ => fakePatientTwo.Id)
-            .Generate(), container);
+        var testingServiceScope = new TestingServiceScope();
+        var fakeSampleOne = new FakeSampleBuilder().Build();
+        var fakeSampleTwo = new FakeSampleBuilder().Build();
         var queryParameters = new SampleParametersDto();
 
-        await InsertAsync(fakeSampleOne, fakeSampleTwo);
+        await testingServiceScope.InsertAsync(fakeSampleOne, fakeSampleTwo);
 
         // Act
         var query = new GetSampleList.Query(queryParameters);
-        var samples = await SendAsync(query);
+        var samples = await testingServiceScope.SendAsync(query);
 
         // Assert
         samples.Count.Should().BeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanReadSamples);
+        var queryParameters = new SampleParametersDto();
+
+        // Act
+        var command = new GetSampleList.Query(queryParameters);
+        Func<Task> act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

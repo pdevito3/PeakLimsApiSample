@@ -3,24 +3,24 @@ namespace PeakLims.IntegrationTests.FeatureTests.Users;
 using PeakLims.SharedTestHelpers.Fakes.User;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
 using PeakLims.Domain.Users.Features;
-using static TestFixture;
 using SharedKernel.Exceptions;
 
 public class AddUserCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_add_new_user_to_db()
     {
         // Arrange
+        var testingServiceScope = new TestingServiceScope();
         var fakeUserOne = new FakeUserForCreationDto().Generate();
 
         // Act
         var command = new AddUser.Command(fakeUserOne);
-        var userReturned = await SendAsync(command);
-        var userCreated = await ExecuteDbContextAsync(db => db.Users
+        var userReturned = await testingServiceScope.SendAsync(command);
+        var userCreated = await testingServiceScope.ExecuteDbContextAsync(db => db.Users
             .FirstOrDefaultAsync(u => u.Id == userReturned.Id));
 
         // Assert

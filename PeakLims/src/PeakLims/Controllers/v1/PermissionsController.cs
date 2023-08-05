@@ -23,8 +23,6 @@ public sealed class PermissionsController: ControllerBase
     /// <summary>
     /// Gets a list of all available permissions.
     /// </summary>
-    /// <response code="200">List retrieved.</response>
-    /// <response code="500">There was an error getting the list of permissions.</response>
     [Authorize]
     [HttpGet(Name = "GetPermissions")]
     public List<string> GetPermissions()
@@ -36,8 +34,6 @@ public sealed class PermissionsController: ControllerBase
     /// <summary>
     /// Gets a list of the current user's assigned permissions.
     /// </summary>
-    /// <response code="200">List retrieved.</response>
-    /// <response code="500">There was an error getting the list of permissions.</response>
     [Authorize]
     [HttpGet("mine", Name = "GetAssignedPermissions")]
     public async Task<List<string>> GetAssignedPermissions()

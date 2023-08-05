@@ -5,28 +5,45 @@ using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.HealthcareOrganizations.Features;
 using FluentAssertions;
-using NUnit.Framework;
+using Domain;
+using Xunit;
 using System.Threading.Tasks;
-using static TestFixture;
 
 public class HealthcareOrganizationListQueryTests : TestBase
 {
     
-    [Test]
+    [Fact]
     public async Task can_get_healthcareorganization_list()
     {
         // Arrange
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        var fakeHealthcareOrganizationTwo = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
+        var testingServiceScope = new TestingServiceScope();
+        var fakeHealthcareOrganizationOne = new FakeHealthcareOrganizationBuilder().Build();
+        var fakeHealthcareOrganizationTwo = new FakeHealthcareOrganizationBuilder().Build();
         var queryParameters = new HealthcareOrganizationParametersDto();
 
-        await InsertAsync(fakeHealthcareOrganizationOne, fakeHealthcareOrganizationTwo);
+        await testingServiceScope.InsertAsync(fakeHealthcareOrganizationOne, fakeHealthcareOrganizationTwo);
 
         // Act
         var query = new GetHealthcareOrganizationList.Query(queryParameters);
-        var healthcareOrganizations = await SendAsync(query);
+        var healthcareOrganizations = await testingServiceScope.SendAsync(query);
 
         // Assert
         healthcareOrganizations.Count.Should().BeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanReadHealthcareOrganizations);
+        var queryParameters = new HealthcareOrganizationParametersDto();
+
+        // Act
+        var command = new GetHealthcareOrganizationList.Query(queryParameters);
+        Func<Task> act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

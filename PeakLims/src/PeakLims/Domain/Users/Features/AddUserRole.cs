@@ -6,12 +6,13 @@ using PeakLims.Domain.Users.Dtos;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using HeimGuard;
+using Mappings;
 using MediatR;
 using Roles;
 
 public static class AddUserRole
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid UserId;
         public readonly string Role;
@@ -25,7 +26,7 @@ public static class AddUserRole
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -38,7 +39,7 @@ public static class AddUserRole
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             if(!request.SkipPermissions)
                 await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddUserRoles);
@@ -48,8 +49,6 @@ public static class AddUserRole
             var roleToAdd = user.AddRole(new Role(request.Role));
             await _userRepository.AddRole(roleToAdd, cancellationToken);
             await _unitOfWork.CommitChanges(cancellationToken);
-
-            return true;
         }
     }
 }

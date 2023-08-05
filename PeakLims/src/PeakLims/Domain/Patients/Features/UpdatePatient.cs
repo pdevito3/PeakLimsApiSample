@@ -2,53 +2,52 @@ namespace PeakLims.Domain.Patients.Features;
 
 using PeakLims.Domain.Patients;
 using PeakLims.Domain.Patients.Dtos;
-using PeakLims.Domain.Patients.Validators;
 using PeakLims.Domain.Patients.Services;
 using PeakLims.Services;
+using PeakLims.Domain.Patients.Models;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class UpdatePatient
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
-        public readonly PatientForUpdateDto PatientToUpdate;
+        public readonly PatientForUpdateDto UpdatedPatientData;
 
-        public Command(Guid patient, PatientForUpdateDto newPatientData)
+        public Command(Guid id, PatientForUpdateDto updatedPatientData)
         {
-            Id = patient;
-            PatientToUpdate = newPatientData;
+            Id = id;
+            UpdatedPatientData = updatedPatientData;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IPatientRepository _patientRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHeimGuardClient _heimGuard;
-        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public Handler(IPatientRepository patientRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard, IDateTimeProvider dateTimeProvider)
+        public Handler(IPatientRepository patientRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard)
         {
             _patientRepository = patientRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
-            _dateTimeProvider = dateTimeProvider;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdatePatients);
 
             var patientToUpdate = await _patientRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            var patientToAdd = request.UpdatedPatientData.ToPatientForUpdate();
+            patientToUpdate.Update(patientToAdd);
 
-            patientToUpdate.Update(request.PatientToUpdate, _dateTimeProvider);
             _patientRepository.Update(patientToUpdate);
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

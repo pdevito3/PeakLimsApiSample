@@ -1,7 +1,5 @@
 namespace PeakLims.Databases.EntityConfigurations;
 
-using Domain.Addresses;
-using Domain.Emails;
 using Domain.HealthcareOrganizationStatuses;
 using PeakLims.Domain.HealthcareOrganizations;
 using Microsoft.EntityFrameworkCore;
@@ -14,22 +12,22 @@ public sealed class HealthcareOrganizationConfiguration : IEntityTypeConfigurati
     /// </summary>
     public void Configure(EntityTypeBuilder<HealthcareOrganization> builder)
     {
-        builder.Property(x => x.Email)
-            .HasConversion(x => x.Value, x => new Email(x))
-            .HasColumnName("email");
+        // Relationship Marker -- Deleting or modifying this comment could cause incomplete relationship scaffolding
         
-        builder.OwnsOne(x => x.PrimaryAddress, opts =>
-        {
-            opts.Property(x => x.Line1).HasColumnName("primary_address_line1");
-            opts.Property(x => x.Line2).HasColumnName("primary_address_line2");
-            opts.Property(x => x.City).HasColumnName("primary_address_city");
-            opts.Property(x => x.State).HasColumnName("primary_address_state");
-            opts.Property(x => x.PostalCode).HasColumnName("primary_address_postal_code")
-                .HasConversion(x => x.Value, x => new PostalCode(x));
-            opts.Property(x => x.Country).HasColumnName("primary_address_country");
-        }).Navigation(x => x.PrimaryAddress)
-            .IsRequired();
         builder.Property(x => x.Status)
             .HasConversion(x => x.Value, x => new HealthcareOrganizationStatus(x));
+
+        // example for a more complex value object
+        // builder.OwnsOne(x => x.PhysicalAddress, opts =>
+        // {
+        //     opts.Property(x => x.Line1).HasColumnName("physical_address_line1");
+        //     opts.Property(x => x.Line2).HasColumnName("physical_address_line2");
+        //     opts.Property(x => x.City).HasColumnName("physical_address_city");
+        //     opts.Property(x => x.State).HasColumnName("physical_address_state");
+        //     opts.Property(x => x.PostalCode).HasColumnName("physical_address_postal_code")
+        //         .HasConversion(x => x.Value, x => new PostalCode(x));
+        //     opts.Property(x => x.Country).HasColumnName("physical_address_country");
+        // }).Navigation(x => x.PhysicalAddress)
+        //     .IsRequired();
     }
 }

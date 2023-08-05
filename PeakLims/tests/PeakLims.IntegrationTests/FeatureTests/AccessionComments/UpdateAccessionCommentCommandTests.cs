@@ -1,56 +1,69 @@
 namespace PeakLims.IntegrationTests.FeatureTests.AccessionComments;
 
+using PeakLims.SharedTestHelpers.Fakes.AccessionComment;
 using PeakLims.Domain.AccessionComments.Dtos;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.AccessionComments.Features;
+using Domain;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
 using Bogus;
 using Domain.AccessionCommentStatuses;
-using Domain.Accessions;
-using static TestFixture;
-using PeakLims.SharedTestHelpers.Fakes.Accession;
-using SharedTestHelpers.Fakes.AccessionComments;
 
 public class UpdateAccessionCommentCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_update_existing_accessioncomment_in_db()
     {
         // Arrange
-        var originalAccessionComment = FakeAccessionCommentBuilder.Initialize()
-            .WithMockAccession()
-            .Build();
-        await InsertAsync(originalAccessionComment);
+        var testingServiceScope = new TestingServiceScope();
+        var originalAccessionComment = new FakeAccessionCommentBuilder().Build();
+        await testingServiceScope.InsertAsync(originalAccessionComment);
         
         var faker = new Faker();
         var comment = faker.Lorem.Sentence();
 
         // Act
         var command = new UpdateAccessionComment.Command(originalAccessionComment.Id, comment);
-        await SendAsync(command);
+        await testingServiceScope.SendAsync(command);
         
-        var accessionComments = await ExecuteDbContextAsync(db => db.AccessionComments
-            .Where(a => a.AccessionId == originalAccessionComment.AccessionId)
+        var accessionComments = await testingServiceScope.ExecuteDbContextAsync(db => db.AccessionComments
+            .Where(a => a.Accession.Id == originalAccessionComment.Accession.Id)
             .ToListAsync());
         var newComment = accessionComments.FirstOrDefault(a => a.Status == AccessionCommentStatus.Active());
         var archivedComment = accessionComments.FirstOrDefault(a => a.Status == AccessionCommentStatus.Archived());
-
         // Assert
         accessionComments.Count.Should().Be(2);
         
-        newComment.AccessionId.Should().Be(originalAccessionComment.AccessionId);
+        newComment.Accession.Id.Should().Be(originalAccessionComment.Accession.Id);
         newComment.Comment.Should().Be(comment);
-        newComment.ParentAccessionCommentId.Should().BeNull();
+        newComment.ParentComment.Should().BeNull();
         newComment.Status.Should().Be(AccessionCommentStatus.Active());
         
         archivedComment.Id.Should().Be(originalAccessionComment.Id);
-        archivedComment.AccessionId.Should().Be(originalAccessionComment.AccessionId);
-        archivedComment.ParentAccessionCommentId.Should().Be(newComment.Id);
+        archivedComment.Accession.Id.Should().Be(originalAccessionComment.Accession.Id);
+        archivedComment.ParentComment.Id.Should().Be(newComment.Id);
         archivedComment.Comment.Should().Be(originalAccessionComment.Comment);
         archivedComment.Status.Should().Be(AccessionCommentStatus.Archived());
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanUpdateAccessionComments);
+        var faker = new Faker();
+        var comment = faker.Lorem.Sentence();
+
+        // Act
+        var command = new UpdateAccessionComment.Command(Guid.NewGuid(), comment);
+        var act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

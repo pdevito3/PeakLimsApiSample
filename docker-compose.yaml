@@ -4,7 +4,7 @@ services:
   keycloakdb:
     image: postgres
     ports:
-      - '52932:5432'
+      - '58187:5432'
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
@@ -29,7 +29,7 @@ services:
       # PostgreSQL JDBC driver documentation in order to use it.
       #JDBC_PARAMS: "ssl=true"
     ports:
-      - 7821:8080
+      - 4933:8080
     depends_on:
       - keycloakdb
 
@@ -37,7 +37,7 @@ services:
     image: postgres
     restart: always
     ports:
-      - '52892:5432'
+      - '58147:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -49,15 +49,15 @@ services:
     image: jaegertracing/all-in-one:latest
 #    port mappings: https://www.jaegertracing.io/docs/1.32/getting-started/
     ports:
-      - "52900:5775/udp"
-      - "52899:6831/udp"
-      - "52901:6832/udp"
-      - "52902:5778"
-      - "52903:16686"
-      - "52904:14250"
-      - "52905:14268"
-      - "52906:14269"
-      - "52907:9411"
+      - "58158:5775/udp"
+      - "58157:6831/udp"
+      - "58159:6832/udp"
+      - "58160:5778"
+      - "58161:16686"
+      - "58162:14250"
+      - "58163:14268"
+      - "58164:14269"
+      - "58165:9411"
 
         
 volumes:

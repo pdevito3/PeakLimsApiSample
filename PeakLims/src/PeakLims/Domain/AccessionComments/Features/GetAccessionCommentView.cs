@@ -3,7 +3,6 @@ namespace PeakLims.Domain.AccessionComments.Features;
 using AccessionCommentStatuses;
 using Accessions;
 using Accessions.Services;
-using Ardalis.Specification;
 using Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -37,8 +36,9 @@ public static class GetAccessionCommentView
 
         public async Task<AccessionCommentViewDto> Handle(Query request, CancellationToken cancellationToken)
         {
-            var accessionWithCommentsSpecification = new UntrackedAccessionWithCommentsSpecification(request.AccessionId);
-            var accession = await _accessionRepository.GetByIdOrDefault(accessionWithCommentsSpecification, cancellationToken);
+            var accession = await _accessionRepository.Query()
+                .Include(x => x.Comments)
+                .FirstOrDefaultAsync(x => x.Id == request.AccessionId, cancellationToken);
             
             if (accession == null)
                 throw new KeyNotFoundException($"Accession with id {request.AccessionId} not found");
@@ -54,32 +54,15 @@ public static class GetAccessionCommentView
                 .Distinct()
                 .ToList();
 
-            var distinctUserListSpecification = new DistinctUserListSpecification(distinctAccessionCommentUserIdList);
-            var distinctUserList = await _userRepository.ListAsync(distinctUserListSpecification, cancellationToken);
+            var distinctUserList = await _userRepository.Query()
+                .Where(x => distinctAccessionCommentUserIdList.Contains(x.CreatedBy))
+                .ToListAsync(cancellationToken);
             foreach (var accessionComment in activeAccessionComments)
             {
                 treatmentPlanDto.AccessionComments.Add(GetAccessionCommentItemDto(accessionComment, allAccessionComments, distinctUserList));
             }
 
             return treatmentPlanDto;
-        }
-    }
-    
-    private sealed class DistinctUserListSpecification : Specification<User>
-    {
-        public DistinctUserListSpecification(List<string> distinctAccessionCommentUserIdList)
-        {
-            Query.Where(x => distinctAccessionCommentUserIdList.Contains(x.CreatedBy));
-        }
-    }
-    
-    private sealed class UntrackedAccessionWithCommentsSpecification : Specification<Accession>
-    {
-        public UntrackedAccessionWithCommentsSpecification(Guid accessionId)
-        {
-            Query.Include(x => x.Comments)
-                .AsNoTracking()
-                .Where(x => x.Id == accessionId);
         }
     }
     
@@ -100,7 +83,7 @@ public static class GetAccessionCommentView
 
         var archivedAccessionComments = allAccessionComments
             .Where(tsi => tsi.Status == AccessionCommentStatus.Archived() && 
-                          tsi.ParentAccessionCommentId == accessionComment.Id);
+                          tsi.ParentComment.Id == accessionComment.Id);
 
         var accessionCommentHistory = new List<AccessionCommentViewDto.AccessionCommentHistoryRecordDto>();
 
@@ -122,7 +105,7 @@ public static class GetAccessionCommentView
 
             var childArchivedAccessionComments = allAccessionComments
                 .Where(tsi => tsi.Status == AccessionCommentStatus.Archived() && 
-                              tsi.ParentAccessionCommentId == archivedAccessionComment.Id)
+                              tsi.ParentComment.Id == archivedAccessionComment.Id)
                 .OrderBy(x => x.CreatedOn);
             foreach (var childArchivedAccessionComment in childArchivedAccessionComments)
             {

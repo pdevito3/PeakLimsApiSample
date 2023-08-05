@@ -5,7 +5,7 @@ using PeakLims.Domain.Accessions.Features;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
 using Domain.Tests.Services;
@@ -17,33 +17,29 @@ using SharedTestHelpers.Fakes.Test;
 
 public class AddTestToAccessionCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_add_test_to_accession()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
-        await InsertAsync(fakePatientOne);
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
-        await InsertAsync(fakeHealthcareOrganizationOne);
-        var fakeTest = new FakeTestBuilder()
-            .Activate()
-            .WithRepository(GetService<ITestRepository>())
-            .Build();
-        await InsertAsync(fakeTest);
+        var testingServiceScope = new TestingServiceScope();
+        var fakePatientOne = new FakePatientBuilder().Build();
+        await testingServiceScope.InsertAsync(fakePatientOne);
+        var fakeHealthcareOrganizationOne = new FakeHealthcareOrganizationBuilder().Build();
+        await testingServiceScope.InsertAsync(fakeHealthcareOrganizationOne);
+        var fakeTest = new FakeTestBuilder().Build().Activate();
+        await testingServiceScope.InsertAsync(fakeTest);
 
-        var fakeAccessionOne = FakeAccessionBuilder
-            .Initialize()
-            .WithTestRepository(GetService<ITestRepository>())
+        var fakeAccessionOne = new FakeAccessionBuilder()
             // .WithPatient(fakePatientOne)
             // .WithHealthcareOrganization(fakeHealthcareOrganizationOne)
-            .ExcludeTestOrders()
+            // .ExcludeTestOrders()
             .Build();
-        await InsertAsync(fakeAccessionOne);
+        await testingServiceScope.InsertAsync(fakeAccessionOne);
 
         // Act
         var command = new AddTestToAccession.Command(fakeAccessionOne.Id, fakeTest.Id);
-        await SendAsync(command);
-        var accession = await ExecuteDbContextAsync(db => db.Accessions
+        await testingServiceScope.SendAsync(command);
+        var accession = await testingServiceScope.ExecuteDbContextAsync(db => db.Accessions
             .Include(x => x.TestOrders)
             .ThenInclude(x => x.Test)
             .FirstOrDefaultAsync(a => a.Id == fakeAccessionOne.Id));
@@ -51,39 +47,32 @@ public class AddTestToAccessionCommandTests : TestBase
 
         // Assert
         testOrders.Count.Should().Be(1);
-        testOrders.FirstOrDefault().Test.TestName.Should().Be(fakeTest.TestName);
+        testOrders.FirstOrDefault()!.Test.TestName.Should().Be(fakeTest.TestName);
     }
-    [Test]
+    [Fact]
     public async Task can_add_test_to_accession_with_existing_test_orders()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
-        await InsertAsync(fakePatientOne);
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate();
-        await InsertAsync(fakeHealthcareOrganizationOne);
-        var existingTest = new FakeTestBuilder()
-            .Activate()
-            .WithRepository(GetService<ITestRepository>())
-            .Build();
-        var fakeTest = new FakeTestBuilder()
-            .Activate()
-            .WithRepository(GetService<ITestRepository>())
-            .Build();
-        await InsertAsync(fakeTest);
+        var testingServiceScope = new TestingServiceScope();
+        var fakePatientOne = new FakePatientBuilder().Build();
+        await testingServiceScope.InsertAsync(fakePatientOne);
+        var fakeHealthcareOrganizationOne = new FakeHealthcareOrganizationBuilder().Build();
+        await testingServiceScope.InsertAsync(fakeHealthcareOrganizationOne);
+        var existingTest = new FakeTestBuilder().Build().Activate();
+        var fakeTest = new FakeTestBuilder().Build().Activate();
+        await testingServiceScope.InsertAsync(fakeTest);
 
-        var fakeAccessionOne = FakeAccessionBuilder
-            .Initialize()
-            .WithTestRepository(GetService<ITestRepository>())
+        var fakeAccessionOne = new FakeAccessionBuilder()
             // .WithPatient(fakePatientOne)
             // .WithHealthcareOrganization(fakeHealthcareOrganizationOne)
-            .WithTest(existingTest)
-            .Build();
-        await InsertAsync(fakeAccessionOne);
+            .Build()
+            .AddTest(existingTest);
+        await testingServiceScope.InsertAsync(fakeAccessionOne);
 
         // Act
         var command = new AddTestToAccession.Command(fakeAccessionOne.Id, fakeTest.Id);
-        await SendAsync(command);
-        var accession = await ExecuteDbContextAsync(db => db.Accessions
+        await testingServiceScope.SendAsync(command);
+        var accession = await testingServiceScope.ExecuteDbContextAsync(db => db.Accessions
             .Include(x => x.TestOrders)
             .ThenInclude(x => x.Test)
             .FirstOrDefaultAsync(a => a.Id == fakeAccessionOne.Id));

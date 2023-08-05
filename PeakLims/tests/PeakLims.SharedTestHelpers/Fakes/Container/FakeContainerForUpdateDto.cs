@@ -5,8 +5,7 @@ using Domain.SampleTypes;
 using PeakLims.Domain.Containers;
 using PeakLims.Domain.Containers.Dtos;
 
-// or replace 'AutoFaker' with 'Faker' along with your own rules if you don't want all fields to be auto faked
-public class FakeContainerForUpdateDto : AutoFaker<ContainerForUpdateDto>
+public sealed class FakeContainerForUpdateDto : AutoFaker<ContainerForUpdateDto>
 {
     public FakeContainerForUpdateDto()
     {

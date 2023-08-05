@@ -1,24 +1,13 @@
 namespace PeakLims.IntegrationTests;
 
-using NUnit.Framework;
-using System.Threading.Tasks;
 using AutoBogus;
+using Xunit;
 
-    using HeimGuard;
-    using Moq;
-using static TestFixture;
-
-[Parallelizable]
-public class TestBase
+[Collection(nameof(TestFixture))]
+public class TestBase : IDisposable
 {
-    [SetUp]
-    public Task TestSetUp()
+    public TestBase()
     {
-        var userPolicyHandler = GetService<IHeimGuardClient>();
-        Mock.Get(userPolicyHandler)
-            .Setup(x => x.HasPermissionAsync(It.IsAny<string>()))
-            .ReturnsAsync(true);
-
         AutoFaker.Configure(builder =>
         {
             // configure global autobogus settings here
@@ -27,7 +16,9 @@ public class TestBase
                 .WithTreeDepth(1)
                 .WithRepeatCount(1);
         });
-        
-        return Task.CompletedTask;
+    }
+    
+    public void Dispose()
+    {
     }
 }

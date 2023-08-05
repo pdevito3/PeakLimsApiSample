@@ -2,15 +2,15 @@ namespace PeakLims.Extensions.Services;
 
 using PeakLims.Middleware;
 using PeakLims.Services;
+using Configurations;
 using System.Text.Json.Serialization;
 using Serilog;
 using FluentValidation.AspNetCore;
-using Mapster;
-using MapsterMapper;
+using Hellang.Middleware.ProblemDetails;
+using Hellang.Middleware.ProblemDetails.Mvc;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Resources;
-using Sieve.Services;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -21,36 +21,28 @@ public static class WebAppServiceConfiguration
     {
         builder.Services.AddTransient<IDateTimeProvider, DateTimeProvider>();
         builder.Services.AddSingleton(Log.Logger);
+        builder.Services.AddProblemDetails(ProblemDetailsConfigurationExtension.ConfigureProblemDetails)
+            .AddProblemDetailsConventions();
+
         // TODO update CORS for your env
         builder.Services.AddCorsService("PeakLimsCorsPolicy", builder.Environment);
-        builder.Services.OpenTelemetryRegistration("PeakLims");
-        builder.Services.AddInfrastructure(builder.Environment);
+        builder.OpenTelemetryRegistration(builder.Configuration, "PeakLims");
+        builder.Services.AddInfrastructure(builder.Environment, builder.Configuration);
 
         builder.Services.AddControllers()
             .AddJsonOptions(o => o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         builder.Services.AddApiVersioningExtension();
 
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
-        builder.Services.AddScoped<SieveProcessor>();
+        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-        // registers all services that inherit from your base service interface - IPeakLimsService
+        // registers all services that inherit from your base service interface - IPeakLimsScopedService
         builder.Services.AddBoundaryServices(Assembly.GetExecutingAssembly());
 
-        builder.Services
-            .AddMvc(options => options.Filters.Add<ErrorHandlerFilterAttribute>())
-            .AddJsonOptions(opt => opt.JsonSerializerOptions.AddDateOnlyConverters());
-
-        if(builder.Environment.EnvironmentName != Consts.Testing.FunctionalTestingEnvName)
-        {
-            var typeAdapterConfig = TypeAdapterConfig.GlobalSettings;
-            typeAdapterConfig.Scan(Assembly.GetExecutingAssembly());
-            var mapperConfig = new Mapper(typeAdapterConfig);
-            builder.Services.AddSingleton<IMapper>(mapperConfig);
-        }
+        builder.Services.AddMvc();
 
         builder.Services.AddHealthChecks();
-        builder.Services.AddSwaggerExtension();
+        builder.Services.AddSwaggerExtension(builder.Configuration);
     }
 
     /// <summary>
@@ -64,7 +56,7 @@ public static class WebAppServiceConfiguration
         foreach (var assembly in assemblies)
         {
             var rules = assembly.GetTypes()
-                .Where(x => !x.IsAbstract && x.IsClass && x.GetInterface(nameof(IPeakLimsService)) == typeof(IPeakLimsService));
+                .Where(x => !x.IsAbstract && x.IsClass && x.GetInterface(nameof(IPeakLimsScopedService)) == typeof(IPeakLimsScopedService));
 
             foreach (var rule in rules)
             {
@@ -75,60 +67,4 @@ public static class WebAppServiceConfiguration
             }
         }
     }
-}
-
-// TODO these will be baked into System.Text.Json in .NET 7
-public static class DateOnlyConverterExtensions
-{
-    public static void AddDateOnlyConverters(this JsonSerializerOptions options)
-    {
-        options.Converters.Add(new DateOnlyConverter());
-        options.Converters.Add(new DateOnlyNullableConverter());
-    }
-}
-
-public class DateOnlyConverter : JsonConverter<DateOnly>
-{
-    public override DateOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        if (reader.TryGetDateTime(out var dt))
-        {
-            return DateOnly.FromDateTime(dt);
-        };
-        var value = reader.GetString();
-        if (value == null)
-        {
-            return default;
-        }
-        var match = new Regex("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)(T|\\s|\\z)").Match(value);
-        return match.Success
-            ? new DateOnly(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value))
-            : default;
-    }
-
-    public override void Write(Utf8JsonWriter writer, DateOnly value, JsonSerializerOptions options)
-        => writer.WriteStringValue(value.ToString("yyyy-MM-dd"));
-}
-
-public class DateOnlyNullableConverter : JsonConverter<DateOnly?>
-{
-    public override DateOnly? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        if (reader.TryGetDateTime(out var dt))
-        {
-            return DateOnly.FromDateTime(dt);
-        };
-        var value = reader.GetString();
-        if (value == null)
-        {
-            return default;
-        }
-        var match = new Regex("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)(T|\\s|\\z)").Match(value);
-        return match.Success
-            ? new DateOnly(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value))
-            : default;
-    }
-
-    public override void Write(Utf8JsonWriter writer, DateOnly? value, JsonSerializerOptions options)
-        => writer.WriteStringValue(value?.ToString("yyyy-MM-dd"));
 }

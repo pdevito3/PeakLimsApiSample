@@ -5,7 +5,7 @@ using Bogus;
 using Domain.Accessions;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using PeakLims.Domain.Accessions.Features;
 using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using static TestFixture;
@@ -19,31 +19,32 @@ public class ManageOrganizationOnAccessionCommandTests : TestBase
         _faker = new Faker();
     }
     
-    [Test]
+    [Fact]
     public async Task can_manage_org()
     {
         // Arrange
-        var org = FakeHealthcareOrganization.Generate();
-        await InsertAsync(org);
+        var testingServiceScope = new TestingServiceScope();
+        var org = new FakeHealthcareOrganizationBuilder().Build();
+        await testingServiceScope.InsertAsync(org);
         var accession = Accession.Create();
-        await InsertAsync(accession);
+        await testingServiceScope.InsertAsync(accession);
 
         // Act - set
         var command = new SetAccessionHealthcareOrganization.Command(accession.Id, org.Id);
-        await SendAsync(command);
-        var accessionFromDb = await ExecuteDbContextAsync(db => db.Accessions
+        await testingServiceScope.SendAsync(command);
+        var accessionFromDb = await testingServiceScope.ExecuteDbContextAsync(db => db.Accessions
             .FirstOrDefaultAsync(x => x.Id == accession.Id));
 
         // Assert - set
-        accessionFromDb.HealthcareOrganizationId.Should().Be(org.Id);
+        accessionFromDb.HealthcareOrganization.Id.Should().Be(org.Id);
 
         // Act - remove
         var removeCommand = new RemoveAccessionHealthcareOrganization.Command(accession.Id);
-        await SendAsync(removeCommand);
-        accessionFromDb = await ExecuteDbContextAsync(db => db.Accessions
+        await testingServiceScope.SendAsync(removeCommand);
+        accessionFromDb = await testingServiceScope.ExecuteDbContextAsync(db => db.Accessions
             .FirstOrDefaultAsync(x => x.Id == accession.Id));
 
         // Assert - remove
-        accessionFromDb.HealthcareOrganizationId.Should().BeNull();
+        accessionFromDb.HealthcareOrganization.Should().BeNull();
     }
 }

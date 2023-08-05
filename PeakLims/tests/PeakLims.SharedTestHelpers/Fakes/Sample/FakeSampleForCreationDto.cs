@@ -1,19 +1,15 @@
 namespace PeakLims.SharedTestHelpers.Fakes.Sample;
 
 using AutoBogus;
-using Domain.Containers;
 using Domain.SampleTypes;
 using PeakLims.Domain.Samples;
 using PeakLims.Domain.Samples.Dtos;
 
-// or replace 'AutoFaker' with 'Faker' along with your own rules if you don't want all fields to be auto faked
-public class FakeSampleForCreationDto : AutoFaker<SampleForCreationDto>
+public sealed class FakeSampleForCreationDto : AutoFaker<SampleForCreationDto>
 {
-    public FakeSampleForCreationDto(Container container)
+    public FakeSampleForCreationDto()
     {
-        RuleFor(s => s.ParentSampleId, _ => null);
-        RuleFor(s => s.PatientId, _ => null);
-        RuleFor(s => s.ContainerId, container.Id);
-        RuleFor(x => x.Type, container.UsedFor.Value);
+        RuleFor(x => x.Type, f => f.PickRandom(SampleType.ListNames()));
+        RuleFor(x => x.ContainerId, _ => null); 
     }
 }

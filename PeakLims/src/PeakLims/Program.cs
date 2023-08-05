@@ -1,7 +1,9 @@
 using Serilog;
+using Hellang.Middleware.ProblemDetails;
 using PeakLims.Extensions.Application;
 using PeakLims.Extensions.Host;
 using PeakLims.Extensions.Services;
+using PeakLims.Databases;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.AddLoggingConfiguration(builder.Environment);
@@ -9,6 +11,7 @@ builder.Host.AddLoggingConfiguration(builder.Environment);
 builder.ConfigureServices();
 var app = builder.Build();
 
+using var scope = app.Services.CreateScope();
 if (builder.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -19,6 +22,7 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+app.UseProblemDetails();
 
 // For elevated security, it is recommended to remove this middleware and set your server to only listen on https.
 // A slightly less secure option would be to redirect http to 400, 505, etc.
@@ -32,13 +36,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapHealthChecks("/api/health");
-    endpoints.MapControllers();
-});
+app.MapHealthChecks("api/health");
+app.MapControllers();
 
-app.UseSwaggerExtension();
+app.UseSwaggerExtension(builder.Configuration, builder.Environment);
 
 try
 {

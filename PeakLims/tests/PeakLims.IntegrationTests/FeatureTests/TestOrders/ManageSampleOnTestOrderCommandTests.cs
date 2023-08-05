@@ -5,7 +5,6 @@ using PeakLims.Domain.TestOrders.Features;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
 using Bogus;
@@ -16,6 +15,7 @@ using static TestFixture;
 using PeakLims.SharedTestHelpers.Fakes.Test;
 using SharedTestHelpers.Fakes.Container;
 using SharedTestHelpers.Fakes.Sample;
+using Xunit;
 
 public class ManageSampleOnTestOrderCommandTests : TestBase
 {
@@ -26,36 +26,39 @@ public class ManageSampleOnTestOrderCommandTests : TestBase
         _faker = new Faker();
     }
     
-    [Test]
+    [Fact]
     public async Task can_manage_sample()
     {
         // Arrange
-        var container = FakeContainer.Generate();
-        var sample = FakeSample.Generate(container);
-        await InsertAsync(sample);
-        var fakeTestOne = new FakeTestBuilder()
-            .WithRepository(GetService<ITestRepository>())
+        var testingServiceScope = new TestingServiceScope();
+        var container = new FakeContainerBuilder().Build();
+        var sample = new FakeSampleBuilder()
+            .WithValidContainer(container)
             .Build();
-        await InsertAsync(fakeTestOne);
-        var fakeTestOrderOne = FakeTestOrder.Generate(fakeTestOne.Id);
-        await InsertAsync(fakeTestOrderOne);
+        await testingServiceScope.InsertAsync(sample);
+        var fakeTestOne = new FakeTestBuilder().Build();
+        await testingServiceScope.InsertAsync(fakeTestOne);
+        var fakeTestOrderOne = new FakeTestOrderBuilder()
+            .WithTest(fakeTestOne)
+            .Build();
+        await testingServiceScope.InsertAsync(fakeTestOrderOne);
 
         // Act - set
         var command = new SetSampleOnTestOrder.Command(fakeTestOrderOne.Id, sample.Id);
-        await SendAsync(command);
-        var testOrder = await ExecuteDbContextAsync(db => db.TestOrders
+        await testingServiceScope.SendAsync(command);
+        var testOrder = await testingServiceScope.ExecuteDbContextAsync(db => db.TestOrders
             .FirstOrDefaultAsync(x => x.Id == fakeTestOrderOne.Id));
 
         // Assert - set
-        testOrder.SampleId.Should().Be(sample.Id);
+        testOrder.Sample.Id.Should().Be(sample.Id);
 
         // Act - remove
         var removeCommand = new RemoveSampleOnTestOrder.Command(fakeTestOrderOne.Id);
-        await SendAsync(removeCommand);
-        testOrder = await ExecuteDbContextAsync(db => db.TestOrders
+        await testingServiceScope.SendAsync(removeCommand);
+        testOrder = await testingServiceScope.ExecuteDbContextAsync(db => db.TestOrders
             .FirstOrDefaultAsync(x => x.Id == fakeTestOrderOne.Id));
 
         // Assert - remove
-        testOrder.SampleId.Should().BeNull();
+        testOrder.Sample.Should().BeNull();
     }
 }

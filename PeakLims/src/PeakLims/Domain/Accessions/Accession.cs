@@ -1,77 +1,72 @@
 namespace PeakLims.Domain.Accessions;
 
-using PeakLims.Domain.Accessions.Dtos;
+using SharedKernel.Exceptions;
+using PeakLims.Domain.AccessionComments;
 using PeakLims.Domain.Accessions.DomainEvents;
-using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.Serialization;
 using AccessionStatuses;
 using Panels;
-using Sieve.Attributes;
 using PeakLims.Domain.Patients;
+using PeakLims.Domain.Patients.Models;
 using PeakLims.Domain.HealthcareOrganizations;
+using PeakLims.Domain.HealthcareOrganizations.Models;
 using PeakLims.Domain.HealthcareOrganizationContacts;
+using PeakLims.Domain.HealthcareOrganizationContacts.Models;
 using PeakLims.Domain.TestOrders;
-using PeakLims.Domain.AccessionComments;
-using PeakLims.Services;
-using SharedKernel.Exceptions;
-using TestOrders.Services;
 using Tests;
 
 public class Accession : BaseEntity
 {
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string AccessionNumber { get; }
+    public string AccessionNumber { get; }
 
-    public virtual AccessionStatus Status { get; private set; }
+    public AccessionStatus Status { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("Patient")]
-    public virtual Guid? PatientId { get; private set; }
-    public virtual Patient Patient { get; private set; }
+    public Patient Patient { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("HealthcareOrganization")]
-    public virtual Guid? HealthcareOrganizationId { get; private set; }
-    public virtual HealthcareOrganization HealthcareOrganization { get; private set; }
+    public HealthcareOrganization HealthcareOrganization { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<HealthcareOrganizationContact> Contacts { get; } = new List<HealthcareOrganizationContact>();
+    private readonly List<HealthcareOrganizationContact> _healthcareOrganizationContacts = new();
+    public IReadOnlyCollection<HealthcareOrganizationContact> HealthcareOrganizationContacts => _healthcareOrganizationContacts.AsReadOnly();
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<TestOrder> TestOrders { get; private set; } = new List<TestOrder>();
+    private readonly List<TestOrder> _testOrders = new();
+    public IReadOnlyCollection<TestOrder> TestOrders => _testOrders.AsReadOnly();
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<AccessionComment> Comments { get; private set; } = new List<AccessionComment>();
+    public IReadOnlyCollection<AccessionComment> Comments { get; } = new List<AccessionComment>();
+
+    // Add Props Marker -- Deleting this comment will cause the add props utility to be incomplete
+
 
     public static Accession Create()
     {
         var newAccession = new Accession();
 
         newAccession.Status = AccessionStatus.Draft();
+
         newAccession.QueueDomainEvent(new AccessionCreated(){ Accession = newAccession });
         
         return newAccession;
     }
 
-    public Accession SetStatusToReadyForTesting(IDateTimeProvider dateTimeProvider)
+    public Accession AddHealthcareOrganizationContact(HealthcareOrganizationContact healthcareOrganizationContact)
     {
-        new ValidationException(nameof(Accession),
-                $"A patient is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}")
-            .ThrowWhenNullOrEmpty(PatientId);
-        new ValidationException(nameof(Accession),
-                $"An organization is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}")
-            .ThrowWhenNullOrEmpty(HealthcareOrganizationId);
-        if (TestOrders.Count <= 0)
-            throw new ValidationException(nameof(Accession),
+        _healthcareOrganizationContacts.Add(healthcareOrganizationContact);
+        return this;
+    }
+    
+    public Accession RemoveHealthcareOrganizationContact(HealthcareOrganizationContact healthcareOrganizationContact)
+    {
+        _healthcareOrganizationContacts.Remove(healthcareOrganizationContact);
+        return this;
+    }
+    
+    public Accession SetStatusToReadyForTesting()
+    {
+        ValidationException.ThrowWhenNull(Patient, 
+            $"A patient is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}");
+        ValidationException.ThrowWhenNull(HealthcareOrganization, 
+                $"An organization is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}");
+        ValidationException.MustNot(TestOrders.Count <= 0,
                 $"At least 1 panel or test is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}");
-        if (Contacts.Count <= 0)
-            throw new ValidationException(nameof(Accession),
+        ValidationException.MustNot(HealthcareOrganizationContacts.Count <= 0,
                 $"At least 1 organization contact is required in order to set an accession to {AccessionStatus.ReadyForTesting().Value}");
         
         // TODO unit test
@@ -83,7 +78,7 @@ public class Accession : BaseEntity
         
         foreach (var testOrder in TestOrders)
         {
-            testOrder.SetStatusToReadyForTesting(dateTimeProvider);
+            testOrder.SetStatusToReadyForTesting();
         }
 
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
@@ -101,7 +96,7 @@ public class Accession : BaseEntity
                 $"This test is not active. Only active tests can be added to an accession.");
 
         var testOrder = TestOrder.Create(test);
-        TestOrders.Add(testOrder);
+        _testOrders.Add(testOrder);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
         return this;
     }
@@ -127,8 +122,7 @@ public class Accession : BaseEntity
         GuardIfInFinalState("Test orders");
 
         // TODO if test order status is not in one of the pending states, guard
-
-        TestOrders.Remove(testOrder);
+        _testOrders.Remove(testOrder);
     }
 
     public Accession AddPanel(Panel panel)
@@ -137,14 +131,12 @@ public class Accession : BaseEntity
         GuardIfInFinalState("Panels");
         
         var hasInactivePanel = !panel.Status.IsActive();
-        if(hasInactivePanel)
-            throw new ValidationException(nameof(Accession),
-                $"This panel is not active. Only active panels can be added to an accession.");
+        ValidationException.MustNot(hasInactivePanel,
+            $"This panel is not active. Only active panels can be added to an accession.");
         
         var hasNonActiveTests = panel.Tests.Any(x => !x.Status.IsActive());
-        if(hasNonActiveTests)
-            throw new ValidationException(nameof(Accession),
-                $"This panel has one or more tests that are not active. Only active tests can be added to an accession.");
+        ValidationException.MustNot(hasNonActiveTests,
+            $"This panel has one or more tests that are not active. Only active tests can be added to an accession.");
 
         // TODO unit test
         var hasNoTests = panel.Tests.Count == 0;
@@ -155,7 +147,7 @@ public class Accession : BaseEntity
         foreach (var test in panel.Tests)
         {
             var testOrder = TestOrder.Create(test, panel);
-            TestOrders.Add(testOrder);
+            _testOrders.Add(testOrder);
         }
         
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
@@ -167,11 +159,11 @@ public class Accession : BaseEntity
         // TODO unit test
         GuardIfInFinalState("Panels");
 
-        var alreadyExists = TestOrders.Any(x => panel.Id == x.AssociatedPanelId);
+        var alreadyExists = TestOrders.Any(x => panel == x.AssociatedPanel);
         if (!alreadyExists)
             return this;
 
-        var testsToRemove = TestOrders.Where(x => x.AssociatedPanelId == panel.Id).ToList();
+        var testsToRemove = TestOrders.Where(x => x.AssociatedPanel == panel).ToList();
         foreach (var testOrder in testsToRemove)
         {
             RemoveTestOrderForTestOrPanel(testOrder);
@@ -187,7 +179,7 @@ public class Accession : BaseEntity
         if (alreadyExists)
             return this;
         
-        Contacts.Add(contact);
+        _healthcareOrganizationContacts.Add(contact);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
         return this;
     }
@@ -198,7 +190,7 @@ public class Accession : BaseEntity
         if (!alreadyExists)
             return this;
         
-        Contacts.Remove(contact);
+        _healthcareOrganizationContacts.Remove(contact);
         QueueDomainEvent(new AccessionUpdated(){ Id = Id });
         return this;
     }
@@ -206,9 +198,9 @@ public class Accession : BaseEntity
     public Accession SetPatient(Patient patient)
     {
         GuardIfInProcessingState("The patient");
-        new ValidationException(nameof(Accession), $"Invalid Patient.").ThrowWhenNull(patient);
+        ValidationException.ThrowWhenNull(patient, $"Invalid Patient.");
+        
         Patient = patient;
-        PatientId = patient.Id;
         return this;
     }
 
@@ -216,20 +208,17 @@ public class Accession : BaseEntity
     {
         GuardIfInProcessingState("The patient");
         Patient = null;
-        PatientId = null;
         return this;
     }
 
     public Accession SetHealthcareOrganization(HealthcareOrganization org)
     {
-        new ValidationException(nameof(Accession), $"Invalid Healthcare Organization.").ThrowWhenNull(org);
+        ValidationException.ThrowWhenNull(org, $"Invalid Healthcare Organization.");
         GuardIfInProcessingState("The organization");
-        if (!org.Status.IsActive())
-            throw new ValidationException(nameof(Accession),
-                $"Only active organizations can be set on an accession.");
+        ValidationException.Must(org.Status.IsActive(),
+            $"Only active organizations can be set on an accession.");
         
         HealthcareOrganization = org;
-        HealthcareOrganizationId = org.Id;
         return this;
     }
 
@@ -237,12 +226,11 @@ public class Accession : BaseEntity
     {
         GuardIfInProcessingState("The organization");
         HealthcareOrganization = null;
-        HealthcareOrganizationId = null;
         return this;
     }
 
     private bool HealthcareOrganizationContactAlreadyExists(HealthcareOrganizationContact contact) 
-        => Contacts.Any(x => contact.Id == x.Id);
+        => _healthcareOrganizationContacts.Any(x => contact.Id == x.Id);
 
     private void GuardIfInFinalState(string subject)
     {
@@ -257,6 +245,8 @@ public class Accession : BaseEntity
             throw new ValidationException(nameof(Accession),
                 $"This accession is processing. {subject} can not be modified.");
     }
+
+    // Add Prop Methods Marker -- Deleting this comment will cause the add props utility to be incomplete
     
     protected Accession() { } // For EF + Mocking
 }

@@ -2,7 +2,7 @@ namespace PeakLims.Services;
 
 using PeakLims.Databases;
 
-public interface IUnitOfWork : IPeakLimsService
+public interface IUnitOfWork : IPeakLimsScopedService
 {
     Task<int> CommitChanges(CancellationToken cancellationToken = default);
 }

@@ -5,16 +5,7 @@ This project was created with [Craftsman](https://github.com/pdevito3/craftsman)
 ## Getting Started
 1. Run `docker-compose up --build` from your `.sln` directory to spin up your database(s) and other supporting 
 infrastructure depending on your configuration (e.g. RabbitMQ, Keycloak, Jaeger, etc.).
-2. Apply migrations
-    1. Make sure you have a migrations in your boundary project (there should be a `Migrations` directory in the project directory). 
-    If there isn't see [Running Migrations](#running-migrations) below.
-    2. Confirm your environment (`ASPNETCORE_ENVIRONMENT`) is set to `Development` using 
-    `$Env:ASPNETCORE_ENVIRONMENT = "Development"` for powershell or `export ASPNETCORE_ENVIRONMENT=Development` for bash.
-    3. `cd` to the boundary project root (e.g. `cd RecipeManagement/src/RecipeManagement`)
-    4. Run `dotnet ef database update` to apply your migrations.
-
-    > You can also stay in the `sln` root and run something like `dotnet ef database update --project RecipeManagement/src/RecipeManagement`
-3. If using a Keycloak auth server, you'll need to configure it manually (new realm, client, etc) or use the scaffolded Pulumi setup.
+2. If using a Keycloak auth server, you'll need to configure it manually (new realm, client, etc) or use the scaffolded Pulumi setup.
     1. [Install the pulumi CLI](https://www.pulumi.com/docs/get-started/) 
     1. `cd` to your scaffolded Pulumi project
     1. Run `pulumi up` to start the scaffolding process
@@ -22,13 +13,24 @@ infrastructure depending on your configuration (e.g. RabbitMQ, Keycloak, Jaeger,
     you can use the `pulumi stack init` command to make a new stack first.
         > Note: The stack name must match the extension on your yaml config file (e.g. `Pulumi.dev.yaml`) would have a stack of `dev`.
     1. Select yes to apply the configuration to your local Keycloak instance.
-4. If running a BFF:
+3. If running a BFF:
     1. Make sure you have [`yarn` installed](https://yarnpkg.com/getting-started/install)
     1. Run the project with `dotnet run` or your IDE
 
 ### Running Your Project(s)
 Once you have your database(s) running, you can run your API(s), BFF, and Auth Servers by using 
 the `dotnet run` command or running your project(s) from your IDE of choice.   
+
+### Migrations
+Migrations should be applied for you automatically on startup, but if you have any any issues, you can do the following:
+    1. Make sure you have a migrations in your boundary project (there should be a `Migrations` directory in the project directory). 
+    If there isn't see [Running Migrations](#running-migrations) below.
+    2. Confirm your environment (`ASPNETCORE_ENVIRONMENT`) is set to `Development` using 
+    `$Env:ASPNETCORE_ENVIRONMENT = "Development"` for powershell or `export ASPNETCORE_ENVIRONMENT=Development` for bash.
+    3. `cd` to the boundary project root (e.g. `cd RecipeManagement/src/RecipeManagement`)
+    4. Run your project and your migrations should be applied automatically. Alternatively, you can run `dotnet ef database update` to apply your migrations manually.
+
+    > You can also stay in the `sln` root and run something like `dotnet ef database update --project RecipeManagement/src/RecipeManagement`
 
 ## Running Integration Tests
 To run integration tests:

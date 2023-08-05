@@ -5,7 +5,7 @@ using PeakLims.Domain.Containers.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetContainer
@@ -23,12 +23,10 @@ public static class GetContainer
     public sealed class Handler : IRequestHandler<Query, ContainerDto>
     {
         private readonly IContainerRepository _containerRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IContainerRepository containerRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IContainerRepository containerRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _containerRepository = containerRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetContainer
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadContainers);
 
             var result = await _containerRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<ContainerDto>(result);
+            return result.ToContainerDto();
         }
     }
 }

@@ -1,6 +1,7 @@
 namespace PeakLims.Domain.RolePermissions.Dtos;
 
-public sealed class RolePermissionForUpdateDto : RolePermissionForManipulationDto
+public sealed class RolePermissionForUpdateDto
 {
-
+    public string Role { get; set; }
+    public string Permission { get; set; }
 }

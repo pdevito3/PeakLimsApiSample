@@ -4,14 +4,15 @@ using PeakLims.Domain.RolePermissions.Dtos;
 using PeakLims.Domain.RolePermissions.Services;
 using PeakLims.Wrappers;
 using SharedKernel.Exceptions;
+using PeakLims.Resources;
+using PeakLims.Services;
 using PeakLims.Domain;
 using HeimGuard;
-using Microsoft.EntityFrameworkCore;
-using MapsterMapper;
-using Mapster;
+using Mappings;
 using MediatR;
-using Sieve.Models;
-using Sieve.Services;
+using Microsoft.EntityFrameworkCore;
+using QueryKit;
+using QueryKit.Configuration;
 
 public static class GetRolePermissionList
 {
@@ -28,33 +29,29 @@ public static class GetRolePermissionList
     public sealed class Handler : IRequestHandler<Query, PagedList<RolePermissionDto>>
     {
         private readonly IRolePermissionRepository _rolePermissionRepository;
-        private readonly SieveProcessor _sieveProcessor;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IRolePermissionRepository rolePermissionRepository, IMapper mapper, SieveProcessor sieveProcessor, IHeimGuardClient heimGuard)
+        public Handler(IRolePermissionRepository rolePermissionRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _rolePermissionRepository = rolePermissionRepository;
-            _sieveProcessor = sieveProcessor;
             _heimGuard = heimGuard;
         }
 
         public async Task<PagedList<RolePermissionDto>> Handle(Query request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadRolePermissions);
-
-            var collection = _rolePermissionRepository.Query().AsNoTracking();
-
-            var sieveModel = new SieveModel
+            
+            var queryKitConfig = new CustomQueryKitConfiguration();
+            var queryKitData = new QueryKitData()
             {
-                Sorts = request.QueryParameters.SortOrder ?? "-CreatedOn",
-                Filters = request.QueryParameters.Filters
+                Filters = request.QueryParameters.Filters,
+                SortOrder = request.QueryParameters.SortOrder ?? "-CreatedOn",
+                Configuration = queryKitConfig
             };
 
-            var appliedCollection = _sieveProcessor.Apply(sieveModel, collection);
-            var dtoCollection = appliedCollection
-                .ProjectToType<RolePermissionDto>();
+            var collection = _rolePermissionRepository.Query().AsNoTracking();
+            var appliedCollection = collection.ApplyQueryKit(queryKitData);
+            var dtoCollection = appliedCollection.ToRolePermissionDtoQueryable();
 
             return await PagedList<RolePermissionDto>.CreateAsync(dtoCollection,
                 request.QueryParameters.PageNumber,

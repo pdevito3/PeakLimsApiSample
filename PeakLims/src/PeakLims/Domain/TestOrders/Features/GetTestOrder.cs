@@ -5,7 +5,7 @@ using PeakLims.Domain.TestOrders.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetTestOrder
@@ -23,12 +23,10 @@ public static class GetTestOrder
     public sealed class Handler : IRequestHandler<Query, TestOrderDto>
     {
         private readonly ITestOrderRepository _testOrderRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(ITestOrderRepository testOrderRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(ITestOrderRepository testOrderRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _testOrderRepository = testOrderRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetTestOrder
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadTestOrders);
 
             var result = await _testOrderRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<TestOrderDto>(result);
+            return result.ToTestOrderDto();
         }
     }
 }

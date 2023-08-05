@@ -4,40 +4,50 @@ using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using PeakLims.Domain.HealthcareOrganizations.Dtos;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.HealthcareOrganizations.Features;
+using Domain;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
-using static TestFixture;
 
 public class UpdateHealthcareOrganizationCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_update_existing_healthcareorganization_in_db()
     {
         // Arrange
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
+        var testingServiceScope = new TestingServiceScope();
+        var fakeHealthcareOrganizationOne = new FakeHealthcareOrganizationBuilder().Build();
         var updatedHealthcareOrganizationDto = new FakeHealthcareOrganizationForUpdateDto().Generate();
-        await InsertAsync(fakeHealthcareOrganizationOne);
+        await testingServiceScope.InsertAsync(fakeHealthcareOrganizationOne);
 
-        var healthcareOrganization = await ExecuteDbContextAsync(db => db.HealthcareOrganizations
+        var healthcareOrganization = await testingServiceScope.ExecuteDbContextAsync(db => db.HealthcareOrganizations
             .FirstOrDefaultAsync(h => h.Id == fakeHealthcareOrganizationOne.Id));
-        var id = healthcareOrganization.Id;
 
         // Act
-        var command = new UpdateHealthcareOrganization.Command(id, updatedHealthcareOrganizationDto);
-        await SendAsync(command);
-        var updatedHealthcareOrganization = await ExecuteDbContextAsync(db => db.HealthcareOrganizations.FirstOrDefaultAsync(h => h.Id == id));
+        var command = new UpdateHealthcareOrganization.Command(healthcareOrganization.Id, updatedHealthcareOrganizationDto);
+        await testingServiceScope.SendAsync(command);
+        var updatedHealthcareOrganization = await testingServiceScope.ExecuteDbContextAsync(db => db.HealthcareOrganizations.FirstOrDefaultAsync(h => h.Id == healthcareOrganization.Id));
 
         // Assert
-        updatedHealthcareOrganization?.Name.Should().Be(updatedHealthcareOrganizationDto.Name);
-        updatedHealthcareOrganization?.Email.Value.Should().Be(updatedHealthcareOrganizationDto.Email);
-        updatedHealthcareOrganization?.PrimaryAddress.Line1.Should().Be(updatedHealthcareOrganizationDto.PrimaryAddress.Line1);
-        updatedHealthcareOrganization?.PrimaryAddress.Line2.Should().Be(updatedHealthcareOrganizationDto.PrimaryAddress.Line2);
-        updatedHealthcareOrganization?.PrimaryAddress.City.Should().Be(updatedHealthcareOrganizationDto.PrimaryAddress.City);
-        updatedHealthcareOrganization?.PrimaryAddress.State.Should().Be(updatedHealthcareOrganizationDto.PrimaryAddress.State);
-        updatedHealthcareOrganization?.PrimaryAddress.PostalCode.Value.Should().Be(updatedHealthcareOrganizationDto.PrimaryAddress.PostalCode);
-        updatedHealthcareOrganization?.PrimaryAddress.Country.Should().Be(updatedHealthcareOrganizationDto.PrimaryAddress.Country);
+        updatedHealthcareOrganization.Name.Should().Be(updatedHealthcareOrganizationDto.Name);
+        updatedHealthcareOrganization.Email.Should().Be(updatedHealthcareOrganizationDto.Email);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanUpdateHealthcareOrganizations);
+        var fakeHealthcareOrganizationOne = new FakeHealthcareOrganizationForUpdateDto();
+
+        // Act
+        var command = new UpdateHealthcareOrganization.Command(Guid.NewGuid(), fakeHealthcareOrganizationOne);
+        var act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

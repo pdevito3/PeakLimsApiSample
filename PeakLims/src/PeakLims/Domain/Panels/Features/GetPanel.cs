@@ -5,7 +5,7 @@ using PeakLims.Domain.Panels.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetPanel
@@ -23,12 +23,10 @@ public static class GetPanel
     public sealed class Handler : IRequestHandler<Query, PanelDto>
     {
         private readonly IPanelRepository _panelRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IPanelRepository panelRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IPanelRepository panelRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _panelRepository = panelRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetPanel
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadPanels);
 
             var result = await _panelRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<PanelDto>(result);
+            return result.ToPanelDto();
         }
     }
 }

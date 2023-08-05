@@ -2,7 +2,7 @@ namespace PeakLims.Services;
 
 using System.Security.Claims;
 
-public interface ICurrentUserService : IPeakLimsService
+public interface ICurrentUserService : IPeakLimsScopedService
 {
     ClaimsPrincipal? User { get; }
     string? UserId { get; }

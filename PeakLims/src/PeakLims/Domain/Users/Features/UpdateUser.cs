@@ -2,30 +2,30 @@ namespace PeakLims.Domain.Users.Features;
 
 using PeakLims.Domain.Users;
 using PeakLims.Domain.Users.Dtos;
-using PeakLims.Domain.Users.Validators;
 using PeakLims.Domain.Users.Services;
 using PeakLims.Services;
+using PeakLims.Domain.Users.Models;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class UpdateUser
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
-        public readonly UserForUpdateDto UserToUpdate;
+        public readonly UserForUpdateDto UpdatedUserData;
 
-        public Command(Guid user, UserForUpdateDto newUserData)
+        public Command(Guid id, UserForUpdateDto updatedUserData)
         {
-            Id = user;
-            UserToUpdate = newUserData;
+            Id = id;
+            UpdatedUserData = updatedUserData;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -38,15 +38,16 @@ public static class UpdateUser
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdateUsers);
 
             var userToUpdate = await _userRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            var userToAdd = request.UpdatedUserData.ToUserForUpdate();
+            userToUpdate.Update(userToAdd);
 
-            userToUpdate.Update(request.UserToUpdate);
             _userRepository.Update(userToUpdate);
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

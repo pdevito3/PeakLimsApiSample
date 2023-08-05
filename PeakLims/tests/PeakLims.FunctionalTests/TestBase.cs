@@ -9,21 +9,20 @@ using AutoBogus;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using System.Threading.Tasks;
+using Xunit;
  
-public class TestBase
+[Collection(nameof(TestBase))]
+public class TestBase : IDisposable
 {
     private static IServiceScopeFactory _scopeFactory;
-    private static WebApplicationFactory<Program> _factory;
     protected static HttpClient FactoryClient  { get; private set; }
 
-    [SetUp]
-    public async Task TestSetUp()
+    public TestBase()
     {
-        _factory = FunctionalTestFixture.Factory;
-        _scopeFactory = FunctionalTestFixture.ScopeFactory;
-        FactoryClient = _factory.CreateClient(new WebApplicationFactoryClientOptions());
+        var factory = new TestingWebApplicationFactory();
+        _scopeFactory = factory.Services.GetRequiredService<IServiceScopeFactory>();
+        FactoryClient = factory.CreateClient(new WebApplicationFactoryClientOptions());
 
         AutoFaker.Configure(builder =>
         {
@@ -35,15 +34,18 @@ public class TestBase
         });
         
         // seed root user so tests won't always have user as super admin
-        await AddNewSuperAdmin();
+        AddNewSuperAdmin().Wait();
+    }
+    
+    public void Dispose()
+    {
+        FactoryClient.Dispose();
     }
 
     public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
     {
         using var scope = _scopeFactory.CreateScope();
-
         var mediator = scope.ServiceProvider.GetService<ISender>();
-
         return await mediator.Send(request);
     }
 
@@ -51,9 +53,7 @@ public class TestBase
         where TEntity : class
     {
         using var scope = _scopeFactory.CreateScope();
-
         var context = scope.ServiceProvider.GetService<PeakLimsDbContext>();
-
         return await context.FindAsync<TEntity>(keyValues);
     }
 
@@ -61,11 +61,8 @@ public class TestBase
         where TEntity : class
     {
         using var scope = _scopeFactory.CreateScope();
-
         var context = scope.ServiceProvider.GetService<PeakLimsDbContext>();
-
         context.Add(entity);
-
         await context.SaveChangesAsync();
     }
 
@@ -73,42 +70,14 @@ public class TestBase
     {
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<PeakLimsDbContext>();
-
-        try
-        {
-            //await dbContext.BeginTransactionAsync();
-
-            await action(scope.ServiceProvider);
-
-            //await dbContext.CommitTransactionAsync();
-        }
-        catch (Exception)
-        {
-            //dbContext.RollbackTransaction();
-            throw;
-        }
+        await action(scope.ServiceProvider);
     }
 
     public static async Task<T> ExecuteScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
     {
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<PeakLimsDbContext>();
-
-        try
-        {
-            //await dbContext.BeginTransactionAsync();
-
-            var result = await action(scope.ServiceProvider);
-
-            //await dbContext.CommitTransactionAsync();
-
-            return result;
-        }
-        catch (Exception)
-        {
-            //dbContext.RollbackTransaction();
-            throw;
-        }
+        return await action(scope.ServiceProvider);
     }
 
     public static Task ExecuteDbContextAsync(Func<PeakLimsDbContext, Task> action)
@@ -143,7 +112,7 @@ public class TestBase
 
     public static async Task<User> AddNewSuperAdmin()
     {
-        var user = FakeUser.Generate();
+        var user = new FakeUserBuilder().Build();
         user.AddRole(Role.SuperAdmin());
         await InsertAsync(user);
         return user;
@@ -151,11 +120,14 @@ public class TestBase
 
     public static async Task<User> AddNewUser(List<Role> roles)
     {
-        var user = FakeUser.Generate();
+        var user = new FakeUserBuilder().Build();
         foreach (var role in roles)
             user.AddRole(role);
         
         await InsertAsync(user);
         return user;
     }
+
+    public static async Task<User> AddNewUser(params Role[] roles)
+        => await AddNewUser(roles.ToList());
 }

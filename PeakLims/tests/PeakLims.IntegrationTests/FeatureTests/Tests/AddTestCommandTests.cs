@@ -1,27 +1,28 @@
 namespace PeakLims.IntegrationTests.FeatureTests.Tests;
 
 using PeakLims.SharedTestHelpers.Fakes.Test;
+using Domain;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
 using PeakLims.Domain.Tests.Features;
-using static TestFixture;
 using SharedKernel.Exceptions;
 
 public class AddTestCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_add_new_test_to_db()
     {
         // Arrange
+        var testingServiceScope = new TestingServiceScope();
         var fakeTestOne = new FakeTestForCreationDto().Generate();
 
         // Act
         var command = new AddTest.Command(fakeTestOne);
-        var testReturned = await SendAsync(command);
-        var testCreated = await ExecuteDbContextAsync(db => db.Tests
+        var testReturned = await testingServiceScope.SendAsync(command);
+        var testCreated = await testingServiceScope.ExecuteDbContextAsync(db => db.Tests
             .FirstOrDefaultAsync(t => t.Id == testReturned.Id));
 
         // Assert
@@ -29,33 +30,28 @@ public class AddTestCommandTests : TestBase
         testReturned.TestName.Should().Be(fakeTestOne.TestName);
         testReturned.Methodology.Should().Be(fakeTestOne.Methodology);
         testReturned.Platform.Should().Be(fakeTestOne.Platform);
-        testReturned.Version.Should().Be(fakeTestOne.Version);
         testReturned.TurnAroundTime.Should().Be(fakeTestOne.TurnAroundTime);
-        
+
         testCreated.TestCode.Should().Be(fakeTestOne.TestCode);
         testCreated.TestName.Should().Be(fakeTestOne.TestName);
         testCreated.Methodology.Should().Be(fakeTestOne.Methodology);
         testCreated.Platform.Should().Be(fakeTestOne.Platform);
-        testCreated.Version.Should().Be(fakeTestOne.Version);
         testCreated.TurnAroundTime.Should().Be(fakeTestOne.TurnAroundTime);
     }
-    
-    [Test]
-    public async Task can_not_add_test_with_same_code_and_version()
+
+    [Fact]
+    public async Task must_be_permitted()
     {
         // Arrange
-        var fakeTestOne = new FakeTestForCreationDto().Generate();
-        var fakeTestTwo = new FakeTestForCreationDto().Generate();
-        fakeTestTwo.TestCode = fakeTestOne.TestCode;
-        fakeTestTwo.Version = fakeTestOne.Version;
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanAddTests);
+        var fakeTestOne = new FakeTestForCreationDto();
 
         // Act
-        var commandOne = new AddTest.Command(fakeTestOne);
-        await SendAsync(commandOne);
-        var commandTwo = new AddTest.Command(fakeTestTwo);
-        var act = () => SendAsync(commandTwo);
+        var command = new AddTest.Command(fakeTestOne);
+        var act = () => testingServiceScope.SendAsync(command);
 
         // Assert
-        await act.Should().ThrowAsync<ValidationException>();
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

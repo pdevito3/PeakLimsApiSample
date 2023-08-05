@@ -4,12 +4,10 @@ using AutoBogus;
 using PeakLims.Domain.Tests;
 using PeakLims.Domain.Tests.Dtos;
 
-// or replace 'AutoFaker' with 'Faker' along with your own rules if you don't want all fields to be auto faked
-public class FakeTestForCreationDto : AutoFaker<TestForCreationDto>
+public sealed class FakeTestForCreationDto : AutoFaker<TestForCreationDto>
 {
     public FakeTestForCreationDto()
     {
-        RuleFor(x => x.Version, f => f.Random.Int(0));
-        RuleFor(x => x.TurnAroundTime, f => f.Random.Int(0, 600));
+        RuleFor(x => x.TurnAroundTime, x => x.Random.Int(min: 1, max: 1000));
     }
 }

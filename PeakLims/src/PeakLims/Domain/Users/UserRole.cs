@@ -8,27 +8,26 @@ using Roles;
 
 public class UserRole : BaseEntity
 {
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("User")]
-    public virtual Guid UserId { get; private set; }
-    public virtual User User { get; private set; }
+    public User User { get; private set; }
+    public Role Role { get; private set; }
 
-    public virtual Role Role { get; private set; }
+    // Add Props Marker -- Deleting this comment will cause the add props utility to be incomplete
     
 
-    public static UserRole Create(Guid userId, Role role)
+    public static UserRole Create(User user, Role role)
     {
         var newUserRole = new UserRole
         {
-            UserId = userId,
+            User = user,
             Role = role
         };
 
-        newUserRole.QueueDomainEvent(new UserRolesUpdated(){ UserId = userId });
+        newUserRole.QueueDomainEvent(new UserRolesUpdated(){ UserId = user.Id });
         
         return newUserRole;
     }
+
+    // Add Prop Methods Marker -- Deleting this comment will cause the add props utility to be incomplete
     
     protected UserRole() { } // For EF + Mocking
 }

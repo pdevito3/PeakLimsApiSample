@@ -1,64 +1,70 @@
 namespace PeakLims.Domain.HealthcareOrganizationContacts;
 
 using SharedKernel.Exceptions;
-using PeakLims.Domain.HealthcareOrganizationContacts.Dtos;
-using PeakLims.Domain.HealthcareOrganizationContacts.Validators;
+using PeakLims.Domain.Accessions;
+using PeakLims.Domain.HealthcareOrganizationContacts.Models;
 using PeakLims.Domain.HealthcareOrganizationContacts.DomainEvents;
 using FluentValidation;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
-using Emails;
-using Sieve.Attributes;
 using PeakLims.Domain.HealthcareOrganizations;
+using PeakLims.Domain.HealthcareOrganizations.Models;
 
 
 public class HealthcareOrganizationContact : BaseEntity
 {
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string Name { get; private set; }
+    public string Name { get; private set; }
 
-    public virtual Email Email { get; private set; }
+    public string Email { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string Npi { get; private set; }
+    public string Npi { get; private set; }
 
-    [Required]
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("HealthcareOrganization")]
-    public virtual Guid HealthcareOrganizationId { get; private set; }
-    public virtual HealthcareOrganization HealthcareOrganization { get; private set; }
+    private readonly List<HealthcareOrganization> _healthcareOrganization = new();
+    public IReadOnlyCollection<HealthcareOrganization> HealthcareOrganizations => _healthcareOrganization.AsReadOnly();
+
+    public Accession Accession { get; }
+
+    // Add Props Marker -- Deleting this comment will cause the add props utility to be incomplete
 
 
-    public static HealthcareOrganizationContact Create(HealthcareOrganizationContactForCreationDto healthcareOrganizationContactForCreationDto)
+    public static HealthcareOrganizationContact Create(HealthcareOrganizationContactForCreation healthcareOrganizationContactForCreation)
     {
-        new HealthcareOrganizationContactForCreationDtoValidator().ValidateAndThrow(healthcareOrganizationContactForCreationDto);
-
         var newHealthcareOrganizationContact = new HealthcareOrganizationContact();
 
-        newHealthcareOrganizationContact.Name = healthcareOrganizationContactForCreationDto.Name;
-        newHealthcareOrganizationContact.Email = new Email(healthcareOrganizationContactForCreationDto.Email);
-        newHealthcareOrganizationContact.Npi = healthcareOrganizationContactForCreationDto.Npi;
-        newHealthcareOrganizationContact.HealthcareOrganizationId = healthcareOrganizationContactForCreationDto.HealthcareOrganizationId;
+        newHealthcareOrganizationContact.Name = healthcareOrganizationContactForCreation.Name;
+        newHealthcareOrganizationContact.Email = healthcareOrganizationContactForCreation.Email;
+        newHealthcareOrganizationContact.Npi = healthcareOrganizationContactForCreation.Npi;
 
         newHealthcareOrganizationContact.QueueDomainEvent(new HealthcareOrganizationContactCreated(){ HealthcareOrganizationContact = newHealthcareOrganizationContact });
         
         return newHealthcareOrganizationContact;
     }
 
-    public void Update(HealthcareOrganizationContactForUpdateDto healthcareOrganizationContactForUpdateDto)
+    public HealthcareOrganizationContact Update(HealthcareOrganizationContactForUpdate healthcareOrganizationContactForUpdate)
     {
-        new HealthcareOrganizationContactForUpdateDtoValidator().ValidateAndThrow(healthcareOrganizationContactForUpdateDto);
-
-        Name = healthcareOrganizationContactForUpdateDto.Name;
-        Email = new Email(healthcareOrganizationContactForUpdateDto.Email);
-        Npi = healthcareOrganizationContactForUpdateDto.Npi;
-        HealthcareOrganizationId = healthcareOrganizationContactForUpdateDto.HealthcareOrganizationId;
+        Name = healthcareOrganizationContactForUpdate.Name;
+        Email = healthcareOrganizationContactForUpdate.Email;
+        Npi = healthcareOrganizationContactForUpdate.Npi;
 
         QueueDomainEvent(new HealthcareOrganizationContactUpdated(){ Id = Id });
+        return this;
     }
+
+    public HealthcareOrganizationContact AddHealthcareOrganization(HealthcareOrganization healthcareOrganization)
+    {
+        _healthcareOrganization.Add(healthcareOrganization);
+        return this;
+    }
+    
+    public HealthcareOrganizationContact RemoveHealthcareOrganization(HealthcareOrganization healthcareOrganization)
+    {
+        _healthcareOrganization.Remove(healthcareOrganization);
+        return this;
+    }
+
+    // Add Prop Methods Marker -- Deleting this comment will cause the add props utility to be incomplete
     
     protected HealthcareOrganizationContact() { } // For EF + Mocking
 }

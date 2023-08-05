@@ -2,30 +2,30 @@ namespace PeakLims.Domain.Panels.Features;
 
 using PeakLims.Domain.Panels;
 using PeakLims.Domain.Panels.Dtos;
-using PeakLims.Domain.Panels.Validators;
 using PeakLims.Domain.Panels.Services;
 using PeakLims.Services;
+using PeakLims.Domain.Panels.Models;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class UpdatePanel
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
         public readonly PanelForUpdateDto UpdatedPanelData;
 
-        public Command(Guid panel, PanelForUpdateDto newPanelData)
+        public Command(Guid id, PanelForUpdateDto updatedPanelData)
         {
-            Id = panel;
-            UpdatedPanelData = newPanelData;
+            Id = id;
+            UpdatedPanelData = updatedPanelData;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IPanelRepository _panelRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -38,15 +38,16 @@ public static class UpdatePanel
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdatePanels);
 
             var panelToUpdate = await _panelRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            var panelToAdd = request.UpdatedPanelData.ToPanelForUpdate();
+            panelToUpdate.Update(panelToAdd);
 
-            panelToUpdate.Update(request.UpdatedPanelData, _panelRepository);
             _panelRepository.Update(panelToUpdate);
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

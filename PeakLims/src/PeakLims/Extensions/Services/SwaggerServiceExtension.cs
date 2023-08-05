@@ -1,5 +1,7 @@
 namespace PeakLims.Extensions.Services;
 
+using PeakLims.Services;
+using Configurations;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +15,9 @@ using System.Reflection;
 
 public static class SwaggerServiceExtension
 {
-    public static void AddSwaggerExtension(this IServiceCollection services)
+    public static void AddSwaggerExtension(this IServiceCollection services, IConfiguration configuration)
     {
+        var authOptions = configuration.GetAuthOptions();
         services.AddSwaggerGen(config =>
         {
             config.CustomSchemaIds(type => type.ToString());
@@ -45,8 +48,8 @@ public static class SwaggerServiceExtension
                 {
                     AuthorizationCode = new OpenApiOAuthFlow
                     {
-                        AuthorizationUrl = new Uri(Environment.GetEnvironmentVariable("AUTH_AUTHORIZATION_URL")),
-                        TokenUrl = new Uri(Environment.GetEnvironmentVariable("AUTH_TOKEN_URL")),
+                        AuthorizationUrl = new Uri(authOptions.AuthorizationUrl),
+                        TokenUrl = new Uri(authOptions.TokenUrl),
                         Scopes = new Dictionary<string, string>
                         {
                             {"peak_lims", "Peak lims access"}

@@ -4,62 +4,51 @@ using PeakLims.SharedTestHelpers.Fakes.Panel;
 using PeakLims.Domain.Panels.Dtos;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.Panels.Features;
+using Domain;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
-using Domain.Panels.Services;
-using Domain.TestOrders.Services;
-using static TestFixture;
 
 public class UpdatePanelCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_update_existing_panel_in_db()
     {
         // Arrange
-        var fakePanelOne = FakePanelBuilder
-            .Initialize()
-            .WithPanelRepository(GetService<IPanelRepository>())
-            .WithTestOrderRepository(GetService<ITestOrderRepository>())
-            .Build();
+        var testingServiceScope = new TestingServiceScope();
+        var fakePanelOne = new FakePanelBuilder().Build();
         var updatedPanelDto = new FakePanelForUpdateDto().Generate();
-        await InsertAsync(fakePanelOne);
+        await testingServiceScope.InsertAsync(fakePanelOne);
 
-        var panel = await ExecuteDbContextAsync(db => db.Panels
+        var panel = await testingServiceScope.ExecuteDbContextAsync(db => db.Panels
             .FirstOrDefaultAsync(p => p.Id == fakePanelOne.Id));
-        var id = panel.Id;
 
         // Act
-        var command = new UpdatePanel.Command(id, updatedPanelDto);
-        await SendAsync(command);
-        var updatedPanel = await ExecuteDbContextAsync(db => db.Panels.FirstOrDefaultAsync(p => p.Id == id));
+        var command = new UpdatePanel.Command(panel.Id, updatedPanelDto);
+        await testingServiceScope.SendAsync(command);
+        var updatedPanel = await testingServiceScope.ExecuteDbContextAsync(db => db.Panels.FirstOrDefaultAsync(p => p.Id == panel.Id));
 
         // Assert
+        updatedPanel.PanelCode.Should().Be(updatedPanelDto.PanelCode);
         updatedPanel.PanelName.Should().Be(updatedPanelDto.PanelName);
         updatedPanel.Type.Should().Be(updatedPanelDto.Type);
-        updatedPanel.Version.Should().Be(updatedPanelDto.Version);
     }
-    
-    [Test]
-    public async Task can_not_update_panel_with_same_code_and_version()
+
+    [Fact]
+    public async Task must_be_permitted()
     {
         // Arrange
-        var fakePanelOne = FakePanelBuilder
-            .Initialize()
-            .WithPanelRepository(GetService<IPanelRepository>())
-            .WithTestOrderRepository(GetService<ITestOrderRepository>())
-            .Build();
-        await InsertAsync(fakePanelOne);
-        var fakePanelTwo = new FakePanelForUpdateDto().Generate();
-        fakePanelTwo.Version = fakePanelOne.Version;
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanUpdatePanels);
+        var fakePanelOne = new FakePanelForUpdateDto();
 
         // Act
-        var command = new UpdatePanel.Command(fakePanelOne.Id, fakePanelTwo);
-        var act = () => SendAsync(command);
+        var command = new UpdatePanel.Command(Guid.NewGuid(), fakePanelOne);
+        var act = () => testingServiceScope.SendAsync(command);
 
         // Assert
-        await act.Should().ThrowAsync<ValidationException>();
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

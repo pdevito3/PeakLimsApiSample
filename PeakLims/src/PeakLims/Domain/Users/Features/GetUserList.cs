@@ -4,14 +4,15 @@ using PeakLims.Domain.Users.Dtos;
 using PeakLims.Domain.Users.Services;
 using PeakLims.Wrappers;
 using SharedKernel.Exceptions;
+using PeakLims.Resources;
+using PeakLims.Services;
 using PeakLims.Domain;
 using HeimGuard;
-using Microsoft.EntityFrameworkCore;
-using MapsterMapper;
-using Mapster;
+using Mappings;
 using MediatR;
-using Sieve.Models;
-using Sieve.Services;
+using Microsoft.EntityFrameworkCore;
+using QueryKit;
+using QueryKit.Configuration;
 
 public static class GetUserList
 {
@@ -28,33 +29,29 @@ public static class GetUserList
     public sealed class Handler : IRequestHandler<Query, PagedList<UserDto>>
     {
         private readonly IUserRepository _userRepository;
-        private readonly SieveProcessor _sieveProcessor;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IUserRepository userRepository, IMapper mapper, SieveProcessor sieveProcessor, IHeimGuardClient heimGuard)
+        public Handler(IUserRepository userRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _userRepository = userRepository;
-            _sieveProcessor = sieveProcessor;
             _heimGuard = heimGuard;
         }
 
         public async Task<PagedList<UserDto>> Handle(Query request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadUsers);
-
-            var collection = _userRepository.Query().AsNoTracking();
-
-            var sieveModel = new SieveModel
+            
+            var queryKitConfig = new CustomQueryKitConfiguration();
+            var queryKitData = new QueryKitData()
             {
-                Sorts = request.QueryParameters.SortOrder ?? "-CreatedOn",
-                Filters = request.QueryParameters.Filters
+                Filters = request.QueryParameters.Filters,
+                SortOrder = request.QueryParameters.SortOrder ?? "-CreatedOn",
+                Configuration = queryKitConfig
             };
 
-            var appliedCollection = _sieveProcessor.Apply(sieveModel, collection);
-            var dtoCollection = appliedCollection
-                .ProjectToType<UserDto>();
+            var collection = _userRepository.Query().AsNoTracking();
+            var appliedCollection = collection.ApplyQueryKit(queryKitData);
+            var dtoCollection = appliedCollection.ToUserDtoQueryable();
 
             return await PagedList<UserDto>.CreateAsync(dtoCollection,
                 request.QueryParameters.PageNumber,

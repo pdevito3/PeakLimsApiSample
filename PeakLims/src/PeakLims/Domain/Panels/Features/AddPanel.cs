@@ -3,11 +3,12 @@ namespace PeakLims.Domain.Panels.Features;
 using PeakLims.Domain.Panels.Services;
 using PeakLims.Domain.Panels;
 using PeakLims.Domain.Panels.Dtos;
+using PeakLims.Domain.Panels.Models;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class AddPanel
@@ -26,12 +27,10 @@ public static class AddPanel
     {
         private readonly IPanelRepository _panelRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IPanelRepository panelRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IPanelRepository panelRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _panelRepository = panelRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
@@ -41,13 +40,13 @@ public static class AddPanel
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddPanels);
 
-            var panel = Panel.Create(request.PanelToAdd, _panelRepository);
-            await _panelRepository.Add(panel, cancellationToken);
+            var panelToAdd = request.PanelToAdd.ToPanelForCreation();
+            var panel = Panel.Create(panelToAdd);
 
+            await _panelRepository.Add(panel, cancellationToken);
             await _unitOfWork.CommitChanges(cancellationToken);
 
-            var panelAdded = await _panelRepository.GetById(panel.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<PanelDto>(panelAdded);
+            return panel.ToPanelDto();
         }
     }
 }

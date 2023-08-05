@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using PeakLims.Domain.Panels;
 using PeakLims.Databases;
 using PeakLims.Services;
-using SharedKernel.Exceptions;
 
 public interface IPanelRepository : IGenericRepository<Panel>
 {
@@ -35,15 +34,5 @@ public sealed class PanelRepository : GenericRepository<Panel>, IPanelRepository
                 .Include(x => x.Tests)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-    }
-
-    public override async Task<Panel> GetById(Guid id, bool withTracking = true, CancellationToken cancellationToken = default)
-    {
-        var entity = await GetByIdOrDefault(id, withTracking, cancellationToken);
-        
-        if(entity == null)
-            throw new NotFoundException($"{nameof(Panel)} with an id '{id}' was not found.");
-
-        return entity;
     }
 }

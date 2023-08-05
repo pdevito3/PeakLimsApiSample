@@ -5,17 +5,17 @@ using PeakLims.FunctionalTests.TestUtilities;
 using PeakLims.Domain;
 using SharedKernel.Domain;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 using System.Net;
 using System.Threading.Tasks;
 
 public class UpdateHealthcareOrganizationRecordTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task put_healthcareorganization_returns_nocontent_when_entity_exists_and_auth_credentials_are_valid()
     {
         // Arrange
-        var fakeHealthcareOrganization = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
+        var fakeHealthcareOrganization = new FakeHealthcareOrganizationBuilder().Build();
         var updatedHealthcareOrganizationDto = new FakeHealthcareOrganizationForUpdateDto().Generate();
 
         var user = await AddNewSuperAdmin();
@@ -23,42 +23,38 @@ public class UpdateHealthcareOrganizationRecordTests : TestBase
         await InsertAsync(fakeHealthcareOrganization);
 
         // Act
-        var route = ApiRoutes.HealthcareOrganizations.Put.Replace(ApiRoutes.HealthcareOrganizations.Id, fakeHealthcareOrganization.Id.ToString());
+        var route = ApiRoutes.HealthcareOrganizations.Put(fakeHealthcareOrganization.Id);
         var result = await FactoryClient.PutJsonRequestAsync(route, updatedHealthcareOrganizationDto);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
             
-    [Test]
+    [Fact]
     public async Task put_healthcareorganization_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var fakeHealthcareOrganization = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
+        var fakeHealthcareOrganization = new FakeHealthcareOrganizationBuilder().Build();
         var updatedHealthcareOrganizationDto = new FakeHealthcareOrganizationForUpdateDto { }.Generate();
 
-        await InsertAsync(fakeHealthcareOrganization);
-
         // Act
-        var route = ApiRoutes.HealthcareOrganizations.Put.Replace(ApiRoutes.HealthcareOrganizations.Id, fakeHealthcareOrganization.Id.ToString());
+        var route = ApiRoutes.HealthcareOrganizations.Put(fakeHealthcareOrganization.Id);
         var result = await FactoryClient.PutJsonRequestAsync(route, updatedHealthcareOrganizationDto);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
             
-    [Test]
+    [Fact]
     public async Task put_healthcareorganization_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var fakeHealthcareOrganization = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
+        var fakeHealthcareOrganization = new FakeHealthcareOrganizationBuilder().Build();
         var updatedHealthcareOrganizationDto = new FakeHealthcareOrganizationForUpdateDto { }.Generate();
         FactoryClient.AddAuth();
 
-        await InsertAsync(fakeHealthcareOrganization);
-
         // Act
-        var route = ApiRoutes.HealthcareOrganizations.Put.Replace(ApiRoutes.HealthcareOrganizations.Id, fakeHealthcareOrganization.Id.ToString());
+        var route = ApiRoutes.HealthcareOrganizations.Put(fakeHealthcareOrganization.Id);
         var result = await FactoryClient.PutJsonRequestAsync(route, updatedHealthcareOrganizationDto);
 
         // Assert

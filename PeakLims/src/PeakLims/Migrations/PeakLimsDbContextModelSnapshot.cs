@@ -17,7 +17,7 @@ namespace PeakLims.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.10")
+                .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -26,10 +26,29 @@ namespace PeakLims.Migrations
                 .StartsAt(10005702L);
 
             modelBuilder.HasSequence("PAT")
-                .StartsAt(10145702L);
+                .StartsAt(10045702L);
 
             modelBuilder.HasSequence("SAM")
                 .StartsAt(10000202L);
+
+            modelBuilder.Entity("HealthcareOrganizationHealthcareOrganizationContact", b =>
+                {
+                    b.Property<Guid>("HealthcareOrganizationContactsId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("healthcare_organization_contacts_id");
+
+                    b.Property<Guid>("HealthcareOrganizationsId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("healthcare_organizations_id");
+
+                    b.HasKey("HealthcareOrganizationContactsId", "HealthcareOrganizationsId")
+                        .HasName("pk_healthcare_organization_healthcare_organization_contact");
+
+                    b.HasIndex("HealthcareOrganizationsId")
+                        .HasDatabaseName("ix_healthcare_organization_healthcare_organization_contact_hea");
+
+                    b.ToTable("healthcare_organization_healthcare_organization_contact", (string)null);
+                });
 
             modelBuilder.Entity("PanelTest", b =>
                 {
@@ -57,7 +76,7 @@ namespace PeakLims.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("AccessionId")
+                    b.Property<Guid?>("AccessionId")
                         .HasColumnType("uuid")
                         .HasColumnName("accession_id");
 
@@ -85,9 +104,9 @@ namespace PeakLims.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_modified_on");
 
-                    b.Property<Guid?>("ParentAccessionCommentId")
+                    b.Property<Guid?>("ParentCommentId")
                         .HasColumnType("uuid")
-                        .HasColumnName("parent_accession_comment_id");
+                        .HasColumnName("parent_comment_id");
 
                     b.Property<string>("Status")
                         .HasColumnType("text")
@@ -99,8 +118,8 @@ namespace PeakLims.Migrations
                     b.HasIndex("AccessionId")
                         .HasDatabaseName("ix_accession_comments_accession_id");
 
-                    b.HasIndex("ParentAccessionCommentId")
-                        .HasDatabaseName("ix_accession_comments_parent_accession_comment_id");
+                    b.HasIndex("ParentCommentId")
+                        .HasDatabaseName("ix_accession_comments_parent_comment_id");
 
                     b.ToTable("accession_comments", (string)null);
                 });
@@ -231,10 +250,6 @@ namespace PeakLims.Migrations
                         .HasColumnType("text")
                         .HasColumnName("email");
 
-                    b.Property<Guid>("HealthcareOrganizationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("healthcare_organization_id");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
@@ -260,9 +275,6 @@ namespace PeakLims.Migrations
 
                     b.HasIndex("AccessionId")
                         .HasDatabaseName("ix_healthcare_organization_contacts_accession_id");
-
-                    b.HasIndex("HealthcareOrganizationId")
-                        .HasDatabaseName("ix_healthcare_organization_contacts_healthcare_organization_id");
 
                     b.ToTable("healthcare_organization_contacts", (string)null);
                 });
@@ -481,7 +493,7 @@ namespace PeakLims.Migrations
                         .HasColumnType("text")
                         .HasColumnName("collection_site");
 
-                    b.Property<Guid>("ContainerId")
+                    b.Property<Guid?>("ContainerId")
                         .HasColumnType("uuid")
                         .HasColumnName("container_id");
 
@@ -528,9 +540,13 @@ namespace PeakLims.Migrations
                         .HasColumnName("sample_number")
                         .HasDefaultValueSql("concat('SAM', nextval('\"SAM\"'))");
 
+                    b.Property<string>("Status")
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
                     b.Property<string>("Type")
                         .HasColumnType("text")
-                        .HasColumnName("sex");
+                        .HasColumnName("type");
 
                     b.HasKey("Id")
                         .HasName("pk_samples");
@@ -773,7 +789,7 @@ namespace PeakLims.Migrations
                         .HasColumnType("text")
                         .HasColumnName("role");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
@@ -784,6 +800,23 @@ namespace PeakLims.Migrations
                         .HasDatabaseName("ix_user_roles_user_id");
 
                     b.ToTable("user_roles", (string)null);
+                });
+
+            modelBuilder.Entity("HealthcareOrganizationHealthcareOrganizationContact", b =>
+                {
+                    b.HasOne("PeakLims.Domain.HealthcareOrganizationContacts.HealthcareOrganizationContact", null)
+                        .WithMany()
+                        .HasForeignKey("HealthcareOrganizationContactsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_healthcare_organization_healthcare_organization_contact_hea");
+
+                    b.HasOne("PeakLims.Domain.HealthcareOrganizations.HealthcareOrganization", null)
+                        .WithMany()
+                        .HasForeignKey("HealthcareOrganizationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_healthcare_organization_healthcare_organization_contact_hea1");
                 });
 
             modelBuilder.Entity("PanelTest", b =>
@@ -808,29 +841,27 @@ namespace PeakLims.Migrations
                     b.HasOne("PeakLims.Domain.Accessions.Accession", "Accession")
                         .WithMany("Comments")
                         .HasForeignKey("AccessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_accession_comments_accessions_accession_id");
 
-                    b.HasOne("PeakLims.Domain.AccessionComments.AccessionComment", "ParentAccessionComment")
+                    b.HasOne("PeakLims.Domain.AccessionComments.AccessionComment", "ParentComment")
                         .WithMany()
-                        .HasForeignKey("ParentAccessionCommentId")
-                        .HasConstraintName("fk_accession_comments_accession_comments_parent_accession_comm");
+                        .HasForeignKey("ParentCommentId")
+                        .HasConstraintName("fk_accession_comments_accession_comments_parent_comment_id");
 
                     b.Navigation("Accession");
 
-                    b.Navigation("ParentAccessionComment");
+                    b.Navigation("ParentComment");
                 });
 
             modelBuilder.Entity("PeakLims.Domain.Accessions.Accession", b =>
                 {
                     b.HasOne("PeakLims.Domain.HealthcareOrganizations.HealthcareOrganization", "HealthcareOrganization")
-                        .WithMany()
+                        .WithMany("Accessions")
                         .HasForeignKey("HealthcareOrganizationId")
-                        .HasConstraintName("fk_accessions_healthcare_organizations_healthcare_organization");
+                        .HasConstraintName("fk_accessions_healthcare_organizations_healthcare_organization_id");
 
                     b.HasOne("PeakLims.Domain.Patients.Patient", "Patient")
-                        .WithMany()
+                        .WithMany("Accessions")
                         .HasForeignKey("PatientId")
                         .HasConstraintName("fk_accessions_patients_patient_id");
 
@@ -841,64 +872,12 @@ namespace PeakLims.Migrations
 
             modelBuilder.Entity("PeakLims.Domain.HealthcareOrganizationContacts.HealthcareOrganizationContact", b =>
                 {
-                    b.HasOne("PeakLims.Domain.Accessions.Accession", null)
-                        .WithMany("Contacts")
+                    b.HasOne("PeakLims.Domain.Accessions.Accession", "Accession")
+                        .WithMany("HealthcareOrganizationContacts")
                         .HasForeignKey("AccessionId")
                         .HasConstraintName("fk_healthcare_organization_contacts_accessions_accession_id");
 
-                    b.HasOne("PeakLims.Domain.HealthcareOrganizations.HealthcareOrganization", "HealthcareOrganization")
-                        .WithMany("Contacts")
-                        .HasForeignKey("HealthcareOrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_healthcare_organization_contacts_healthcare_organizations_h");
-
-                    b.Navigation("HealthcareOrganization");
-                });
-
-            modelBuilder.Entity("PeakLims.Domain.HealthcareOrganizations.HealthcareOrganization", b =>
-                {
-                    b.OwnsOne("PeakLims.Domain.Addresses.Address", "PrimaryAddress", b1 =>
-                        {
-                            b1.Property<Guid>("HealthcareOrganizationId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
-
-                            b1.Property<string>("City")
-                                .HasColumnType("text")
-                                .HasColumnName("primary_address_city");
-
-                            b1.Property<string>("Country")
-                                .HasColumnType("text")
-                                .HasColumnName("primary_address_country");
-
-                            b1.Property<string>("Line1")
-                                .HasColumnType("text")
-                                .HasColumnName("primary_address_line1");
-
-                            b1.Property<string>("Line2")
-                                .HasColumnType("text")
-                                .HasColumnName("primary_address_line2");
-
-                            b1.Property<string>("PostalCode")
-                                .HasColumnType("text")
-                                .HasColumnName("primary_address_postal_code");
-
-                            b1.Property<string>("State")
-                                .HasColumnType("text")
-                                .HasColumnName("primary_address_state");
-
-                            b1.HasKey("HealthcareOrganizationId");
-
-                            b1.ToTable("healthcare_organizations");
-
-                            b1.WithOwner()
-                                .HasForeignKey("HealthcareOrganizationId")
-                                .HasConstraintName("fk_healthcare_organizations_healthcare_organizations_id");
-                        });
-
-                    b.Navigation("PrimaryAddress")
-                        .IsRequired();
+                    b.Navigation("Accession");
                 });
 
             modelBuilder.Entity("PeakLims.Domain.Patients.Patient", b =>
@@ -909,13 +888,13 @@ namespace PeakLims.Migrations
                                 .HasColumnType("uuid")
                                 .HasColumnName("id");
 
-                            b1.Property<int?>("Age")
-                                .HasColumnType("integer")
-                                .HasColumnName("age");
-
                             b1.Property<DateOnly?>("DateOfBirth")
                                 .HasColumnType("date")
                                 .HasColumnName("date_of_birth");
+
+                            b1.Property<int?>("KnownAge")
+                                .HasColumnType("integer")
+                                .HasColumnName("known_age");
 
                             b1.HasKey("PatientId");
 
@@ -933,10 +912,8 @@ namespace PeakLims.Migrations
             modelBuilder.Entity("PeakLims.Domain.Samples.Sample", b =>
                 {
                     b.HasOne("PeakLims.Domain.Containers.Container", "Container")
-                        .WithMany()
+                        .WithMany("Samples")
                         .HasForeignKey("ContainerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_samples_containers_container_id");
 
                     b.HasOne("PeakLims.Domain.Samples.Sample", "ParentSample")
@@ -945,7 +922,7 @@ namespace PeakLims.Migrations
                         .HasConstraintName("fk_samples_samples_parent_sample_id");
 
                     b.HasOne("PeakLims.Domain.Patients.Patient", "Patient")
-                        .WithMany()
+                        .WithMany("Samples")
                         .HasForeignKey("PatientId")
                         .HasConstraintName("fk_samples_patients_patient_id");
 
@@ -992,8 +969,6 @@ namespace PeakLims.Migrations
                     b.HasOne("PeakLims.Domain.Users.User", "User")
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_user_roles_users_user_id");
 
                     b.Navigation("User");
@@ -1003,14 +978,26 @@ namespace PeakLims.Migrations
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("Contacts");
+                    b.Navigation("HealthcareOrganizationContacts");
 
                     b.Navigation("TestOrders");
                 });
 
+            modelBuilder.Entity("PeakLims.Domain.Containers.Container", b =>
+                {
+                    b.Navigation("Samples");
+                });
+
             modelBuilder.Entity("PeakLims.Domain.HealthcareOrganizations.HealthcareOrganization", b =>
                 {
-                    b.Navigation("Contacts");
+                    b.Navigation("Accessions");
+                });
+
+            modelBuilder.Entity("PeakLims.Domain.Patients.Patient", b =>
+                {
+                    b.Navigation("Accessions");
+
+                    b.Navigation("Samples");
                 });
 
             modelBuilder.Entity("PeakLims.Domain.Samples.Sample", b =>

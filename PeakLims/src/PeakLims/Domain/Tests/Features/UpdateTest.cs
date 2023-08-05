@@ -2,30 +2,30 @@ namespace PeakLims.Domain.Tests.Features;
 
 using PeakLims.Domain.Tests;
 using PeakLims.Domain.Tests.Dtos;
-using PeakLims.Domain.Tests.Validators;
 using PeakLims.Domain.Tests.Services;
 using PeakLims.Services;
+using PeakLims.Domain.Tests.Models;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class UpdateTest
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
-        public readonly TestForUpdateDto TestToUpdate;
+        public readonly TestForUpdateDto UpdatedTestData;
 
-        public Command(Guid test, TestForUpdateDto newTestData)
+        public Command(Guid id, TestForUpdateDto updatedTestData)
         {
-            Id = test;
-            TestToUpdate = newTestData;
+            Id = id;
+            UpdatedTestData = updatedTestData;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly ITestRepository _testRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -38,15 +38,16 @@ public static class UpdateTest
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdateTests);
 
             var testToUpdate = await _testRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            var testToAdd = request.UpdatedTestData.ToTestForUpdate();
+            testToUpdate.Update(testToAdd);
 
-            testToUpdate.Update(request.TestToUpdate, _testRepository);
             _testRepository.Update(testToUpdate);
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

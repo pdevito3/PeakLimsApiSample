@@ -2,39 +2,35 @@ namespace PeakLims.IntegrationTests.FeatureTests.AccessionComments;
 
 using Bogus;
 using Domain.AccessionComments.Features;
-using Domain.Tests.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
 using SharedTestHelpers.Fakes.Accession;
-using SharedTestHelpers.Fakes.AccessionComments;
-using static TestFixture;
+using SharedTestHelpers.Fakes.AccessionComment;
+using Xunit;
 
-public class GetAccessionCommentViewTests
+public class GetAccessionCommentViewTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_get_view_with_basic_history()
     {
         // Arrange
+        var testingServiceScope = new TestingServiceScope();
         
         // summary
-        var accession = FakeAccessionBuilder
-            .Initialize()
-            .WithTestRepository(GetService<ITestRepository>())
-            .Build();
+        var accession = new FakeAccessionBuilder().Build();
 
         // input
-        var accessionCommentItem = FakeAccessionCommentBuilder.Initialize()
+        var accessionCommentItem = new FakeAccessionCommentBuilder()
             .WithAccession(accession)
             .Build();
-        await InsertAsync(accessionCommentItem);
-        var newComment = new Faker().Lorem.Sentence();
+        await testingServiceScope.InsertAsync(accessionCommentItem);
+        var newComment =  new Faker().Lorem.Sentence();
         var command = new UpdateAccessionComment.Command(accessionCommentItem.Id, newComment);
-        await SendAsync(command);
+        await testingServiceScope.SendAsync(command);
 
         // Act
         var query = new GetAccessionCommentView.Query(accession.Id);
-        var accessionView = await SendAsync(query);
+        var accessionView = await testingServiceScope.SendAsync(query);
 
         // Assert
         accessionView.AccessionComments.Count.Should().Be(1);
@@ -46,41 +42,39 @@ public class GetAccessionCommentViewTests
         viewCommentItemHistory.Comment.Should().Be(accessionCommentItem.Comment);
     }
     
-    [Test]
+    [Fact]
     public async Task can_handle_complex_chat_history()
     {
         // Arrange
+        var testingServiceScope = new TestingServiceScope();
         
         // summary
-        var accession = FakeAccessionBuilder
-            .Initialize()
-            .WithTestRepository(GetService<ITestRepository>())
-            .Build();
+        var accession = new FakeAccessionBuilder().Build();
 
         // standalone input
-        var standaloneCommentItem = FakeAccessionCommentBuilder.Initialize()
+        var standaloneCommentItem = new FakeAccessionCommentBuilder()
             .WithAccession(accession)
             .Build();
         
         // input with history
-        var rootCommentItem = FakeAccessionCommentBuilder.Initialize()
+        var rootCommentItem = new FakeAccessionCommentBuilder()
             .WithAccession(accession)
             .Build();
-        await InsertAsync(rootCommentItem, standaloneCommentItem);
+        await testingServiceScope.InsertAsync(rootCommentItem, standaloneCommentItem);
         
         var firstUpdatedCommentText = new Faker().Lorem.Sentence();
         var command = new UpdateAccessionComment.Command(rootCommentItem.Id, firstUpdatedCommentText);
-        await SendAsync(command);
+        await testingServiceScope.SendAsync(command);
         
-        var updatedCommentItem = await ExecuteDbContextAsync(db => db.AccessionComments
+        var updatedCommentItem = await testingServiceScope.ExecuteDbContextAsync(db => db.AccessionComments
             .FirstOrDefaultAsync(x => x.Comment == firstUpdatedCommentText));
         var finalCommentText = new Faker().Lorem.Sentence();
         command = new UpdateAccessionComment.Command(updatedCommentItem.Id, finalCommentText);
-        await SendAsync(command);
+        await testingServiceScope.SendAsync(command);
 
         // Act
         var query = new GetAccessionCommentView.Query(accession.Id);
-        var accessionView = await SendAsync(query);
+        var accessionView = await testingServiceScope.SendAsync(query);
 
         // Assert
         accessionView.AccessionComments.Count.Should().Be(2);

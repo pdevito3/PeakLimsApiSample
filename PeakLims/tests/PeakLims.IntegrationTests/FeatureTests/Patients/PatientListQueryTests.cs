@@ -5,29 +5,45 @@ using PeakLims.SharedTestHelpers.Fakes.Patient;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.Patients.Features;
 using FluentAssertions;
-using NUnit.Framework;
+using Domain;
+using Xunit;
 using System.Threading.Tasks;
-using Services;
-using static TestFixture;
 
 public class PatientListQueryTests : TestBase
 {
     
-    [Test]
+    [Fact]
     public async Task can_get_patient_list()
     {
         // Arrange
-        var fakePatientOne = FakePatient.Generate(GetService<IDateTimeProvider>());
-        var fakePatientTwo = FakePatient.Generate(GetService<IDateTimeProvider>());
+        var testingServiceScope = new TestingServiceScope();
+        var fakePatientOne = new FakePatientBuilder().Build();
+        var fakePatientTwo = new FakePatientBuilder().Build();
         var queryParameters = new PatientParametersDto();
 
-        await InsertAsync(fakePatientOne, fakePatientTwo);
+        await testingServiceScope.InsertAsync(fakePatientOne, fakePatientTwo);
 
         // Act
         var query = new GetPatientList.Query(queryParameters);
-        var patients = await SendAsync(query);
+        var patients = await testingServiceScope.SendAsync(query);
 
         // Assert
         patients.Count.Should().BeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanReadPatients);
+        var queryParameters = new PatientParametersDto();
+
+        // Act
+        var command = new GetPatientList.Query(queryParameters);
+        Func<Task> act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

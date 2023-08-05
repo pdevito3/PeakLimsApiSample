@@ -1,8 +1,7 @@
 namespace PeakLims.Domain.HealthcareOrganizations.Dtos;
 
-using Addresses.Dtos;
-
-public sealed class HealthcareOrganizationForUpdateDto : HealthcareOrganizationForManipulationDto
+public sealed class HealthcareOrganizationForUpdateDto
 {
-    public AddressForUpdateDto PrimaryAddress { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
 }

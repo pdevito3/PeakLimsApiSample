@@ -5,69 +5,53 @@ using PeakLims.FunctionalTests.TestUtilities;
 using PeakLims.Domain;
 using SharedKernel.Domain;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 using System.Net;
 using System.Threading.Tasks;
 
 public class GetPanelTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task get_panel_returns_success_when_entity_exists_using_valid_auth_credentials()
     {
         // Arrange
-        var panel = FakePanelBuilder
-            .Initialize()
-            .WithMockPanelRepository()
-            .WithMockTestOrderRepository()
-            .Build();
+        var fakePanel = new FakePanelBuilder().Build();
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);
-        await InsertAsync(panel);
+        await InsertAsync(fakePanel);
 
         // Act
-        var route = ApiRoutes.Panels.GetRecord.Replace(ApiRoutes.Panels.Id, panel.Id.ToString());
+        var route = ApiRoutes.Panels.GetRecord(fakePanel.Id);
         var result = await FactoryClient.GetRequestAsync(route);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.OK);
     }
             
-    [Test]
+    [Fact]
     public async Task get_panel_returns_unauthorized_without_valid_token()
     {
         // Arrange
-        var panel = FakePanelBuilder
-            .Initialize()
-            .WithMockPanelRepository()
-            .WithMockTestOrderRepository()
-            .Build();
-
-        await InsertAsync(panel);
+        var fakePanel = new FakePanelBuilder().Build();
 
         // Act
-        var route = ApiRoutes.Panels.GetRecord.Replace(ApiRoutes.Panels.Id, panel.Id.ToString());
+        var route = ApiRoutes.Panels.GetRecord(fakePanel.Id);
         var result = await FactoryClient.GetRequestAsync(route);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
             
-    [Test]
+    [Fact]
     public async Task get_panel_returns_forbidden_without_proper_scope()
     {
         // Arrange
-        var panel = FakePanelBuilder
-            .Initialize()
-            .WithMockPanelRepository()
-            .WithMockTestOrderRepository()
-            .Build();
+        var fakePanel = new FakePanelBuilder().Build();
         FactoryClient.AddAuth();
 
-        await InsertAsync(panel);
-
         // Act
-        var route = ApiRoutes.Panels.GetRecord.Replace(ApiRoutes.Panels.Id, panel.Id.ToString());
+        var route = ApiRoutes.Panels.GetRecord(fakePanel.Id);
         var result = await FactoryClient.GetRequestAsync(route);
 
         // Assert

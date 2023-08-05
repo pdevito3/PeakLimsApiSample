@@ -3,11 +3,12 @@ namespace PeakLims.Domain.HealthcareOrganizationContacts.Features;
 using PeakLims.Domain.HealthcareOrganizationContacts.Services;
 using PeakLims.Domain.HealthcareOrganizationContacts;
 using PeakLims.Domain.HealthcareOrganizationContacts.Dtos;
+using PeakLims.Domain.HealthcareOrganizationContacts.Models;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class AddHealthcareOrganizationContact
@@ -26,12 +27,10 @@ public static class AddHealthcareOrganizationContact
     {
         private readonly IHealthcareOrganizationContactRepository _healthcareOrganizationContactRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IHealthcareOrganizationContactRepository healthcareOrganizationContactRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IHealthcareOrganizationContactRepository healthcareOrganizationContactRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _healthcareOrganizationContactRepository = healthcareOrganizationContactRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
@@ -41,13 +40,13 @@ public static class AddHealthcareOrganizationContact
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddHealthcareOrganizationContacts);
 
-            var healthcareOrganizationContact = HealthcareOrganizationContact.Create(request.HealthcareOrganizationContactToAdd);
-            await _healthcareOrganizationContactRepository.Add(healthcareOrganizationContact, cancellationToken);
+            var healthcareOrganizationContactToAdd = request.HealthcareOrganizationContactToAdd.ToHealthcareOrganizationContactForCreation();
+            var healthcareOrganizationContact = HealthcareOrganizationContact.Create(healthcareOrganizationContactToAdd);
 
+            await _healthcareOrganizationContactRepository.Add(healthcareOrganizationContact, cancellationToken);
             await _unitOfWork.CommitChanges(cancellationToken);
 
-            var healthcareOrganizationContactAdded = await _healthcareOrganizationContactRepository.GetById(healthcareOrganizationContact.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<HealthcareOrganizationContactDto>(healthcareOrganizationContactAdded);
+            return healthcareOrganizationContact.ToHealthcareOrganizationContactDto();
         }
     }
 }

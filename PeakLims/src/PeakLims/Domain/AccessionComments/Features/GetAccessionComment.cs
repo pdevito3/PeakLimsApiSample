@@ -5,7 +5,7 @@ using PeakLims.Domain.AccessionComments.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetAccessionComment
@@ -23,12 +23,10 @@ public static class GetAccessionComment
     public sealed class Handler : IRequestHandler<Query, AccessionCommentDto>
     {
         private readonly IAccessionCommentRepository _accessionCommentRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IAccessionCommentRepository accessionCommentRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IAccessionCommentRepository accessionCommentRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _accessionCommentRepository = accessionCommentRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetAccessionComment
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadAccessionComments);
 
             var result = await _accessionCommentRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<AccessionCommentDto>(result);
+            return result.ToAccessionCommentDto();
         }
     }
 }

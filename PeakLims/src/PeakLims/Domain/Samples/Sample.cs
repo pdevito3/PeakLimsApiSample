@@ -1,101 +1,76 @@
 namespace PeakLims.Domain.Samples;
 
 using SharedKernel.Exceptions;
-using PeakLims.Domain.Samples.Dtos;
-using PeakLims.Domain.Samples.Validators;
+using PeakLims.Domain.TestOrders;
+using PeakLims.Domain.Patients;
+using PeakLims.Domain.Samples.Models;
 using PeakLims.Domain.Samples.DomainEvents;
-using FluentValidation;
 using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
-using Containers.Services;
-using Features;
-using Sieve.Attributes;
-using PeakLims.Domain.Patients;
-using PeakLims.Domain.Samples;
 using PeakLims.Domain.Containers;
+using PeakLims.Domain.Containers.Models;
 using SampleTypes;
-using TestOrders;
-using ValidationException = SharedKernel.Exceptions.ValidationException;
 
 public class Sample : BaseEntity
 {
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string SampleNumber { get; }
-    public virtual SampleType Type { get; private set; }
+    public string SampleNumber { get; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual decimal? Quantity { get; private set; }
+    public string Status { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual DateOnly? CollectionDate { get; private set; }
+    public SampleType Type { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual DateOnly? ReceivedDate { get; private set; }
+    public decimal? Quantity { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string CollectionSite { get; private set; }
+    public DateOnly? CollectionDate { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("Patient")]
-    public virtual Guid? PatientId { get; private set; }
-    public virtual Patient Patient { get; private set; }
+    public DateOnly? ReceivedDate { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("Sample")]
-    public virtual Guid? ParentSampleId { get; private set; }
-    public virtual Sample ParentSample { get; private set; }
+    public string CollectionSite { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    [ForeignKey("Container")]
-    public virtual Guid ContainerId { get; private set; }
-    public virtual Container Container { get; private set; }
-    public virtual ICollection<TestOrder> TestOrders { get; private set; } = new List<TestOrder>();
+    public Sample ParentSample { get; private set; }
+
+    public Container Container { get; private set; }
+
+    public Patient Patient { get; }
+
+    public IReadOnlyCollection<TestOrder> TestOrders { get; }
+
+    // Add Props Marker -- Deleting this comment will cause the add props utility to be incomplete
 
 
-    public static Sample Create(ContainerlessSampleForCreationDto containerlessSampleForCreationDto, Container container)
+    public static Sample Create(SampleForCreation sampleForCreation)
     {
-        new SampleForCreationDtoValidator().ValidateAndThrow(containerlessSampleForCreationDto);
-
         var newSample = new Sample();
 
-        newSample.Type = new SampleType(containerlessSampleForCreationDto.Type);
-        newSample.Quantity = containerlessSampleForCreationDto.Quantity;
-        newSample.CollectionDate = containerlessSampleForCreationDto.CollectionDate;
-        newSample.ReceivedDate = containerlessSampleForCreationDto.ReceivedDate;
-        newSample.CollectionSite = containerlessSampleForCreationDto.CollectionSite;
-        newSample.PatientId = containerlessSampleForCreationDto.PatientId;
-        newSample.ParentSampleId = containerlessSampleForCreationDto.ParentSampleId;
-        newSample.SetContainer(container);
+        newSample.Status = sampleForCreation.Status;
+        newSample.Type = SampleType.Of(sampleForCreation.Type);
+        newSample.Quantity = sampleForCreation.Quantity;
+        newSample.CollectionDate = sampleForCreation.CollectionDate;
+        newSample.ReceivedDate = sampleForCreation.ReceivedDate;
+        newSample.CollectionSite = sampleForCreation.CollectionSite;
 
         newSample.QueueDomainEvent(new SampleCreated(){ Sample = newSample });
         
         return newSample;
     }
 
-    public void Update(ContainerlessSampleForUpdateDto containerlessSampleForUpdateDto, Container container)
+    public Sample Update(SampleForUpdate sampleForUpdate)
     {
-        new SampleForUpdateDtoValidator().ValidateAndThrow(containerlessSampleForUpdateDto);
-
-        Type = new SampleType(containerlessSampleForUpdateDto.Type);
-        Quantity = containerlessSampleForUpdateDto.Quantity;
-        CollectionDate = containerlessSampleForUpdateDto.CollectionDate;
-        ReceivedDate = containerlessSampleForUpdateDto.ReceivedDate;
-        CollectionSite = containerlessSampleForUpdateDto.CollectionSite;
-        PatientId = containerlessSampleForUpdateDto.PatientId;
-        ParentSampleId = containerlessSampleForUpdateDto.ParentSampleId;
-        SetContainer(container);
+        Status = sampleForUpdate.Status;
+        Type = SampleType.Of(sampleForUpdate.Type);
+        Quantity = sampleForUpdate.Quantity;
+        CollectionDate = sampleForUpdate.CollectionDate;
+        ReceivedDate = sampleForUpdate.ReceivedDate;
+        CollectionSite = sampleForUpdate.CollectionSite;
 
         QueueDomainEvent(new SampleUpdated(){ Id = Id });
+        return this;
     }
 
-    private Sample SetContainer(Container container)
+    public Sample SetContainer(Container container)
     {
-        new ValidationException(nameof(Sample), $"Invalid Container.").ThrowWhenNull(container);
+        ValidationException.ThrowWhenNull(container, $"Invalid Container.");
         if (!container.CanStore(Type))
             throw new ValidationException(nameof(Sample),
                 $"A {container.Type} container is used to store {container.UsedFor.Value} samples, not {Type.Value}.");
@@ -104,9 +79,12 @@ public class Sample : BaseEntity
                 $"Only active containers can be added to a sample.");
         
         Container = container;
-        ContainerId = container.Id;
+        
+        QueueDomainEvent(new SampleUpdated(){ Id = Id });
         return this;
     }
+
+    // Add Prop Methods Marker -- Deleting this comment will cause the add props utility to be incomplete
     
     protected Sample() { } // For EF + Mocking
 }

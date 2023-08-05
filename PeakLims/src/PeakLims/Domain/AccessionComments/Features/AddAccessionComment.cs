@@ -4,11 +4,12 @@ using Accessions.Services;
 using PeakLims.Domain.AccessionComments.Services;
 using PeakLims.Domain.AccessionComments;
 using PeakLims.Domain.AccessionComments.Dtos;
+using PeakLims.Domain.AccessionComments.Models;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class AddAccessionComment
@@ -28,14 +29,12 @@ public static class AddAccessionComment
     public sealed class Handler : IRequestHandler<Command, AccessionCommentDto>
     {
         private readonly IAccessionCommentRepository _accessionCommentRepository;
-        private readonly IAccessionRepository _accessionRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
+        private readonly IAccessionRepository _accessionRepository;
 
-        public Handler(IAccessionCommentRepository accessionCommentRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard, IAccessionRepository accessionRepository)
+        public Handler(IAccessionCommentRepository accessionCommentRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard, IAccessionRepository accessionRepository)
         {
-            _mapper = mapper;
             _accessionCommentRepository = accessionCommentRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
@@ -52,8 +51,7 @@ public static class AddAccessionComment
 
             await _unitOfWork.CommitChanges(cancellationToken);
 
-            var accessionCommentAdded = await _accessionCommentRepository.GetById(accessionComment.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<AccessionCommentDto>(accessionCommentAdded);
+            return accessionComment.ToAccessionCommentDto();
         }
     }
 }

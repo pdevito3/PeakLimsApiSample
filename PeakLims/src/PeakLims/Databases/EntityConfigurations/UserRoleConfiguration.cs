@@ -12,6 +12,8 @@ public sealed class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
     /// </summary>
     public void Configure(EntityTypeBuilder<UserRole> builder)
     {
+        // Relationship Marker -- Deleting or modifying this comment could cause incomplete relationship scaffolding
+
         builder.Property(x => x.Role)
             .HasConversion(x => x.Value, x => new Role(x))
             .HasColumnName("role");

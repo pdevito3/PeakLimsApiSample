@@ -3,6 +3,10 @@ namespace PeakLims.Databases;
 using PeakLims.Domain;
 using PeakLims.Databases.EntityConfigurations;
 using PeakLims.Services;
+using Configurations;
+using MediatR;
+using PeakLims.Domain.RolePermissions;
+using PeakLims.Domain.Users;
 using PeakLims.Domain.Patients;
 using PeakLims.Domain.Accessions;
 using PeakLims.Domain.AccessionComments;
@@ -13,10 +17,8 @@ using PeakLims.Domain.Panels;
 using PeakLims.Domain.Tests;
 using PeakLims.Domain.HealthcareOrganizations;
 using PeakLims.Domain.HealthcareOrganizationContacts;
-using MediatR;
-using PeakLims.Domain.RolePermissions;
-using PeakLims.Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,7 +60,7 @@ public sealed class PeakLimsDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         
         modelBuilder.HasSequence<long>(Consts.DatabaseSequences.PatientInternalIdPrefix)
-            .StartsAt(10145702) // people don't like a nice round starting number
+            .StartsAt(10045702) // people don't like a nice round starting number
             .IncrementsBy(1);
         
         modelBuilder.HasSequence<long>(Consts.DatabaseSequences.AccessionNumberPrefix)
@@ -68,7 +70,7 @@ public sealed class PeakLimsDbContext : DbContext
         modelBuilder.HasSequence<long>(Consts.DatabaseSequences.SampleNumberPrefix)
             .StartsAt(10000202) // people don't like a nice round starting number
             .IncrementsBy(1);
-        
+
         modelBuilder.FilterSoftDeletedRecords();
         /* any query filters added after this will override soft delete 
                 https://docs.microsoft.com/en-us/ef/core/querying/filters

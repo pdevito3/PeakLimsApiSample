@@ -2,51 +2,53 @@ namespace PeakLims.IntegrationTests;
 
 using PeakLims.Extensions.Services;
 using PeakLims.Databases;
-using PeakLims;
 using PeakLims.Resources;
-using PeakLims.Services;
-using HeimGuard;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Moq;
-using Npgsql;
-using NUnit.Framework;
-using Respawn;
-using Respawn.Graph;
-using System.IO;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using DotNet.Testcontainers.Containers.Builders;
-using DotNet.Testcontainers.Containers.Configurations.Databases;
-using DotNet.Testcontainers.Containers.Modules.Abstractions;
-using DotNet.Testcontainers.Containers.Modules.Databases;
+using PeakLims.SharedTestHelpers.Utilities;
+using Configurations;
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using HeimGuard;
+using Moq;
+using Testcontainers.PostgreSql;
+using Testcontainers.RabbitMq;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Xunit;
 
-[SetUpFixture]
-public class TestFixture
+[CollectionDefinition(nameof(TestFixture))]
+public class TestFixtureCollection : ICollectionFixture<TestFixture> {}
+
+public class TestFixture : IAsyncLifetime
 {
-    private static IServiceScopeFactory _scopeFactory;
-    private static ServiceProvider _provider;
-    private readonly TestcontainerDatabase _dbContainer = dbSetup();
+    public static IServiceScopeFactory BaseScopeFactory;
+    private PostgreSqlContainer _dbContainer;
+    private RabbitMqContainer _rmqContainer;
 
-    [OneTimeSetUp]
-    public async Task RunBeforeAnyTests()
+    public async Task InitializeAsync()
     {
-        await _dbContainer.StartAsync();
-        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", _dbContainer.ConnectionString);
-        
-        var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
-            EnvironmentName = Consts.Testing.IntegrationTestingEnvName,
+            EnvironmentName = Consts.Testing.IntegrationTestingEnvName
         });
-        builder.Configuration.AddEnvironmentVariables();
+
+        _dbContainer = new PostgreSqlBuilder().Build();
+        await _dbContainer.StartAsync();
+        builder.Configuration.GetSection(ConnectionStringOptions.SectionName)[ConnectionStringOptions.PeakLimsKey] = _dbContainer.GetConnectionString();
+        await RunMigration(_dbContainer.GetConnectionString());
+
+        var freePort = DockerUtilities.GetFreePort();
+        _rmqContainer = new RabbitMqBuilder()
+            .WithPortBinding(freePort, 5672)
+            .Build();
+        await _rmqContainer.StartAsync();
+        builder.Configuration.GetSection(RabbitMqOptions.SectionName)[RabbitMqOptions.HostKey] = "localhost";
+        builder.Configuration.GetSection(RabbitMqOptions.SectionName)[RabbitMqOptions.VirtualHostKey] = "/";
+        builder.Configuration.GetSection(RabbitMqOptions.SectionName)[RabbitMqOptions.UsernameKey] = "guest";
+        builder.Configuration.GetSection(RabbitMqOptions.SectionName)[RabbitMqOptions.PasswordKey] = "guest";
+        builder.Configuration.GetSection(RabbitMqOptions.SectionName)[RabbitMqOptions.PortKey] = _rmqContainer.GetConnectionString();
 
         builder.ConfigureServices();
         var services = builder.Services;
@@ -55,245 +57,24 @@ public class TestFixture
         services.ReplaceServiceWithSingletonMock<IHttpContextAccessor>();
         services.ReplaceServiceWithSingletonMock<IHeimGuardClient>();
 
-        // MassTransit Harness Setup -- Do Not Delete Comment
-
-        _provider = services.BuildServiceProvider();
-        _scopeFactory = _provider.GetService<IServiceScopeFactory>();
-
-        // MassTransit Start Setup -- Do Not Delete Comment
-
+        var provider = services.BuildServiceProvider();
+        BaseScopeFactory = provider.GetService<IServiceScopeFactory>();
         SetupDateAssertions();
-        await EnsureDatabase();
-        await ResetState();
     }
 
-    private static async Task EnsureDatabase()
+    private static async Task RunMigration(string connectionString)
     {
-        using var scope = _scopeFactory.CreateScope();
-
-        var context = scope.ServiceProvider.GetService<PeakLimsDbContext>();
-
+        var options = new DbContextOptionsBuilder<PeakLimsDbContext>()
+            .UseNpgsql(connectionString)
+            .Options;
+        var context = new PeakLimsDbContext(options, null, null, null);
         await context?.Database?.MigrateAsync();
     }
 
-    public static TScopedService GetService<TScopedService>()
-    {
-        var scope = _scopeFactory.CreateScope();
-        var service = scope.ServiceProvider.GetService<TScopedService>();
-        return service;
-    }
-
-    public static void SetUserRole(string role, string sub = null)
-    {
-        sub ??= Guid.NewGuid().ToString();
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Role, role),
-            new Claim(ClaimTypes.Name, sub)
-        };
-
-        var identity = new ClaimsIdentity(claims);
-        var claimsPrincipal = new ClaimsPrincipal(identity);
-
-        var httpContext = Mock.Of<HttpContext>(c => c.User == claimsPrincipal);
-
-        var httpContextAccessor = GetService<IHttpContextAccessor>();
-        httpContextAccessor.HttpContext = httpContext;
-    }
-
-    public static void SetUserRoles(string[] roles, string sub = null)
-    {
-        sub ??= Guid.NewGuid().ToString();
-        var claims = new List<Claim>();
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }
-        claims.Add(new Claim(ClaimTypes.Name, sub));
-
-        var identity = new ClaimsIdentity(claims);
-        var claimsPrincipal = new ClaimsPrincipal(identity);
-
-        var httpContext = Mock.Of<HttpContext>(c => c.User == claimsPrincipal);
-
-        var httpContextAccessor = GetService<IHttpContextAccessor>();
-        httpContextAccessor.HttpContext = httpContext;
-    }
-    
-    public static void SetMachineRole(string role, string clientId = null)
-    {
-        clientId ??= Guid.NewGuid().ToString();
-        var claims = new List<Claim>
-        {
-            new Claim("client_role", role),
-            new Claim("client_id", clientId)
-        };
-
-        var identity = new ClaimsIdentity(claims);
-        var claimsPrincipal = new ClaimsPrincipal(identity);
-
-        var httpContext = Mock.Of<HttpContext>(c => c.User == claimsPrincipal);
-
-        var httpContextAccessor = GetService<IHttpContextAccessor>();
-        httpContextAccessor.HttpContext = httpContext;
-    }
-
-    public static void SetMachineRoles(string[] roles, string clientId = null)
-    {
-        clientId ??= Guid.NewGuid().ToString();
-        var claims = new List<Claim>();
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim("client_role", role));
-        }
-        claims.Add(new Claim("client_id", clientId));
-
-        var identity = new ClaimsIdentity(claims);
-        var claimsPrincipal = new ClaimsPrincipal(identity);
-
-        var httpContext = Mock.Of<HttpContext>(c => c.User == claimsPrincipal);
-
-        var httpContextAccessor = GetService<IHttpContextAccessor>();
-        httpContextAccessor.HttpContext = httpContext;
-    }
-
-    public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
-    {
-        using var scope = _scopeFactory.CreateScope();
-
-        var mediator = scope.ServiceProvider.GetService<ISender>();
-
-        return await mediator.Send(request);
-    }
-
-    public static async Task ResetState()
-    {
-        await using var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"));
-        await connection.OpenAsync();
-        try
-        {
-            var respawner = await Respawner.CreateAsync(connection, new RespawnerOptions
-            {
-                TablesToIgnore = new Table[] { "__EFMigrationsHistory" },
-                SchemasToExclude = new[] { "information_schema", "pg_subscription", "pg_catalog", "pg_toast" },
-                DbAdapter = DbAdapter.Postgres
-            });
-            await respawner.ResetAsync(connection);
-        }
-        catch (InvalidOperationException e)
-        {
-            throw new Exception($"There was an issue resetting your database state. You might need to add a migration to your project. You can add a migration with `dotnet ef migration add YourMigrationDescription`. More details on this error: {e.Message}");
-        }
-    }
-
-    public static async Task<TEntity> FindAsync<TEntity>(params object[] keyValues)
-        where TEntity : class
-    {
-        using var scope = _scopeFactory.CreateScope();
-
-        var context = scope.ServiceProvider.GetService<PeakLimsDbContext>();
-
-        return await context.FindAsync<TEntity>(keyValues);
-    }
-
-    public static async Task AddAsync<TEntity>(TEntity entity)
-        where TEntity : class
-    {
-        using var scope = _scopeFactory.CreateScope();
-
-        var context = scope.ServiceProvider.GetService<PeakLimsDbContext>();
-
-        context.Add(entity);
-
-        await context.SaveChangesAsync();
-    }
-
-    public static async Task ExecuteScopeAsync(Func<IServiceProvider, Task> action)
-    {
-        using var scope = _scopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<PeakLimsDbContext>();
-
-        try
-        {
-            //await dbContext.BeginTransactionAsync();
-
-            await action(scope.ServiceProvider);
-
-            //await dbContext.CommitTransactionAsync();
-        }
-        catch (Exception)
-        {
-            //dbContext.RollbackTransaction();
-            throw;
-        }
-    }
-
-    public static async Task<T> ExecuteScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
-    {
-        using var scope = _scopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<PeakLimsDbContext>();
-
-        try
-        {
-            //await dbContext.BeginTransactionAsync();
-
-            var result = await action(scope.ServiceProvider);
-
-            //await dbContext.CommitTransactionAsync();
-
-            return result;
-        }
-        catch (Exception)
-        {
-            //dbContext.RollbackTransaction();
-            throw;
-        }
-    }
-
-    public static Task ExecuteDbContextAsync(Func<PeakLimsDbContext, Task> action)
-        => ExecuteScopeAsync(sp => action(sp.GetService<PeakLimsDbContext>()));
-
-    public static Task ExecuteDbContextAsync(Func<PeakLimsDbContext, ValueTask> action)
-        => ExecuteScopeAsync(sp => action(sp.GetService<PeakLimsDbContext>()).AsTask());
-
-    public static Task ExecuteDbContextAsync(Func<PeakLimsDbContext, IMediator, Task> action)
-        => ExecuteScopeAsync(sp => action(sp.GetService<PeakLimsDbContext>(), sp.GetService<IMediator>()));
-
-    public static Task<T> ExecuteDbContextAsync<T>(Func<PeakLimsDbContext, Task<T>> action)
-        => ExecuteScopeAsync(sp => action(sp.GetService<PeakLimsDbContext>()));
-
-    public static Task<T> ExecuteDbContextAsync<T>(Func<PeakLimsDbContext, ValueTask<T>> action)
-        => ExecuteScopeAsync(sp => action(sp.GetService<PeakLimsDbContext>()).AsTask());
-
-    public static Task<T> ExecuteDbContextAsync<T>(Func<PeakLimsDbContext, IMediator, Task<T>> action)
-        => ExecuteScopeAsync(sp => action(sp.GetService<PeakLimsDbContext>(), sp.GetService<IMediator>()));
-
-    public static Task<int> InsertAsync<T>(params T[] entities) where T : class
-    {
-        return ExecuteDbContextAsync(db =>
-        {
-            foreach (var entity in entities)
-            {
-                db.Set<T>().Add(entity);
-            }
-            return db.SaveChangesAsync();
-        });
-    }
-
-    // MassTransit Methods -- Do Not Delete Comment
-
-    private static TestcontainerDatabase dbSetup()
-    {
-        return new TestcontainersBuilder<PostgreSqlTestcontainer>()
-            .WithDatabase(new PostgreSqlTestcontainerConfiguration
-            {
-                Database = "db",
-                Username = "postgres",
-                Password = "postgres"
-            })
-            .WithName($"IntegrationTesting_PeakLims_{Guid.NewGuid()}")
-            .WithImage("postgres:latest")
-            .Build();
+    public async Task DisposeAsync()
+    {        
+        await _dbContainer.DisposeAsync();
+        await _rmqContainer.DisposeAsync();
     }
 
     private static void SetupDateAssertions()
@@ -311,17 +92,7 @@ public class TestFixture
             return options;
         });
     }
-
-    [OneTimeTearDown]
-    public async Task RunAfterAnyTests()
-    {
-        await _dbContainer.DisposeAsync();
-        
-        // MassTransit Teardown -- Do Not Delete Comment
-    }
 }
-
-
 
 public static class ServiceCollectionServiceExtensions
 {

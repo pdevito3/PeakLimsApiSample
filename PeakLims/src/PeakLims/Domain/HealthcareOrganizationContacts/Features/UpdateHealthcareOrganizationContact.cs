@@ -2,30 +2,30 @@ namespace PeakLims.Domain.HealthcareOrganizationContacts.Features;
 
 using PeakLims.Domain.HealthcareOrganizationContacts;
 using PeakLims.Domain.HealthcareOrganizationContacts.Dtos;
-using PeakLims.Domain.HealthcareOrganizationContacts.Validators;
 using PeakLims.Domain.HealthcareOrganizationContacts.Services;
 using PeakLims.Services;
+using PeakLims.Domain.HealthcareOrganizationContacts.Models;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class UpdateHealthcareOrganizationContact
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
-        public readonly HealthcareOrganizationContactForUpdateDto HealthcareOrganizationContactToUpdate;
+        public readonly HealthcareOrganizationContactForUpdateDto UpdatedHealthcareOrganizationContactData;
 
-        public Command(Guid healthcareOrganizationContact, HealthcareOrganizationContactForUpdateDto newHealthcareOrganizationContactData)
+        public Command(Guid id, HealthcareOrganizationContactForUpdateDto updatedHealthcareOrganizationContactData)
         {
-            Id = healthcareOrganizationContact;
-            HealthcareOrganizationContactToUpdate = newHealthcareOrganizationContactData;
+            Id = id;
+            UpdatedHealthcareOrganizationContactData = updatedHealthcareOrganizationContactData;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IHealthcareOrganizationContactRepository _healthcareOrganizationContactRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -38,15 +38,16 @@ public static class UpdateHealthcareOrganizationContact
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdateHealthcareOrganizationContacts);
 
             var healthcareOrganizationContactToUpdate = await _healthcareOrganizationContactRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            var healthcareOrganizationContactToAdd = request.UpdatedHealthcareOrganizationContactData.ToHealthcareOrganizationContactForUpdate();
+            healthcareOrganizationContactToUpdate.Update(healthcareOrganizationContactToAdd);
 
-            healthcareOrganizationContactToUpdate.Update(request.HealthcareOrganizationContactToUpdate);
             _healthcareOrganizationContactRepository.Update(healthcareOrganizationContactToUpdate);
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

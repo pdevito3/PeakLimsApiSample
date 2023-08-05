@@ -5,28 +5,45 @@ using PeakLims.SharedTestHelpers.Fakes.User;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.Users.Features;
 using FluentAssertions;
-using NUnit.Framework;
+using Domain;
+using Xunit;
 using System.Threading.Tasks;
-using static TestFixture;
 
 public class UserListQueryTests : TestBase
 {
     
-    [Test]
+    [Fact]
     public async Task can_get_user_list()
     {
         // Arrange
-        var fakeUserOne = FakeUser.Generate(new FakeUserForCreationDto().Generate());
-        var fakeUserTwo = FakeUser.Generate(new FakeUserForCreationDto().Generate());
+        var testingServiceScope = new TestingServiceScope();
+        var fakeUserOne = new FakeUserBuilder().Build();
+        var fakeUserTwo = new FakeUserBuilder().Build();
         var queryParameters = new UserParametersDto();
 
-        await InsertAsync(fakeUserOne, fakeUserTwo);
+        await testingServiceScope.InsertAsync(fakeUserOne, fakeUserTwo);
 
         // Act
         var query = new GetUserList.Query(queryParameters);
-        var users = await SendAsync(query);
+        var users = await testingServiceScope.SendAsync(query);
 
         // Assert
         users.Count.Should().BeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanReadUsers);
+        var queryParameters = new UserParametersDto();
+
+        // Act
+        var command = new GetUserList.Query(queryParameters);
+        Func<Task> act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

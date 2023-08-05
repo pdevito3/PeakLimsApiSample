@@ -5,7 +5,7 @@ using PeakLims.Domain.HealthcareOrganizationContacts.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetHealthcareOrganizationContact
@@ -23,12 +23,10 @@ public static class GetHealthcareOrganizationContact
     public sealed class Handler : IRequestHandler<Query, HealthcareOrganizationContactDto>
     {
         private readonly IHealthcareOrganizationContactRepository _healthcareOrganizationContactRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IHealthcareOrganizationContactRepository healthcareOrganizationContactRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IHealthcareOrganizationContactRepository healthcareOrganizationContactRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _healthcareOrganizationContactRepository = healthcareOrganizationContactRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetHealthcareOrganizationContact
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadHealthcareOrganizationContacts);
 
             var result = await _healthcareOrganizationContactRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<HealthcareOrganizationContactDto>(result);
+            return result.ToHealthcareOrganizationContactDto();
         }
     }
 }

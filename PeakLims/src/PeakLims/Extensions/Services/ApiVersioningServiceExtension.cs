@@ -1,6 +1,5 @@
 namespace PeakLims.Extensions.Services;
 
-using MapsterMapper;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

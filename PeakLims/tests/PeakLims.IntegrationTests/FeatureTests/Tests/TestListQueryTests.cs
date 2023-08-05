@@ -5,33 +5,45 @@ using PeakLims.SharedTestHelpers.Fakes.Test;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.Tests.Features;
 using FluentAssertions;
-using NUnit.Framework;
+using Domain;
+using Xunit;
 using System.Threading.Tasks;
-using Domain.Tests.Services;
-using static TestFixture;
 
 public class TestListQueryTests : TestBase
 {
     
-    [Test]
+    [Fact]
     public async Task can_get_test_list()
     {
         // Arrange
-        var fakeTestOne = new FakeTestBuilder()
-            .WithRepository(GetService<ITestRepository>())
-            .Build();
-        var fakeTestTwo = new FakeTestBuilder()
-            .WithRepository(GetService<ITestRepository>())
-            .Build();
+        var testingServiceScope = new TestingServiceScope();
+        var fakeTestOne = new FakeTestBuilder().Build();
+        var fakeTestTwo = new FakeTestBuilder().Build();
         var queryParameters = new TestParametersDto();
 
-        await InsertAsync(fakeTestOne, fakeTestTwo);
+        await testingServiceScope.InsertAsync(fakeTestOne, fakeTestTwo);
 
         // Act
         var query = new GetTestList.Query(queryParameters);
-        var tests = await SendAsync(query);
+        var tests = await testingServiceScope.SendAsync(query);
 
         // Assert
         tests.Count.Should().BeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanReadTests);
+        var queryParameters = new TestParametersDto();
+
+        // Act
+        var command = new GetTestList.Query(queryParameters);
+        Func<Task> act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

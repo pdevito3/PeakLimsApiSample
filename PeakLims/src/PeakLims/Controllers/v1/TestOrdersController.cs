@@ -1,10 +1,16 @@
 namespace PeakLims.Controllers.v1;
 
+using PeakLims.Domain.TestOrders.Features;
 using PeakLims.Domain.TestOrders.Dtos;
+using PeakLims.Wrappers;
+using PeakLims.Domain;
+using SharedKernel.Domain;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Threading.Tasks;
-using Domain.TestOrders.Features;
+using System.Threading;
 using MediatR;
 
 [ApiController]
@@ -18,86 +24,64 @@ public sealed class TestOrdersController: ControllerBase
     {
         _mediator = mediator;
     }
+    
 
     /// <summary>
-    /// Gets a single Test Order by ID.
+    /// Gets a list of all TestOrders.
     /// </summary>
-    /// <response code="200">Test Order record returned successfully.</response>
-    /// <response code="400">Test Order has missing/invalid values.</response>
-    /// <response code="401">This request was not able to be authenticated.</response>
-    /// <response code="403">The required permissions to access this resource were not present in the given request.</response>
-    /// <response code="500">There was an error on the server while getting the Test Order.</response>
-    [ProducesResponseType(typeof(TestOrderDto), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(500)]
     [Authorize]
-    [Produces("application/json")]
-    [HttpGet("{id:guid}", Name = "GetTestOrder")]
-    public async Task<ActionResult<TestOrderDto>> GetTestOrder(Guid id)
+    [HttpGet(Name = "GetTestOrders")]
+    public async Task<IActionResult> GetTestOrders([FromQuery] TestOrderParametersDto testOrderParametersDto)
     {
-        var query = new GetTestOrder.Query(id);
+        var query = new GetTestOrderList.Query(testOrderParametersDto);
         var queryResponse = await _mediator.Send(query);
+
+        var paginationMetadata = new
+        {
+            totalCount = queryResponse.TotalCount,
+            pageSize = queryResponse.PageSize,
+            currentPageSize = queryResponse.CurrentPageSize,
+            currentStartIndex = queryResponse.CurrentStartIndex,
+            currentEndIndex = queryResponse.CurrentEndIndex,
+            pageNumber = queryResponse.PageNumber,
+            totalPages = queryResponse.TotalPages,
+            hasPrevious = queryResponse.HasPrevious,
+            hasNext = queryResponse.HasNext
+        };
+
+        Response.Headers.Add("X-Pagination",
+            JsonSerializer.Serialize(paginationMetadata));
 
         return Ok(queryResponse);
     }
 
 
     /// <summary>
-    /// Cancels a test order
+    /// Gets a single TestOrder by ID.
     /// </summary>
-    [ProducesResponseType(204)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(500)]
     [Authorize]
-    [Produces("application/json")]
-    [HttpPut("{testOrderId:guid}/cancel", Name = "CancelTestOrder")]
-    public async Task<IActionResult> CancelTestOrder(Guid testOrderId, [FromBody] CancelTestOrderDto cancelTestOrderDto)
+    [HttpGet("{id:guid}", Name = "GetTestOrder")]
+    public async Task<ActionResult<TestOrderDto>> GetTestOrder(Guid id)
     {
-        var command = new CancelTestOrder.Command(testOrderId, cancelTestOrderDto.Reason, cancelTestOrderDto.Comments);
-        await _mediator.Send(command);
-        return NoContent();
+        var query = new GetTestOrder.Query(id);
+        var queryResponse = await _mediator.Send(query);
+        return Ok(queryResponse);
     }
 
 
     /// <summary>
-    /// Sets a given sample on a test order
+    /// Creates a new TestOrder record.
     /// </summary>
-    [ProducesResponseType(204)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(500)]
     [Authorize]
-    [Produces("application/json")]
-    [HttpPut("{testOrderId:guid}/SetSample/{sampleId:guid}", Name = "SetSampleOnTestOrder")]
-    public async Task<IActionResult> SetSampleOnTestOrder(Guid testOrderId, Guid sampleId)
+    [HttpPost(Name = "AddTestOrder")]
+    public async Task<ActionResult<TestOrderDto>> AddTestOrder([FromBody]TestOrderForCreationDto testOrderForCreation)
     {
-        var command = new SetSampleOnTestOrder.Command(testOrderId, sampleId);
-        await _mediator.Send(command);
-        return NoContent();
-    }
+        var command = new AddTestOrder.Command(testOrderForCreation.TestId, testOrderForCreation.PanelId);
+        var commandResponse = await _mediator.Send(command);
 
-
-    /// <summary>
-    /// Removes the sample a test order when present
-    /// </summary>
-    [ProducesResponseType(204)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(500)]
-    [Authorize]
-    [Produces("application/json")]
-    [HttpPut("{testOrderId:guid}/RemoveSample", Name = "RemoveSampleOnTestOrder")]
-    public async Task<IActionResult> RemoveSampleOnTestOrder(Guid testOrderId)
-    {
-        var command = new RemoveSampleOnTestOrder.Command(testOrderId);
-        await _mediator.Send(command);
-        return NoContent();
+        return CreatedAtRoute("GetTestOrder",
+            new { commandResponse.Id },
+            commandResponse);
     }
 
     // endpoint marker - do not delete this comment

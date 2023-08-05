@@ -5,13 +5,13 @@ using PeakLims.FunctionalTests.TestUtilities;
 using PeakLims.Domain;
 using SharedKernel.Domain;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 using System.Net;
 using System.Threading.Tasks;
 
 public class GetPatientListTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task get_patient_list_returns_success_using_valid_auth_credentials()
     {
         // Arrange
@@ -27,7 +27,7 @@ public class GetPatientListTests : TestBase
         result.StatusCode.Should().Be(HttpStatusCode.OK);
     }
             
-    [Test]
+    [Fact]
     public async Task get_patient_list_returns_unauthorized_without_valid_token()
     {
         // Arrange
@@ -40,7 +40,7 @@ public class GetPatientListTests : TestBase
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
             
-    [Test]
+    [Fact]
     public async Task get_patient_list_returns_forbidden_without_proper_scope()
     {
         // Arrange

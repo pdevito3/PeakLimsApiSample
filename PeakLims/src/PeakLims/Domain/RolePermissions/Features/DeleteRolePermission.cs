@@ -9,17 +9,17 @@ using MediatR;
 
 public static class DeleteRolePermission
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
 
-        public Command(Guid rolePermission)
+        public Command(Guid id)
         {
-            Id = rolePermission;
+            Id = id;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IRolePermissionRepository _rolePermissionRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -32,14 +32,13 @@ public static class DeleteRolePermission
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanDeleteRolePermissions);
 
             var recordToDelete = await _rolePermissionRepository.GetById(request.Id, cancellationToken: cancellationToken);
-
             _rolePermissionRepository.Remove(recordToDelete);
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

@@ -5,7 +5,7 @@ using PeakLims.Domain.Users.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetUser
@@ -23,12 +23,10 @@ public static class GetUser
     public sealed class Handler : IRequestHandler<Query, UserDto>
     {
         private readonly IUserRepository _userRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IUserRepository userRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IUserRepository userRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _userRepository = userRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetUser
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadUsers);
 
             var result = await _userRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<UserDto>(result);
+            return result.ToUserDto();
         }
     }
 }

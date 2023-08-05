@@ -5,7 +5,7 @@ using PeakLims.Domain.HealthcareOrganizations.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetHealthcareOrganization
@@ -23,12 +23,10 @@ public static class GetHealthcareOrganization
     public sealed class Handler : IRequestHandler<Query, HealthcareOrganizationDto>
     {
         private readonly IHealthcareOrganizationRepository _healthcareOrganizationRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IHealthcareOrganizationRepository healthcareOrganizationRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IHealthcareOrganizationRepository healthcareOrganizationRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _healthcareOrganizationRepository = healthcareOrganizationRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetHealthcareOrganization
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadHealthcareOrganizations);
 
             var result = await _healthcareOrganizationRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<HealthcareOrganizationDto>(result);
+            return result.ToHealthcareOrganizationDto();
         }
     }
 }

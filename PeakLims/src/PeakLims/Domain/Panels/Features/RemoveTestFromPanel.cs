@@ -5,7 +5,6 @@ using PeakLims.Domain.Panels.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
 using MediatR;
 using PeakLims.Services;
 using TestOrders.Services;
@@ -46,8 +45,8 @@ public static class RemoveTestFromPanel
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanRemoveTestFromPanel);
 
-            var panel = await _panelRepository.GetById(request.PanelId, cancellationToken: cancellationToken);
-            var test = await _testRepository.GetById(request.TestId, cancellationToken: cancellationToken);
+            var panel = await _panelRepository.GetById(request.PanelId, true, cancellationToken);
+            var test = await _testRepository.GetById(request.TestId, true, cancellationToken);
             panel.RemoveTest(test, _testOrderRepository);
             await _unitOfWork.CommitChanges(cancellationToken);
             

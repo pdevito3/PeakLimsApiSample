@@ -4,15 +4,16 @@ using PeakLims.Domain.AccessionComments;
 using PeakLims.Domain.AccessionComments.Dtos;
 using PeakLims.Domain.AccessionComments.Services;
 using PeakLims.Services;
+using PeakLims.Domain.AccessionComments.Models;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class UpdateAccessionComment
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid AccessionCommentId;
         public readonly string Comment;
@@ -24,7 +25,7 @@ public static class UpdateAccessionComment
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IAccessionCommentRepository _accessionCommentRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -37,7 +38,7 @@ public static class UpdateAccessionComment
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdateAccessionComments);
 
@@ -46,8 +47,7 @@ public static class UpdateAccessionComment
             accessionCommentToUpdate.Update(request.Comment, out var newComment, out var archivedComment);
             await _accessionCommentRepository.Add(newComment, cancellationToken);
             _accessionCommentRepository.Update(archivedComment);
-            
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

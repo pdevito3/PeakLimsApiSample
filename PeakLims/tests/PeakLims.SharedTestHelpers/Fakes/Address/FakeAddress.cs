@@ -1,6 +1,6 @@
 namespace PeakLims.SharedTestHelpers.Fakes.Address;
 
-using Domain.Addresses.Dtos;
+using PeakLims.Domain.Addresses.Dtos;
 using PeakLims.Domain.Addresses;
 
 public class FakeAddress

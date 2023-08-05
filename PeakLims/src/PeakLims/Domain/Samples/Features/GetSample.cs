@@ -5,7 +5,7 @@ using PeakLims.Domain.Samples.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetSample
@@ -23,12 +23,10 @@ public static class GetSample
     public sealed class Handler : IRequestHandler<Query, SampleDto>
     {
         private readonly ISampleRepository _sampleRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(ISampleRepository sampleRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(ISampleRepository sampleRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _sampleRepository = sampleRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetSample
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadSamples);
 
             var result = await _sampleRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<SampleDto>(result);
+            return result.ToSampleDto();
         }
     }
 }

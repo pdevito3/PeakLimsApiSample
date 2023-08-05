@@ -49,10 +49,20 @@ namespace SharedKernel.Exceptions
         }
 
         public IDictionary<string, string[]> Errors { get; }
-        
+
         public static void ThrowWhenNullOrEmpty(string value, string message)
         {
             if (string.IsNullOrEmpty(value))
+                throw new ValidationException(message);
+        }
+        public static void ThrowWhenNullOrWhitespace(string value, string message)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException(message);
+        }
+        public static void ThrowWhenEmpty(Guid value, string message)
+        {
+            if (value == Guid.Empty)
                 throw new ValidationException(message);
         }
         public static void ThrowWhenNullOrEmpty(Guid? value, string message)
@@ -60,12 +70,12 @@ namespace SharedKernel.Exceptions
             if (value == null || value == Guid.Empty)
                 throw new ValidationException(message);
         }
-        public static void ThrowWhenNull(object value, string message)
+        public static void ThrowWhenNull(int? value, string message)
         {
             if (value == null)
                 throw new ValidationException(message);
         }
-        public static void ThrowWhenNull(int? value, string message)
+        public static void ThrowWhenNull(object value, string message)
         {
             if (value == null)
                 throw new ValidationException(message);
@@ -75,24 +85,10 @@ namespace SharedKernel.Exceptions
             if(!condition)
                 throw new ValidationException(message);
         }
-    }
-
-    public static class Extensions
-    {
-        public static void ThrowWhenNullOrEmpty(this ValidationException exception, string value)
+        public static void MustNot(bool condition, string message)
         {
-            if (string.IsNullOrEmpty(value))
-                throw exception;
-        }
-        public static void ThrowWhenNullOrEmpty(this ValidationException exception, Guid? value)
-        {
-            if (value == null || value == Guid.Empty)
-                throw exception;
-        }
-        public static void ThrowWhenNull(this ValidationException exception, object value)
-        {
-            if (value == null)
-                throw exception;
+            if (condition)
+                throw new ValidationException(message);
         }
     }
 }

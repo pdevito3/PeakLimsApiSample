@@ -3,11 +3,12 @@ namespace PeakLims.Domain.RolePermissions.Features;
 using PeakLims.Domain.RolePermissions.Services;
 using PeakLims.Domain.RolePermissions;
 using PeakLims.Domain.RolePermissions.Dtos;
+using PeakLims.Domain.RolePermissions.Models;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class AddRolePermission
@@ -26,12 +27,10 @@ public static class AddRolePermission
     {
         private readonly IRolePermissionRepository _rolePermissionRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IRolePermissionRepository rolePermissionRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IRolePermissionRepository rolePermissionRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _rolePermissionRepository = rolePermissionRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
@@ -41,13 +40,13 @@ public static class AddRolePermission
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddRolePermissions);
 
-            var rolePermission = RolePermission.Create(request.RolePermissionToAdd);
-            await _rolePermissionRepository.Add(rolePermission, cancellationToken);
+            var rolePermissionToAdd = request.RolePermissionToAdd.ToRolePermissionForCreation();
+            var rolePermission = RolePermission.Create(rolePermissionToAdd);
 
+            await _rolePermissionRepository.Add(rolePermission, cancellationToken);
             await _unitOfWork.CommitChanges(cancellationToken);
 
-            var rolePermissionAdded = await _rolePermissionRepository.GetById(rolePermission.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<RolePermissionDto>(rolePermissionAdded);
+            return rolePermission.ToRolePermissionDto();
         }
     }
 }

@@ -2,30 +2,30 @@ namespace PeakLims.Domain.Containers.Features;
 
 using PeakLims.Domain.Containers;
 using PeakLims.Domain.Containers.Dtos;
-using PeakLims.Domain.Containers.Validators;
 using PeakLims.Domain.Containers.Services;
 using PeakLims.Services;
+using PeakLims.Domain.Containers.Models;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class UpdateContainer
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
-        public readonly ContainerForUpdateDto ContainerToUpdate;
+        public readonly ContainerForUpdateDto UpdatedContainerData;
 
-        public Command(Guid container, ContainerForUpdateDto newContainerData)
+        public Command(Guid id, ContainerForUpdateDto updatedContainerData)
         {
-            Id = container;
-            ContainerToUpdate = newContainerData;
+            Id = id;
+            UpdatedContainerData = updatedContainerData;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly IContainerRepository _containerRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -38,15 +38,16 @@ public static class UpdateContainer
             _heimGuard = heimGuard;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdateContainers);
 
             var containerToUpdate = await _containerRepository.GetById(request.Id, cancellationToken: cancellationToken);
+            var containerToAdd = request.UpdatedContainerData.ToContainerForUpdate();
+            containerToUpdate.Update(containerToAdd);
 
-            containerToUpdate.Update(request.ContainerToUpdate);
             _containerRepository.Update(containerToUpdate);
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

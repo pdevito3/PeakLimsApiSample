@@ -1,22 +1,29 @@
 namespace PeakLims.Extensions.Application;
 
+using PeakLims.Middleware;
+using PeakLims.Services;
+using Configurations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Resources;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using PeakLims.Middleware;
 
 public static class SwaggerAppExtension
 {
-    public static void UseSwaggerExtension(this IApplicationBuilder app)
+    public static void UseSwaggerExtension(this IApplicationBuilder app, IConfiguration configuration, IWebHostEnvironment env)
     {
-        app.UseSwagger();
-        app.UseSwaggerUI(config =>
+        if (!env.IsEnvironment(Consts.Testing.FunctionalTestingEnvName))
         {
-            config.SwaggerEndpoint("/swagger/v1/swagger.json", "");
-            config.DocExpansion(DocExpansion.None);
-            config.OAuthClientId(Environment.GetEnvironmentVariable("AUTH_CLIENT_ID"));
-            config.OAuthClientSecret(Environment.GetEnvironmentVariable("AUTH_CLIENT_SECRET"));
+            app.UseSwagger();
+            app.UseSwaggerUI(config =>
+            {
+                config.SwaggerEndpoint("/swagger/v1/swagger.json", "");
+                config.DocExpansion(DocExpansion.None);
+            var authOptions = configuration.GetAuthOptions();
+            config.OAuthClientId(authOptions.ClientId);
+            config.OAuthClientSecret(authOptions.ClientSecret);
             config.OAuthUsePkce();
-        });
+            });
+        }
     }
 }

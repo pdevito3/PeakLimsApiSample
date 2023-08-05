@@ -4,23 +4,23 @@ using PeakLims.SharedTestHelpers.Fakes.User;
 using PeakLims.Domain.Users.Features;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using SharedKernel.Exceptions;
 using System.Threading.Tasks;
-using static TestFixture;
 
 public class UserQueryTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_get_existing_user_with_accurate_props()
     {
         // Arrange
-        var fakeUserOne = FakeUser.Generate(new FakeUserForCreationDto().Generate());
-        await InsertAsync(fakeUserOne);
+        var testingServiceScope = new TestingServiceScope();
+        var fakeUserOne = new FakeUserBuilder().Build();
+        await testingServiceScope.InsertAsync(fakeUserOne);
 
         // Act
         var query = new GetUser.Query(fakeUserOne.Id);
-        var user = await SendAsync(query);
+        var user = await testingServiceScope.SendAsync(query);
 
         // Assert
         user.FirstName.Should().Be(fakeUserOne.FirstName);
@@ -30,15 +30,16 @@ public class UserQueryTests : TestBase
         user.Email.Should().Be(fakeUserOne.Email.Value);
     }
 
-    [Test]
+    [Fact]
     public async Task get_user_throws_notfound_exception_when_record_does_not_exist()
     {
         // Arrange
+        var testingServiceScope = new TestingServiceScope();
         var badId = Guid.NewGuid();
 
         // Act
         var query = new GetUser.Query(badId);
-        Func<Task> act = () => SendAsync(query);
+        Func<Task> act = () => testingServiceScope.SendAsync(query);
 
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();

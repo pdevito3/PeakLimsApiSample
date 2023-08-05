@@ -7,7 +7,7 @@ using PeakLims.Domain.Accessions.Features;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
 using Domain.Accessions;
 using static TestFixture;
@@ -17,22 +17,23 @@ using Services;
 
 public class SetAccessionHealthcareOrganizationCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_update_existing_accession_in_db()
     {
         // Arrange
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        await InsertAsync(fakeHealthcareOrganizationOne);
+        var testingServiceScope = new TestingServiceScope();
+        var fakeHealthcareOrganizationOne = new FakeHealthcareOrganizationBuilder().Build();
+        await testingServiceScope.InsertAsync(fakeHealthcareOrganizationOne);
 
         var fakeAccessionOne = Accession.Create();
-        await InsertAsync(fakeAccessionOne);
+        await testingServiceScope.InsertAsync(fakeAccessionOne);
 
         // Act
         var command = new SetAccessionHealthcareOrganization.Command(fakeAccessionOne.Id, fakeHealthcareOrganizationOne.Id);
-        await SendAsync(command);
-        var updatedAccession = await ExecuteDbContextAsync(db => db.Accessions.FirstOrDefaultAsync(a => a.Id == fakeAccessionOne.Id));
+        await testingServiceScope.SendAsync(command);
+        var updatedAccession = await testingServiceScope.ExecuteDbContextAsync(db => db.Accessions.FirstOrDefaultAsync(a => a.Id == fakeAccessionOne.Id));
 
         // Assert
-        updatedAccession.HealthcareOrganizationId.Should().Be(fakeHealthcareOrganizationOne.Id);
+        updatedAccession.HealthcareOrganization.Id.Should().Be(fakeHealthcareOrganizationOne.Id);
     }
 }

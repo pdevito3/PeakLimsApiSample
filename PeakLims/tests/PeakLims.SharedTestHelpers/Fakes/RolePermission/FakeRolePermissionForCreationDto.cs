@@ -4,8 +4,9 @@ using AutoBogus;
 using PeakLims.Domain;
 using PeakLims.Domain.RolePermissions.Dtos;
 using PeakLims.Domain.Roles;
+using PeakLims.Domain.RolePermissions.Models;
 
-public class FakeRolePermissionForCreationDto : AutoFaker<RolePermissionForCreationDto>
+public sealed class FakeRolePermissionForCreationDto : AutoFaker<RolePermissionForCreationDto>
 {
     public FakeRolePermissionForCreationDto()
     {

@@ -5,35 +5,45 @@ using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganizationContact;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.HealthcareOrganizationContacts.Features;
 using FluentAssertions;
-using NUnit.Framework;
+using Domain;
+using Xunit;
 using System.Threading.Tasks;
-using static TestFixture;
-using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 
 public class HealthcareOrganizationContactListQueryTests : TestBase
 {
     
-    [Test]
+    [Fact]
     public async Task can_get_healthcareorganizationcontact_list()
     {
         // Arrange
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        var fakeHealthcareOrganizationTwo = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        await InsertAsync(fakeHealthcareOrganizationOne, fakeHealthcareOrganizationTwo);
-
-        var fakeHealthcareOrganizationContactOne = FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto()
-            .RuleFor(h => h.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
-        var fakeHealthcareOrganizationContactTwo = FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto()
-            .RuleFor(h => h.HealthcareOrganizationId, _ => fakeHealthcareOrganizationTwo.Id).Generate());
+        var testingServiceScope = new TestingServiceScope();
+        var fakeHealthcareOrganizationContactOne = new FakeHealthcareOrganizationContactBuilder().Build();
+        var fakeHealthcareOrganizationContactTwo = new FakeHealthcareOrganizationContactBuilder().Build();
         var queryParameters = new HealthcareOrganizationContactParametersDto();
 
-        await InsertAsync(fakeHealthcareOrganizationContactOne, fakeHealthcareOrganizationContactTwo);
+        await testingServiceScope.InsertAsync(fakeHealthcareOrganizationContactOne, fakeHealthcareOrganizationContactTwo);
 
         // Act
         var query = new GetHealthcareOrganizationContactList.Query(queryParameters);
-        var healthcareOrganizationContacts = await SendAsync(query);
+        var healthcareOrganizationContacts = await testingServiceScope.SendAsync(query);
 
         // Assert
         healthcareOrganizationContacts.Count.Should().BeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanReadHealthcareOrganizationContacts);
+        var queryParameters = new HealthcareOrganizationContactParametersDto();
+
+        // Act
+        var command = new GetHealthcareOrganizationContactList.Query(queryParameters);
+        Func<Task> act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

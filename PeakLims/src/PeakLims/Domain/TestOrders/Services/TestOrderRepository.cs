@@ -5,7 +5,6 @@ using Panels;
 using PeakLims.Domain.TestOrders;
 using PeakLims.Databases;
 using PeakLims.Services;
-using Tests;
 
 public interface ITestOrderRepository : IGenericRepository<TestOrder>
 {
@@ -24,7 +23,7 @@ public sealed class TestOrderRepository : GenericRepository<TestOrder>, ITestOrd
 
     public void CleanupOrphanedTestOrders()
     {
-        var testOrders = _dbContext.TestOrders.Where(x => x.AccessionId == null).ToList();
+        var testOrders = _dbContext.TestOrders.Where(x => x.Accession == null).ToList();
         _dbContext.TestOrders.RemoveRange(testOrders);
     }
 
@@ -33,6 +32,6 @@ public sealed class TestOrderRepository : GenericRepository<TestOrder>, ITestOrd
         return _dbContext.TestOrders
             .Include(x => x.Accession)
             .Include(x => x.AssociatedPanel)
-            .Any(x => x.AccessionId != null && x.AssociatedPanel == panel);
+            .Any(x => x.Accession != null && x.AssociatedPanel == panel);
     }
 }

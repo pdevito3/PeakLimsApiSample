@@ -6,28 +6,28 @@ using SharedKernel.Exceptions;
 using PeakLims.Domain.Users.Features;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
-using static TestFixture;
 
 public class UpdateUserCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_update_existing_user_in_db()
     {
         // Arrange
-        var fakeUserOne = FakeUser.Generate(new FakeUserForCreationDto().Generate());
+        var testingServiceScope = new TestingServiceScope();
+        var fakeUserOne = new FakeUserBuilder().Build();
         var updatedUserDto = new FakeUserForUpdateDto().Generate();
-        await InsertAsync(fakeUserOne);
+        await testingServiceScope.InsertAsync(fakeUserOne);
 
-        var user = await ExecuteDbContextAsync(db => db.Users
+        var user = await testingServiceScope.ExecuteDbContextAsync(db => db.Users
             .FirstOrDefaultAsync(u => u.Id == fakeUserOne.Id));
         var id = user.Id;
 
         // Act
         var command = new UpdateUser.Command(id, updatedUserDto);
-        await SendAsync(command);
-        var updatedUser = await ExecuteDbContextAsync(db => db.Users.FirstOrDefaultAsync(u => u.Id == id));
+        await testingServiceScope.SendAsync(command);
+        var updatedUser = await testingServiceScope.ExecuteDbContextAsync(db => db.Users.FirstOrDefaultAsync(u => u.Id == id));
 
         // Assert
         updatedUser?.FirstName.Should().Be(updatedUserDto.FirstName);

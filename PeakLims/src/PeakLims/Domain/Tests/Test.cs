@@ -1,57 +1,47 @@
 namespace PeakLims.Domain.Tests;
 
-using PeakLims.Domain.Tests.Dtos;
-using PeakLims.Domain.Tests.Validators;
+using SharedKernel.Exceptions;
+using PeakLims.Domain.Panels;
+using PeakLims.Domain.Tests.Models;
 using PeakLims.Domain.Tests.DomainEvents;
 using FluentValidation;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
-using Sieve.Attributes;
-using PeakLims.Domain.Panels;
-using Services;
 using TestStatuses;
-using ValidationException = SharedKernel.Exceptions.ValidationException;
 
 public class Test : BaseEntity
 {
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string TestCode { get; private set; }
+    public string TestCode { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string TestName { get; private set; }
+    public string TestName { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string Methodology { get; private set; }
+    public string Methodology { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string Platform { get; private set; }
+    public string Platform { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual int Version { get; private set; }
+    public int Version { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual int TurnAroundTime { get; private set; }
+    public int TurnAroundTime { get; private set; }
 
-    public virtual TestStatus Status { get; private set; }
+    public TestStatus Status { get; private set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<Panel> Panels { get; private set; }
+    public IReadOnlyCollection<Panel> Panels { get; }
+
+    // Add Props Marker -- Deleting this comment will cause the add props utility to be incomplete
 
 
-    public static Test Create(TestForCreationDto testForCreationDto, ITestRepository testRepository)
+    public static Test Create(TestForCreation testForCreation)
     {
-        new TestForCreationDtoValidator().ValidateAndThrow(testForCreationDto);
-        GuardWhenExists(testForCreationDto.TestCode, testForCreationDto.Version, testRepository);
-
         var newTest = new Test();
-        
-        newTest.TestCode = testForCreationDto.TestCode;
-        newTest.TestName = testForCreationDto.TestName;
-        newTest.TurnAroundTime = testForCreationDto.TurnAroundTime;
-        newTest.Methodology = testForCreationDto.Methodology;
-        newTest.Platform = testForCreationDto.Platform;
-        newTest.Version = testForCreationDto.Version;
+
+        newTest.TestCode = testForCreation.TestCode;
+        newTest.TestName = testForCreation.TestName;
+        newTest.Methodology = testForCreation.Methodology;
+        newTest.Platform = testForCreation.Platform;
+        newTest.Version = 1;
+        newTest.TurnAroundTime = testForCreation.TurnAroundTime;
         newTest.Status = TestStatus.Draft();
 
         newTest.QueueDomainEvent(new TestCreated(){ Test = newTest });
@@ -59,29 +49,20 @@ public class Test : BaseEntity
         return newTest;
     }
 
-    public static void GuardWhenExists(string testCode, int version, ITestRepository testRepository)
+    public Test Update(TestForUpdate testForUpdate)
     {
-        if (Exists(testCode, version, testRepository))
-            throw new ValidationException(nameof(Test),
-                $"A test with the given test code ('{testCode}') and version ('{version}') already exists.");
-    }
-
-    public static bool Exists(string testCode, int version, ITestRepository testRepository) => testRepository.Exists(testCode, version);
-
-    public void Update(TestForUpdateDto testForUpdateDto, ITestRepository testRepository)
-    {
-        new TestForUpdateDtoValidator().ValidateAndThrow(testForUpdateDto);
-        GuardWhenExists(TestCode, testForUpdateDto.Version, testRepository);
+        TestCode = testForUpdate.TestCode;
+        TestName = testForUpdate.TestName;
+        Methodology = testForUpdate.Methodology;
+        Platform = testForUpdate.Platform;
+        TurnAroundTime = testForUpdate.TurnAroundTime;
         
-        TestName = testForUpdateDto.TestName;
-        TurnAroundTime = testForUpdateDto.TurnAroundTime;
-        Methodology = testForUpdateDto.Methodology;
-        Platform = testForUpdateDto.Platform;
-        Version = testForUpdateDto.Version;
+        // TODO figure out how i want to bump versions on updates and based on state of the test
 
         QueueDomainEvent(new TestUpdated(){ Id = Id });
+        return this;
     }
-
+    
     public Test Activate()
     {
         if (Status == TestStatus.Active())
@@ -101,6 +82,8 @@ public class Test : BaseEntity
         QueueDomainEvent(new TestUpdated(){ Id = Id });
         return this;
     }
+    
+    // Add Prop Methods Marker -- Deleting this comment will cause the add props utility to be incomplete
     
     protected Test() { } // For EF + Mocking
 }

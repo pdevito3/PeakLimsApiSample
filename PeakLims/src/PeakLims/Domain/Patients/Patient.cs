@@ -1,63 +1,87 @@
 namespace PeakLims.Domain.Patients;
 
-using Ethnicities;
-using PeakLims.Domain.Patients.Dtos;
-using PeakLims.Domain.Patients.Validators;
+using SharedKernel.Exceptions;
+using PeakLims.Domain.Accessions;
+using PeakLims.Domain.Patients.Models;
 using PeakLims.Domain.Patients.DomainEvents;
 using FluentValidation;
+using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
+using Ethnicities;
 using Lifespans;
-using PeakLims.Services;
+using PeakLims.Domain.Samples;
+using PeakLims.Domain.Samples.Models;
 using Races;
 using Sexes;
-using Sieve.Attributes;
 
 public class Patient : BaseEntity
 {
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string FirstName { get; private set; }
+    public string FirstName { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string LastName { get; private set; }
+    public string LastName { get; private set; }
+    
     public virtual Lifespan Lifespan { get; private set; }
-    public virtual Sex Sex { get; private set; }
-    public virtual Race Race { get; private set; }
-    public virtual Ethnicity Ethnicity { get; private set; }
 
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string InternalId { get; }
+    public Sex Sex { get; private set; }
+
+    public Race Race { get; private set; }
+
+    public Ethnicity Ethnicity { get; private set; }
+
+    public string InternalId { get; }
+
+    private readonly List<Sample> _sample = new();
+    public IReadOnlyCollection<Sample> Samples => _sample.AsReadOnly();
+
+    public IReadOnlyCollection<Accession> Accessions { get; }
+
+    // Add Props Marker -- Deleting this comment will cause the add props utility to be incomplete
 
 
-    public static Patient Create(PatientForCreationDto patientForCreationDto, IDateTimeProvider dateTimeProvider)
+    public static Patient Create(PatientForCreation patientForCreation)
     {
-        new PatientForCreationDtoValidator().ValidateAndThrow(patientForCreationDto);
-
         var newPatient = new Patient();
 
-        newPatient.FirstName = patientForCreationDto.FirstName;
-        newPatient.LastName = patientForCreationDto.LastName;
-        newPatient.Lifespan = new Lifespan(patientForCreationDto.Lifespan.Age, patientForCreationDto.Lifespan.DateOfBirth, dateTimeProvider);
-        newPatient.Race = new Race(patientForCreationDto.Race);
-        newPatient.Ethnicity = new Ethnicity(patientForCreationDto.Ethnicity);
-        newPatient.Sex = new Sex(patientForCreationDto.Sex);
+        newPatient.FirstName = patientForCreation.FirstName;
+        newPatient.LastName = patientForCreation.LastName;
+        newPatient.Lifespan = new Lifespan(patientForCreation.Age, patientForCreation.DateOfBirth);
+        newPatient.Sex = Sex.Of(patientForCreation.Sex);
+        newPatient.Race = Race.Of(patientForCreation.Race);
+        newPatient.Ethnicity = Ethnicity.Of(patientForCreation.Ethnicity);
 
         newPatient.QueueDomainEvent(new PatientCreated(){ Patient = newPatient });
         
         return newPatient;
     }
 
-    public void Update(PatientForUpdateDto patientForUpdateDto, IDateTimeProvider dateTimeProvider)
+    public Patient Update(PatientForUpdate patientForUpdate)
     {
-        new PatientForUpdateDtoValidator().ValidateAndThrow(patientForUpdateDto);
-
-        FirstName = patientForUpdateDto.FirstName;
-        LastName = patientForUpdateDto.LastName;
-        Lifespan = new Lifespan(patientForUpdateDto.Lifespan.Age, patientForUpdateDto.Lifespan.DateOfBirth, dateTimeProvider);
-        Race = new Race(patientForUpdateDto.Race);
-        Ethnicity = new Ethnicity(patientForUpdateDto.Ethnicity);
-        Sex = new Sex(patientForUpdateDto.Sex);
+        FirstName = patientForUpdate.FirstName;
+        LastName = patientForUpdate.LastName;
+        Lifespan = new Lifespan(patientForUpdate.Age, patientForUpdate.DateOfBirth);
+        Sex = Sex.Of(patientForUpdate.Sex);
+        Race = Race.Of(patientForUpdate.Race);
+        Ethnicity = Ethnicity.Of(patientForUpdate.Ethnicity);
 
         QueueDomainEvent(new PatientUpdated(){ Id = Id });
+        return this;
     }
+
+    public Patient AddSample(Sample sample)
+    {
+        _sample.Add(sample);
+        return this;
+    }
+    
+    public Patient RemoveSample(Sample sample)
+    {
+        _sample.Remove(sample);
+        return this;
+    }
+
+    // Add Prop Methods Marker -- Deleting this comment will cause the add props utility to be incomplete
     
     protected Patient() { } // For EF + Mocking
 }

@@ -4,24 +4,18 @@ using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganizationContact;
 using PeakLims.FunctionalTests.TestUtilities;
 using PeakLims.Domain;
 using SharedKernel.Domain;
-using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 using System.Net;
 using System.Threading.Tasks;
 
 public class CreateHealthcareOrganizationContactTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task create_healthcareorganizationcontact_returns_created_using_valid_dto_and_valid_auth_credentials()
     {
         // Arrange
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        await InsertAsync(fakeHealthcareOrganizationOne);
-
-        var fakeHealthcareOrganizationContact = new FakeHealthcareOrganizationContactForCreationDto()
-            .RuleFor(h => h.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id)
-            .Generate();
+        var fakeHealthcareOrganizationContact = new FakeHealthcareOrganizationContactForCreationDto().Generate();
 
         var user = await AddNewSuperAdmin();
         FactoryClient.AddAuth(user.Identifier);
@@ -34,7 +28,7 @@ public class CreateHealthcareOrganizationContactTests : TestBase
         result.StatusCode.Should().Be(HttpStatusCode.Created);
     }
             
-    [Test]
+    [Fact]
     public async Task create_healthcareorganizationcontact_returns_unauthorized_without_valid_token()
     {
         // Arrange
@@ -48,7 +42,7 @@ public class CreateHealthcareOrganizationContactTests : TestBase
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
             
-    [Test]
+    [Fact]
     public async Task create_healthcareorganizationcontact_returns_forbidden_without_proper_scope()
     {
         // Arrange

@@ -5,7 +5,7 @@ using PeakLims.Domain.Patients.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetPatient
@@ -23,12 +23,10 @@ public static class GetPatient
     public sealed class Handler : IRequestHandler<Query, PatientDto>
     {
         private readonly IPatientRepository _patientRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IPatientRepository patientRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IPatientRepository patientRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _patientRepository = patientRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetPatient
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadPatients);
 
             var result = await _patientRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<PatientDto>(result);
+            return result.ToPatientDto();
         }
     }
 }

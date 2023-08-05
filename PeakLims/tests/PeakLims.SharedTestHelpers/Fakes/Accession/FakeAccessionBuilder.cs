@@ -4,50 +4,23 @@ using Domain.HealthcareOrganizationContacts;
 using Domain.HealthcareOrganizations;
 using Domain.Panels;
 using Domain.Patients;
-using Domain.TestOrders;
 using Domain.Tests;
-using Domain.Tests.Services;
+using HealthcareOrganization;
 using HealthcareOrganizationContact;
-using Moq;
+using Panel;
+using Patient;
 using PeakLims.Domain.Accessions;
-using PeakLims.Domain.Accessions.Dtos;
+using Sample;
 using Test;
-using TestOrder;
 
-public class FakeAccessionBuilder :
-    ITestRepositorySetterStage
+public class FakeAccessionBuilder
 {
-    private readonly List<HealthcareOrganizationContact> _contacts = new List<HealthcareOrganizationContact>();
-    private readonly List<Panel> _panels = new List<Panel>();
-    private readonly List<Test> _tests = new List<Test>();
-    private bool _includeATestOrder = true;
-    private bool _includeAContact = true;
+    private List<Panel> _panels = new List<Panel>();
+    private List<Test> _tests = new List<Test>();
     private Patient _patient = null;
-    private HealthcareOrganization _org = null;
-    private ITestRepository _testRepository = null;
+    private HealthcareOrganization _healthcareOrganization = null;
+    private HealthcareOrganizationContact _healthcareOrganizationContact = null;
 
-    private FakeAccessionBuilder() { }
-    
-    public static ITestRepositorySetterStage Initialize() => new FakeAccessionBuilder();
-
-    public FakeAccessionBuilder WithPatient(Patient patient)
-    {
-        _patient = patient;
-        return this;
-    }
-    
-    public FakeAccessionBuilder WithHealthcareOrganization(HealthcareOrganization org)
-    {
-        _org = org;
-        return this;
-    }
-    
-    public FakeAccessionBuilder WithContact(HealthcareOrganizationContact contact)
-    {
-        _contacts.Add(contact);
-        return this;
-    }
-    
     public FakeAccessionBuilder WithPanel(Panel panel)
     {
         _panels.Add(panel);
@@ -59,83 +32,66 @@ public class FakeAccessionBuilder :
         _tests.Add(test);
         return this;
     }
-    
-    public FakeAccessionBuilder ExcludeTestOrders()
+
+    public FakeAccessionBuilder WithRandomTest()
     {
-        _includeATestOrder = false;
+        var test = new FakeTestBuilder().Build().Activate();
+        _tests.Add(test);
         return this;
     }
     
-    public FakeAccessionBuilder ExcludeContacts()
+    public FakeAccessionBuilder WithRandomPanel()
     {
-        _includeAContact = false;
+        var panel = new FakePanelBuilder().Build().Activate();
+        _panels.Add(panel);
         return this;
     }
-    
-    public FakeAccessionBuilder WithTestRepository(ITestRepository testRepository)
+
+    public FakeAccessionBuilder WithSetupForValidReadyForTestingTransition()
     {
-        _testRepository = testRepository;
-        return this;
-    }
-    
-    public FakeAccessionBuilder WithMockTestRepository(bool testExists = false)
-    {
-        var mockTestRepository = new Mock<ITestRepository>();
-        mockTestRepository
-            .Setup(x => x.Exists(It.IsAny<string>(), It.IsAny<int>()))
-            .Returns(testExists);
+        if(_patient == null)
+            _patient = new FakePatientBuilder().Build();
         
-        _testRepository = mockTestRepository.Object;
+        if(_healthcareOrganization == null)
+            _healthcareOrganization = new FakeHealthcareOrganizationBuilder().Build().Activate();
+        
+        if(_healthcareOrganizationContact == null)
+            _healthcareOrganizationContact = new FakeHealthcareOrganizationContactBuilder().Build();
+
+        if (_tests.Count == 0)
+            WithRandomTest();
+
         return this;
     }
-    
+
     public Accession Build()
     {
-        var accession = Accession.Create();
-        if (_patient != null)
-            accession.SetPatient(_patient);
-        if (_org != null)
-        {
-            accession.SetHealthcareOrganization(_org);
-        }
-        else
-        {
-            ExcludeContacts();
-        }
-        
-        if(_contacts.Count <= 0 && _includeAContact)
-            _contacts.Add(FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto()
-                .RuleFor(x => x.HealthcareOrganizationId, _org?.Id)
-                .Generate()));
-
-        if (_tests.Count <= 0 && _panels.Count <= 0 && _includeATestOrder)
-        {
-            var test = new FakeTestBuilder()
-                .WithRepository(_testRepository)
-                .Activate()
-                .Build();
-            accession.AddTest(test);
-        }
-        
-        foreach (var contact in _contacts)
-        {
-            accession.AddContact(contact);
-        }
+        var result = Accession.Create();
         foreach (var panel in _panels)
         {
-            accession.AddPanel(panel);
+            result.AddPanel(panel);
         }
-        foreach (var testOrder in _tests)
+        foreach (var test in _tests)
         {
-            accession.AddTest(testOrder);
+            result.AddTest(test);
+            var sample = new FakeSampleBuilder().Build();
+            result.TestOrders
+                .FirstOrDefault(x => x.Test.TestCode == test.TestCode)
+                !.SetSample(sample);
         }
-
-        return accession;
+        if (_patient != null)
+        {
+            result.SetPatient(_patient);
+        }
+        if (_healthcareOrganization != null)
+        {
+            result.SetHealthcareOrganization(_healthcareOrganization);
+        }
+        if (_healthcareOrganizationContact != null)
+        {
+            result.AddContact(_healthcareOrganizationContact);
+        }
+        
+        return result;
     }
-}
-
-public interface ITestRepositorySetterStage
-{
-    public FakeAccessionBuilder WithTestRepository(ITestRepository testRepository);
-    public FakeAccessionBuilder WithMockTestRepository(bool testExists = false);
 }

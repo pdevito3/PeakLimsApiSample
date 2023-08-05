@@ -1,26 +1,20 @@
 namespace PeakLims.Domain;
 
-using Sieve.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 public abstract class BaseEntity
 {
     [Key]
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual Guid Id { get; private set; } = Guid.NewGuid();
+    public Guid Id { get; private set; } = Guid.NewGuid();
     
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual DateTime CreatedOn { get; private set; }
+    public DateTime CreatedOn { get; private set; }
     
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string CreatedBy { get; private set; }
+    public string CreatedBy { get; private set; }
     
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual DateTime? LastModifiedOn { get; private set; }
+    public DateTime? LastModifiedOn { get; private set; }
     
-    [Sieve(CanFilter = true, CanSort = true)]
-    public virtual string LastModifiedBy { get; private set; }
+    public string LastModifiedBy { get; private set; }
     public bool IsDeleted { get; private set; }
     
     [NotMapped]

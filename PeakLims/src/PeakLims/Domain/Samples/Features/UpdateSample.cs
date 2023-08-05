@@ -3,57 +3,60 @@ namespace PeakLims.Domain.Samples.Features;
 using Containers.Services;
 using PeakLims.Domain.Samples;
 using PeakLims.Domain.Samples.Dtos;
-using PeakLims.Domain.Samples.Validators;
 using PeakLims.Domain.Samples.Services;
 using PeakLims.Services;
+using PeakLims.Domain.Samples.Models;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class UpdateSample
 {
-    public sealed class Command : IRequest<bool>
+    public sealed class Command : IRequest
     {
         public readonly Guid Id;
-        public readonly SampleForUpdateDto SampleToUpdate;
+        public readonly SampleForUpdateDto UpdatedSampleData;
 
-        public Command(Guid sample, SampleForUpdateDto newSampleData)
+        public Command(Guid id, SampleForUpdateDto updatedSampleData)
         {
-            Id = sample;
-            SampleToUpdate = newSampleData;
+            Id = id;
+            UpdatedSampleData = updatedSampleData;
         }
     }
 
-    public sealed class Handler : IRequestHandler<Command, bool>
+    public sealed class Handler : IRequestHandler<Command>
     {
         private readonly ISampleRepository _sampleRepository;
-        private readonly IContainerRepository _containerRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHeimGuardClient _heimGuard;
-        private readonly IMapper _mapper;
+        private readonly IContainerRepository _containerRepository;
 
-        public Handler(ISampleRepository sampleRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard, IMapper mapper, IContainerRepository containerRepository)
+        public Handler(ISampleRepository sampleRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard, IContainerRepository containerRepository)
         {
             _sampleRepository = sampleRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
-            _mapper = mapper;
             _containerRepository = containerRepository;
         }
 
-        public async Task<bool> Handle(Command request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanUpdateSamples);
 
             var sampleToUpdate = await _sampleRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            var containerlessUpdatedSample = _mapper.Map<ContainerlessSampleForUpdateDto>(request.SampleToUpdate);
-            var container = await _containerRepository.GetById(request.SampleToUpdate.ContainerId, cancellationToken: cancellationToken);
-            sampleToUpdate.Update(containerlessUpdatedSample, container);
+            var sampleToAdd = request.UpdatedSampleData.ToSampleForUpdate();
+            sampleToUpdate.Update(sampleToAdd);
+
+            if (request.UpdatedSampleData.ContainerId != null && request.UpdatedSampleData.ContainerId != sampleToUpdate.Container?.Id)
+            {
+                var container = await _containerRepository.GetById(request.UpdatedSampleData.ContainerId.Value, true, cancellationToken);
+                sampleToUpdate.SetContainer(container);
+            }
+
             _sampleRepository.Update(sampleToUpdate);
-            
-            return await _unitOfWork.CommitChanges(cancellationToken) >= 1;
+            await _unitOfWork.CommitChanges(cancellationToken);
         }
     }
 }

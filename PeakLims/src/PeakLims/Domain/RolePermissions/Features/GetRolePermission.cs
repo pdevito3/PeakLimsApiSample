@@ -5,7 +5,7 @@ using PeakLims.Domain.RolePermissions.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class GetRolePermission
@@ -23,12 +23,10 @@ public static class GetRolePermission
     public sealed class Handler : IRequestHandler<Query, RolePermissionDto>
     {
         private readonly IRolePermissionRepository _rolePermissionRepository;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(IRolePermissionRepository rolePermissionRepository, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(IRolePermissionRepository rolePermissionRepository, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _rolePermissionRepository = rolePermissionRepository;
             _heimGuard = heimGuard;
         }
@@ -38,7 +36,7 @@ public static class GetRolePermission
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanReadRolePermissions);
 
             var result = await _rolePermissionRepository.GetById(request.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<RolePermissionDto>(result);
+            return result.ToRolePermissionDto();
         }
     }
 }

@@ -4,42 +4,51 @@ using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganizationContact;
 using PeakLims.Domain.HealthcareOrganizationContacts.Dtos;
 using SharedKernel.Exceptions;
 using PeakLims.Domain.HealthcareOrganizationContacts.Features;
+using Domain;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
-using static TestFixture;
-using PeakLims.SharedTestHelpers.Fakes.HealthcareOrganization;
 
 public class UpdateHealthcareOrganizationContactCommandTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task can_update_existing_healthcareorganizationcontact_in_db()
     {
         // Arrange
-        var fakeHealthcareOrganizationOne = FakeHealthcareOrganization.Generate(new FakeHealthcareOrganizationForCreationDto().Generate());
-        await InsertAsync(fakeHealthcareOrganizationOne);
+        var testingServiceScope = new TestingServiceScope();
+        var fakeHealthcareOrganizationContactOne = new FakeHealthcareOrganizationContactBuilder().Build();
+        var updatedHealthcareOrganizationContactDto = new FakeHealthcareOrganizationContactForUpdateDto().Generate();
+        await testingServiceScope.InsertAsync(fakeHealthcareOrganizationContactOne);
 
-        var fakeHealthcareOrganizationContactOne = FakeHealthcareOrganizationContact.Generate(new FakeHealthcareOrganizationContactForCreationDto()
-            .RuleFor(h => h.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate());
-        var updatedHealthcareOrganizationContactDto = new FakeHealthcareOrganizationContactForUpdateDto()
-            .RuleFor(h => h.HealthcareOrganizationId, _ => fakeHealthcareOrganizationOne.Id).Generate();
-        await InsertAsync(fakeHealthcareOrganizationContactOne);
-
-        var healthcareOrganizationContact = await ExecuteDbContextAsync(db => db.HealthcareOrganizationContacts
+        var healthcareOrganizationContact = await testingServiceScope.ExecuteDbContextAsync(db => db.HealthcareOrganizationContacts
             .FirstOrDefaultAsync(h => h.Id == fakeHealthcareOrganizationContactOne.Id));
-        var id = healthcareOrganizationContact.Id;
 
         // Act
-        var command = new UpdateHealthcareOrganizationContact.Command(id, updatedHealthcareOrganizationContactDto);
-        await SendAsync(command);
-        var updatedHealthcareOrganizationContact = await ExecuteDbContextAsync(db => db.HealthcareOrganizationContacts.FirstOrDefaultAsync(h => h.Id == id));
+        var command = new UpdateHealthcareOrganizationContact.Command(healthcareOrganizationContact.Id, updatedHealthcareOrganizationContactDto);
+        await testingServiceScope.SendAsync(command);
+        var updatedHealthcareOrganizationContact = await testingServiceScope.ExecuteDbContextAsync(db => db.HealthcareOrganizationContacts.FirstOrDefaultAsync(h => h.Id == healthcareOrganizationContact.Id));
 
         // Assert
-        updatedHealthcareOrganizationContact?.Name.Should().Be(updatedHealthcareOrganizationContactDto.Name);
-        updatedHealthcareOrganizationContact?.Email.Value.Should().Be(updatedHealthcareOrganizationContactDto.Email);
-        updatedHealthcareOrganizationContact?.Npi.Should().Be(updatedHealthcareOrganizationContactDto.Npi);
-        updatedHealthcareOrganizationContact?.HealthcareOrganizationId.Should().Be(updatedHealthcareOrganizationContactDto.HealthcareOrganizationId);
+        updatedHealthcareOrganizationContact.Name.Should().Be(updatedHealthcareOrganizationContactDto.Name);
+        updatedHealthcareOrganizationContact.Email.Should().Be(updatedHealthcareOrganizationContactDto.Email);
+        updatedHealthcareOrganizationContact.Npi.Should().Be(updatedHealthcareOrganizationContactDto.Npi);
+    }
+
+    [Fact]
+    public async Task must_be_permitted()
+    {
+        // Arrange
+        var testingServiceScope = new TestingServiceScope();
+        testingServiceScope.SetUserNotPermitted(Permissions.CanUpdateHealthcareOrganizationContacts);
+        var fakeHealthcareOrganizationContactOne = new FakeHealthcareOrganizationContactForUpdateDto();
+
+        // Act
+        var command = new UpdateHealthcareOrganizationContact.Command(Guid.NewGuid(), fakeHealthcareOrganizationContactOne);
+        var act = () => testingServiceScope.SendAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>();
     }
 }

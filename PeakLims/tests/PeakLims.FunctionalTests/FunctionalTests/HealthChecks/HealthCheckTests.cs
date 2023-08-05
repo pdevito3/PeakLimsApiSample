@@ -2,13 +2,13 @@ namespace PeakLims.FunctionalTests.FunctionalTests.HealthChecks;
 
 using PeakLims.FunctionalTests.TestUtilities;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 using System.Net;
 using System.Threading.Tasks;
 
 public class HealthCheckTests : TestBase
 {
-    [Test]
+    [Fact]
     public async Task health_check_returns_ok()
     {
         // Arrange

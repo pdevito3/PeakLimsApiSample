@@ -3,11 +3,12 @@ namespace PeakLims.Domain.Patients.Features;
 using PeakLims.Domain.Patients.Services;
 using PeakLims.Domain.Patients;
 using PeakLims.Domain.Patients.Dtos;
+using PeakLims.Domain.Patients.Models;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class AddPatient
@@ -26,30 +27,26 @@ public static class AddPatient
     {
         private readonly IPatientRepository _patientRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
-        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public Handler(IPatientRepository patientRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard, IDateTimeProvider dateTimeProvider)
+        public Handler(IPatientRepository patientRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _patientRepository = patientRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
-            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<PatientDto> Handle(Command request, CancellationToken cancellationToken)
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddPatients);
 
-            var patient = Patient.Create(request.PatientToAdd, _dateTimeProvider);
-            await _patientRepository.Add(patient, cancellationToken);
+            var patientToAdd = request.PatientToAdd.ToPatientForCreation();
+            var patient = Patient.Create(patientToAdd);
 
+            await _patientRepository.Add(patient, cancellationToken);
             await _unitOfWork.CommitChanges(cancellationToken);
 
-            var patientAdded = await _patientRepository.GetById(patient.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<PatientDto>(patientAdded);
+            return patient.ToPatientDto();
         }
     }
 }

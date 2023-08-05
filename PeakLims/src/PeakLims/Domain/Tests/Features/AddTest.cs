@@ -3,11 +3,12 @@ namespace PeakLims.Domain.Tests.Features;
 using PeakLims.Domain.Tests.Services;
 using PeakLims.Domain.Tests;
 using PeakLims.Domain.Tests.Dtos;
+using PeakLims.Domain.Tests.Models;
 using PeakLims.Services;
 using SharedKernel.Exceptions;
 using PeakLims.Domain;
 using HeimGuard;
-using MapsterMapper;
+using Mappings;
 using MediatR;
 
 public static class AddTest
@@ -26,12 +27,10 @@ public static class AddTest
     {
         private readonly ITestRepository _testRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHeimGuardClient _heimGuard;
 
-        public Handler(ITestRepository testRepository, IUnitOfWork unitOfWork, IMapper mapper, IHeimGuardClient heimGuard)
+        public Handler(ITestRepository testRepository, IUnitOfWork unitOfWork, IHeimGuardClient heimGuard)
         {
-            _mapper = mapper;
             _testRepository = testRepository;
             _unitOfWork = unitOfWork;
             _heimGuard = heimGuard;
@@ -41,13 +40,13 @@ public static class AddTest
         {
             await _heimGuard.MustHavePermission<ForbiddenAccessException>(Permissions.CanAddTests);
 
-            var test = Test.Create(request.TestToAdd, _testRepository);
-            await _testRepository.Add(test, cancellationToken);
+            var testToAdd = request.TestToAdd.ToTestForCreation();
+            var test = Test.Create(testToAdd);
 
+            await _testRepository.Add(test, cancellationToken);
             await _unitOfWork.CommitChanges(cancellationToken);
 
-            var testAdded = await _testRepository.GetById(test.Id, cancellationToken: cancellationToken);
-            return _mapper.Map<TestDto>(testAdded);
+            return test.ToTestDto();
         }
     }
 }
